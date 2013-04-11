@@ -6439,7 +6439,7 @@ CREATE TABLE KREW_DOC_HDR_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KREW_DOC_HDR_S auto_increment = 3015
+ALTER TABLE KREW_DOC_HDR_S auto_increment = 77302
 /
 
 # -----------------------------------------------------------------------
@@ -6621,7 +6621,7 @@ CREATE TABLE KREW_RTE_NODE_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KREW_RTE_NODE_S auto_increment = 3017
+ALTER TABLE KREW_RTE_NODE_S auto_increment = 3032
 /
 
 # -----------------------------------------------------------------------
@@ -6733,7 +6733,7 @@ CREATE TABLE KRIM_ATTR_DATA_ID_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRIM_ATTR_DATA_ID_S auto_increment = 10247
+ALTER TABLE KRIM_ATTR_DATA_ID_S auto_increment = 10282
 /
 
 # -----------------------------------------------------------------------
@@ -6999,7 +6999,7 @@ CREATE TABLE KRIM_PERM_ID_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRIM_PERM_ID_S auto_increment = 10135
+ALTER TABLE KRIM_PERM_ID_S auto_increment = 10151
 /
 
 # -----------------------------------------------------------------------
@@ -7055,7 +7055,7 @@ CREATE TABLE KRIM_ROLE_ID_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRIM_ROLE_ID_S auto_increment = 10003
+ALTER TABLE KRIM_ROLE_ID_S auto_increment = 10036
 /
 
 # -----------------------------------------------------------------------
@@ -7069,7 +7069,7 @@ CREATE TABLE KRIM_ROLE_MBR_ID_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRIM_ROLE_MBR_ID_S auto_increment = 10040
+ALTER TABLE KRIM_ROLE_MBR_ID_S auto_increment = 10042
 /
 
 # -----------------------------------------------------------------------
@@ -7083,7 +7083,7 @@ CREATE TABLE KRIM_ROLE_PERM_ID_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRIM_ROLE_PERM_ID_S auto_increment = 1246
+ALTER TABLE KRIM_ROLE_PERM_ID_S auto_increment = 1267
 /
 
 # -----------------------------------------------------------------------
@@ -7279,7 +7279,7 @@ CREATE TABLE KRMS_CMPND_PROP_PROPS_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRMS_CMPND_PROP_PROPS_S auto_increment = 10248
+ALTER TABLE KRMS_CMPND_PROP_PROPS_S auto_increment = 10252
 /
 
 # -----------------------------------------------------------------------
@@ -7447,7 +7447,7 @@ CREATE TABLE KRMS_NL_TMPL_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRMS_NL_TMPL_S auto_increment = 10128
+ALTER TABLE KRMS_NL_TMPL_S auto_increment = 10409
 /
 
 # -----------------------------------------------------------------------
@@ -7475,7 +7475,7 @@ CREATE TABLE KRMS_NL_USAGE_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRMS_NL_USAGE_S auto_increment = 10005
+ALTER TABLE KRMS_NL_USAGE_S auto_increment = 10007
 /
 
 # -----------------------------------------------------------------------
@@ -7489,7 +7489,7 @@ CREATE TABLE KRMS_PROP_PARM_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRMS_PROP_PARM_S auto_increment = 10594
+ALTER TABLE KRMS_PROP_PARM_S auto_increment = 10601
 /
 
 # -----------------------------------------------------------------------
@@ -7503,7 +7503,7 @@ CREATE TABLE KRMS_PROP_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRMS_PROP_S auto_increment = 10251
+ALTER TABLE KRMS_PROP_S auto_increment = 10254
 /
 
 # -----------------------------------------------------------------------
@@ -7559,7 +7559,7 @@ CREATE TABLE KRMS_TERM_PARM_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRMS_TERM_PARM_S auto_increment = 10211
+ALTER TABLE KRMS_TERM_PARM_S auto_increment = 10214
 /
 
 # -----------------------------------------------------------------------
@@ -7629,7 +7629,7 @@ CREATE TABLE KRMS_TERM_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRMS_TERM_S auto_increment = 10198
+ALTER TABLE KRMS_TERM_S auto_increment = 10201
 /
 
 # -----------------------------------------------------------------------
@@ -7643,7 +7643,7 @@ CREATE TABLE KRMS_TERM_SPEC_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRMS_TERM_SPEC_S auto_increment = 10013
+ALTER TABLE KRMS_TERM_SPEC_S auto_increment = 10014
 /
 
 # -----------------------------------------------------------------------
@@ -7671,7 +7671,7 @@ CREATE TABLE KRMS_TYP_RELN_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRMS_TYP_RELN_S auto_increment = 10119
+ALTER TABLE KRMS_TYP_RELN_S auto_increment = 10117
 /
 
 # -----------------------------------------------------------------------
@@ -7685,7 +7685,7 @@ CREATE TABLE KRMS_TYP_S
 	id bigint(19) not null auto_increment, primary key (id) 
 ) ENGINE MyISAM
 /
-ALTER TABLE KRMS_TYP_S auto_increment = 10076
+ALTER TABLE KRMS_TYP_S auto_increment = 10078
 /
 
 # -----------------------------------------------------------------------
