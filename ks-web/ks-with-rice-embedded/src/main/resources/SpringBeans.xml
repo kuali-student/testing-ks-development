@@ -55,7 +55,7 @@
     <import resource="classpath:ks-transaction-context.xml"/>
    	<import resource="classpath:ksb/ks-core-no-tx-context.xml"/>
     <import resource="classpath:ksb/ks-lu-no-tx-context.xml"/>
-    <import resource="classpath:ksb/ks-enroll-with-rice-embedded-context.xml"/>
+    <import resource="classpath:ksb/ks-enroll-context.xml"/>
 
     <bean id="kualiModuleService" class="org.kuali.rice.krad.service.impl.KualiModuleServiceImpl" />
 
@@ -217,6 +217,20 @@
                 <value>classpath:org/kuali/student/enrollment/check/CheckInfoCreateView.xml</value>
                 <value>classpath:org/kuali/student/enrollment/check/CheckInfoSearchView.xml</value>
                 <value>classpath:org/kuali/student/enrollment/check/CheckInfoView.xml</value>
+
+                <!-- Krms -->
+                <value>classpath:org/kuali/rice/krms/PropositionEditorView.xml</value>
+                <value>classpath:org/kuali/rice/krms/RuleEditMaintenance.xml</value>
+                <value>classpath:org/kuali/rice/krms/RuleManagementView.xml</value>
+                <value>classpath:org/kuali/rice/krms/AgendaManagementView.xml</value>
+                <value>classpath:org/kuali/student/enrollment/krms/KrmsComponentsView.xml</value>
+                <value>classpath:org/kuali/student/enrollment/krms/CORuleMaintenance.xml</value>
+                <value>classpath:org/kuali/student/enrollment/krms/CustomComponents.xml</value>
+                <value>classpath:org/kuali/student/enrollment/krms/DepartmentLookupView.xml</value>
+                <value>classpath:org/kuali/student/enrollment/krms/TestSetLookupView.xml</value>
+                <value>classpath:org/kuali/student/enrollment/krms/KRMSCourseLookupView.xml</value>
+                <value>classpath:org/kuali/student/enrollment/krms/CourseSetsLookupView.xml</value>
+                <value>classpath:org/kuali/student/enrollment/krms/KRMSProgramLookupView.xml</value>
 
                 <!-- Type -->
                 <value>classpath:org/kuali/student/enrollment/type/TypeVerificationView.xml</value>
