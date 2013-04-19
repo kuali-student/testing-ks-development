@@ -121,19 +121,6 @@ function toggleAssignButton() {
     }
 }
 
-function toggleAddAOCButton(buttonId, controlId) {
-    if ((buttonId=="moveAOCButton" && jQuery("#clusterIDListForAOMove_control").val()== "createNewCluster")
-            || buttonId=="addAOCButton") {
-        if (jQuery("#"+controlId).val() == "" ) {
-            jQuery("#"+buttonId).attr("disabled", "disabled");
-        } else {
-            jQuery("#"+buttonId).removeAttr("disabled");
-        }
-    } else {
-        jQuery("#"+buttonId).removeAttr("disabled");
-    }
-}
-
 function renameDialogButtons(labelsToReplace) {
     var checkboxes = jQuery("#kualiLightboxForm :input[name='dialogResponse']");
     jQuery.each(labelsToReplace, function (key, newLabelValue) {
@@ -340,22 +327,12 @@ function showFixedOptions(textBox, url, courseTypeKey) {
     jQuery('#div_fixed_options').show().css('top', jQuery(textBox).offset().top).css('left', jQuery(textBox).offset().left);
 }
 
-function removeCheckboxColumns(columns, componentId) {
-    var div = jQuery('#' + componentId);
-    var table = jQuery(div).find('table');
-    var tableId = jQuery(table).attr('id');
+function removeColumns(isReadOnly, columns, componentId) {
+    if (isReadOnly) {
+        var div = jQuery('#' + componentId);
+        var table = jQuery(div).find('table');
+        var tableId = jQuery(table).attr('id');
 
-    var foundCheckBox = false;
-
-    jQuery(table).find('input:checkbox').each(function(){
-        var div = jQuery(this).parent('div');
-        if(jQuery(div).is(":visible")){
-            foundCheckBox = true;
-            return false;
-        }
-    });
-
-    if (!foundCheckBox) {
         jQuery.each(columns, function (index, column) {
             var columIndex = column - index
             var th = jQuery('#' + tableId + ' thead tr').find('th:nth-child(' + columIndex + ')');
@@ -366,8 +343,6 @@ function removeCheckboxColumns(columns, componentId) {
             var tf = jQuery('#' + tableId + ' tfoot tr').find('th:nth-child(' + columIndex + ')');
             jQuery(tf).remove();
         });
-    }else{
-        ksAddRowSelectionCheckbox(false, componentId,false,'');
     }
 }
 

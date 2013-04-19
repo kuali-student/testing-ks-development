@@ -71,7 +71,7 @@ public class AgendaBuilder {
             if (agenda.getRuleEditors() != null) {
                 for (RuleEditor rule : agenda.getRuleEditors()) {
                     if (rule.getTypeId().equals(ruleType.getId()) && (!rule.isDummy())) {
-                        rule.setKey((String)alphaIterator.next());
+                        rule.setSelectedKey((String)alphaIterator.next());
                         components.add(buildEditRule(rule, ruleType));
                         exist = true;
 
@@ -84,7 +84,7 @@ public class AgendaBuilder {
             if (!exist) {
                 components.add(buildAddRule(ruleType));
                 RuleEditor ruleEditor = new RuleEditor();
-                ruleEditor.setKey((String)alphaIterator.next());
+                ruleEditor.setSelectedKey((String)alphaIterator.next());
                 ruleEditor.setDummy(true);
                 ruleEditor.setTypeId(ruleType.getId());
                 ruleEditors.add(ruleEditor);
@@ -114,7 +114,7 @@ public class AgendaBuilder {
         LinkGroup links = (LinkGroup) ComponentUtils.findComponentInList((List<Component>) editSection.getItems(), "KRSM-RuleEdit-ActionLinks");
         List<Action> actionLinks = (List<Action>) links.getItems();
         for (Action actionLink : actionLinks) {
-            actionLink.getActionParameters().put("ruleKey", rule.getKey());
+            actionLink.getActionParameters().put("ruleKey", rule.getSelectedKey());
         }
         MessageField messageField = (MessageField) ComponentUtils.findComponentInList((List<Component>) editSection.getItems(), "KRMS-Instruction-EditMessage");
         messageField.setMessageText(ruleTypeInfo.getInstruction());

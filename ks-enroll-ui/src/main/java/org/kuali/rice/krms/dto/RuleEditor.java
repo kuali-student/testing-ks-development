@@ -27,8 +27,6 @@ public class RuleEditor extends UifFormBase implements RuleDefinitionContract, S
 
     private static final long serialVersionUID = 1L;
 
-    private String key;
-
     private String id;
     private String namespace;
     private String description;
@@ -89,14 +87,6 @@ public class RuleEditor extends UifFormBase implements RuleDefinitionContract, S
         //TODO: build the set of agenda attribute BOs
         //List<RuleAttributeBo> attrs = new ArrayList<RuleAttributeBo>();
         //this.setAttributeBos(attrs);
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 
     public void setId(String id) {

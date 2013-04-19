@@ -22,11 +22,10 @@ import org.kuali.rice.krad.uif.view.ViewModel;
 import org.kuali.student.enrollment.class2.autogen.form.ARGCourseOfferingManagementForm;
 import org.kuali.student.enrollment.class2.autogen.service.impl.ARGCourseOfferingManagementViewHelperServiceImpl;
 import org.kuali.student.enrollment.courseoffering.dto.CourseOfferingInfo;
-import org.kuali.student.r2.core.class1.search.ActivityOfferingSearchServiceImpl;
-import org.kuali.student.r2.core.search.dto.SearchRequestInfo;
-import org.kuali.student.r2.core.search.dto.SearchResultCellInfo;
-import org.kuali.student.r2.core.search.dto.SearchResultInfo;
-import org.kuali.student.r2.core.search.dto.SearchResultRowInfo;
+import org.kuali.student.enrollment.courseoffering.dto.FormatOfferingInfo;
+import org.kuali.student.enrollment.courseoffering.service.CourseOfferingService;
+import org.kuali.student.r2.common.dto.ContextInfo;
+import org.kuali.student.r2.common.util.ContextUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -47,39 +46,21 @@ public class ARGFormatsForCreateAOKeyValues extends UifKeyValuesFinderBase imple
         ARGCourseOfferingManagementViewHelperServiceImpl helperService = ((ARGCourseOfferingManagementViewHelperServiceImpl)coForm.getView().getViewHelperService());
 
         List<KeyValue> keyValues = new ArrayList<KeyValue>();
+//        keyValues.add(new ConcreteKeyValue("", "Select Format Type"));
         CourseOfferingInfo selectedCourseOffering = coForm.getCurrentCourseOfferingWrapper().getCourseOfferingInfo();
 
         try {
-            SearchRequestInfo sr = new SearchRequestInfo(ActivityOfferingSearchServiceImpl.FO_BY_CO_ID_SEARCH_KEY);
-            sr.addParam(ActivityOfferingSearchServiceImpl.SearchParameters.CO_ID, selectedCourseOffering.getId());
-
-            SearchResultInfo results = helperService.getSearchService().search(sr, null);
-
-            for(SearchResultRowInfo row:results.getRows()){
-                String foId = null;
-                String foName = null;
-
-
-                for(SearchResultCellInfo cell:row.getCells()){
-                    if(ActivityOfferingSearchServiceImpl.SearchResultColumns.FO_ID.equals(cell.getKey())){
-                        foId = cell.getValue();
-                    }else if(ActivityOfferingSearchServiceImpl.SearchResultColumns.FO_NAME.equals(cell.getKey())){
-                        foName = cell.getValue();
-                    }
-                }
-                keyValues.add(new ConcreteKeyValue(foId, foName));
-
+            String courseOfferingId = selectedCourseOffering.getId();
+            ContextInfo contextInfo = ContextUtils.createDefaultContextInfo();
+            CourseOfferingService courseOfferingService = helperService.getCourseOfferingService();
+            List<FormatOfferingInfo> formatOfferingInfos =
+                courseOfferingService.getFormatOfferingsByCourseOffering(courseOfferingId, contextInfo);
+            for (FormatOfferingInfo formatOfferingInfo : formatOfferingInfos) {
+                keyValues.add(new ConcreteKeyValue(formatOfferingInfo.getId(), formatOfferingInfo.getName()));
             }
-
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException();
         }
         return keyValues;
     }
-
-
-
-
-
-
 }

@@ -143,16 +143,11 @@ public class TranslationUtility implements TranslateBusinessMethods {
             Map<String, Object> contextMap = this.buildCompoundPropositionContextMap(naturalLanguageUsageId, proposition, languageCode);
             String naturalLanguage = templater.translate(naturalLanguageTemplate, contextMap);
             tree.setNaturalLanguage(naturalLanguage);
-
-            //Null check because newly created compound propositions should also be translateable.
-            if(proposition.getCompoundComponents()!=null){
-                List<NaturalLanguageTree> children = new ArrayList<NaturalLanguageTree>();
-                for (PropositionDefinition child : proposition.getCompoundComponents()) {
-                    children.add(this.translateNaturalLanguageTreeForProposition(naturalLanguageUsageId, child, languageCode));
-                }
-                tree.setChildren(children);
+            List<NaturalLanguageTree> children = new ArrayList<NaturalLanguageTree>();
+            for (PropositionDefinition child : proposition.getCompoundComponents()) {
+                children.add(this.translateNaturalLanguageTreeForProposition(naturalLanguageUsageId, child, languageCode));
             }
-
+            tree.setChildren(children);
             return tree.build();
         }
         throw new RiceIllegalArgumentException("Unknown proposition type: " + proposition.getPropositionTypeCode());
