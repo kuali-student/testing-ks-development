@@ -96,6 +96,8 @@
                 <value>classpath:org/kuali/student/enrollment/appointment/RegWindowAndAssignmentLookupAndInquiryView.xml</value>
 
                 <!-- Course Offering -->
+                <value>classpath:org/kuali/student/enrollment/courseoffering/TestStatePropagationView.xml</value>
+                <value>classpath:org/kuali/student/enrollment/courseoffering/TestStatePropagation-Page1.xml</value>
                 <value>classpath:org/kuali/student/enrollment/courseoffering/CreateSocPageView.xml</value>
                 <value>classpath:org/kuali/student/enrollment/courseoffering/CreateSocPage-SelectTermPage.xml</value>
                 <value>classpath:org/kuali/student/enrollment/courseoffering/CourseOfferingRolloverManagementView.xml</value>
@@ -262,6 +264,7 @@
                 <value>classpath:org/kuali/student/enrollment/kitchensink/CollectionNestedTable.xml</value>
                 <value>classpath:org/kuali/student/enrollment/kitchensink/CollectionTL.xml</value>
                 <value>classpath:org/kuali/student/enrollment/kitchensink/CollectionSL.xml</value>
+                <value>classpath:org/kuali/student/enrollment/kitchensink/Toolbar.xml</value>
             </list>
 		</property>
 		<property name="packagePrefixes">
