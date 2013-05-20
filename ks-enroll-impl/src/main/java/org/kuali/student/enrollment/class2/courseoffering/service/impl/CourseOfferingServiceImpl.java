@@ -7,7 +7,6 @@ import org.kuali.rice.core.api.criteria.PredicateFactory;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
 import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
 import org.kuali.student.enrollment.class1.lui.model.LuiEntity;
-import org.kuali.student.enrollment.class1.lui.model.LuiSetEntity;
 import org.kuali.student.enrollment.class2.courseoffering.dao.ActivityOfferingClusterDaoApi;
 import org.kuali.student.enrollment.class2.courseoffering.dao.SeatPoolDefinitionDaoApi;
 import org.kuali.student.enrollment.class2.courseoffering.model.ActivityOfferingClusterAttributeEntity;
@@ -19,7 +18,6 @@ import org.kuali.student.enrollment.class2.courseoffering.service.assembler.Regi
 import org.kuali.student.enrollment.class2.courseoffering.service.decorators.R1CourseServiceHelper;
 import org.kuali.student.enrollment.class2.courseoffering.service.transformer.ActivityOfferingDisplayTransformer;
 import org.kuali.student.enrollment.class2.courseoffering.service.transformer.ActivityOfferingTransformer;
-import org.kuali.student.enrollment.class2.courseoffering.service.transformer.ColocatedOfferingSetTransformer;
 import org.kuali.student.enrollment.class2.courseoffering.service.transformer.CourseOfferingDisplayTransformer;
 import org.kuali.student.enrollment.class2.courseoffering.service.transformer.CourseOfferingTransformer;
 import org.kuali.student.enrollment.class2.courseoffering.service.transformer.FormatOfferingTransformer;
@@ -30,7 +28,6 @@ import org.kuali.student.enrollment.courseoffering.dto.ActivityOfferingClusterIn
 import org.kuali.student.enrollment.courseoffering.dto.ActivityOfferingDisplayInfo;
 import org.kuali.student.enrollment.courseoffering.dto.ActivityOfferingInfo;
 import org.kuali.student.enrollment.courseoffering.dto.ActivityOfferingSetInfo;
-import org.kuali.student.enrollment.courseoffering.dto.ColocatedOfferingSetInfo;
 import org.kuali.student.enrollment.courseoffering.dto.CourseOfferingDisplayInfo;
 import org.kuali.student.enrollment.courseoffering.dto.CourseOfferingInfo;
 import org.kuali.student.enrollment.courseoffering.dto.FormatOfferingInfo;
@@ -44,7 +41,6 @@ import org.kuali.student.enrollment.lpr.dto.LprInfo;
 import org.kuali.student.enrollment.lpr.service.LprService;
 import org.kuali.student.enrollment.lui.dto.LuiInfo;
 import org.kuali.student.enrollment.lui.dto.LuiLuiRelationInfo;
-import org.kuali.student.enrollment.lui.dto.LuiSetInfo;
 import org.kuali.student.enrollment.lui.service.LuiService;
 import org.kuali.student.r2.common.criteria.CriteriaLookupService;
 import org.kuali.student.r2.common.dto.AttributeInfo;
@@ -55,7 +51,6 @@ import org.kuali.student.r2.common.dto.StatusInfo;
 import org.kuali.student.r2.common.dto.TypeStateEntityInfo;
 import org.kuali.student.r2.common.dto.ValidationResultInfo;
 import org.kuali.student.r2.common.exceptions.AlreadyExistsException;
-import org.kuali.student.r2.common.exceptions.CircularRelationshipException;
 import org.kuali.student.r2.common.exceptions.DataValidationErrorException;
 import org.kuali.student.r2.common.exceptions.DependentObjectsExistException;
 import org.kuali.student.r2.common.exceptions.DoesNotExistException;
@@ -64,7 +59,6 @@ import org.kuali.student.r2.common.exceptions.MissingParameterException;
 import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
 import org.kuali.student.r2.common.exceptions.ReadOnlyException;
-import org.kuali.student.r2.common.exceptions.UnsupportedActionException;
 import org.kuali.student.r2.common.exceptions.VersionMismatchException;
 import org.kuali.student.r2.common.infc.ValidationResult;
 import org.kuali.student.r2.common.util.constants.CourseOfferingServiceConstants;
@@ -81,6 +75,7 @@ import org.kuali.student.r2.core.class1.type.service.TypeService;
 import org.kuali.student.r2.core.constants.RoomServiceConstants;
 import org.kuali.student.r2.core.constants.TypeServiceConstants;
 import org.kuali.student.r2.core.room.service.RoomService;
+import org.kuali.student.r2.core.scheduling.constants.SchedulingServiceConstants;
 import org.kuali.student.r2.core.scheduling.dto.ScheduleComponentInfo;
 import org.kuali.student.r2.core.scheduling.dto.ScheduleInfo;
 import org.kuali.student.r2.core.scheduling.dto.ScheduleRequestComponentInfo;
@@ -133,7 +128,6 @@ public class CourseOfferingServiceImpl implements CourseOfferingService {
     private CriteriaLookupService criteriaLookupService;
     private RoomService roomService;
     private StateTransitionsHelper stateTransitionsHelper;
-    private ColocatedOfferingSetTransformer colocatedOfferingSetTransformer;
     private SearchService searchService;
 
     private static final Logger LOGGER = Logger.getLogger(CourseOfferingServiceImpl.class);
@@ -1158,7 +1152,7 @@ public class CourseOfferingServiceImpl implements CourseOfferingService {
 
         String sRet = null;
 
-        SearchRequestInfo searchRequest = new SearchRequestInfo(ActivityOfferingSearchServiceImpl.SCH_ID_BY_AO_SEARCH_TYPE.getKey());
+        SearchRequestInfo searchRequest = new SearchRequestInfo(ActivityOfferingSearchServiceImpl.SCH_IDS_BY_AO_SEARCH_TYPE.getKey());
         searchRequest.addParam(ActivityOfferingSearchServiceImpl.SearchParameters.AO_ID, activityOfferingId);
 
         SearchResultInfo searchResult = null;
@@ -1522,7 +1516,7 @@ public class CourseOfferingServiceImpl implements CourseOfferingService {
         ActivityOfferingInfo targetAO = new ActivityOfferingInfo(sourceAO);
         targetAO.setStateKey(LuiServiceConstants.LUI_AO_STATE_DRAFT_KEY);
         targetAO.setId(null);
-        targetAO.setScheduleId(null);
+// TODOSSR       targetAO.setScheduleId(null);
         if (targetAO.getInstructors() != null && !targetAO.getInstructors().isEmpty()) {
             for (OfferingInstructorInfo inst : targetAO.getInstructors()) {
                 inst.setId(null);
@@ -1532,6 +1526,7 @@ public class CourseOfferingServiceImpl implements CourseOfferingService {
         targetAO = createActivityOffering(sourceAO.getFormatOfferingId(), sourceAO.getActivityId(), sourceAO.getTypeKey(), targetAO, context);
 
         // copy ADL from source AO to RDL in target AO
+        /*    TODOSSR
         if(sourceAO.getScheduleId() != null && !sourceAO.getScheduleId().isEmpty()) {
             // _RCO_rolloverScheduleToScheduleRequest(sourceAo, targetAo, context);
             ScheduleInfo sourceScheduleInfo = this.getSchedulingService().getSchedule(sourceAO.getScheduleId(), context);
@@ -1562,7 +1557,7 @@ public class CourseOfferingServiceImpl implements CourseOfferingService {
                     this.getSchedulingService().createScheduleRequest(targetScheduleRequest.getTypeKey(), targetScheduleRequest, context);
                 }
             }
-        }
+        }*/
 
         try {
             List<SeatPoolDefinitionInfo> sourceSPList = getSeatPoolDefinitionsForActivityOffering(activityOfferingId, context);
@@ -1809,7 +1804,7 @@ public class CourseOfferingServiceImpl implements CourseOfferingService {
             throws MissingParameterException, InvalidParameterException, OperationFailedException,
             PermissionDeniedException, VersionMismatchException, ReadOnlyException, DataValidationErrorException,
             DoesNotExistException {
-
+        /* TODOSSR
         List<ColocatedOfferingSetInfo> coloSets = getColocatedOfferingSetsByActivityOffering(activityOfferingId, context);
 
         for (ColocatedOfferingSetInfo colo: coloSets) {
@@ -1829,9 +1824,21 @@ public class CourseOfferingServiceImpl implements CourseOfferingService {
             } else {
                 updateColocatedOfferingSet(colo.getId(),colo,context);
             }
-        }
+        }*/
     }
 
+    private void releaseScheduleResources(String scheduleInfoId, ContextInfo contextInfo) throws OperationFailedException,
+            InvalidParameterException, MissingParameterException, DoesNotExistException, PermissionDeniedException {
+        ScheduleInfo scheduleInfo = schedulingService.getSchedule(scheduleInfoId, contextInfo);
+        if (scheduleInfo != null && StringUtils.isNotBlank(scheduleInfo.getId()) && !scheduleInfo.getScheduleComponents().isEmpty()) {
+            scheduleInfo.getScheduleComponents().clear();
+            try {
+                schedulingService.updateSchedule(scheduleInfo.getId(), scheduleInfo, contextInfo);
+            } catch (Exception e) {
+                throw new OperationFailedException("Error clearing out the actual schedule components");
+            }
+        }
+    }
 
     /**
      * This implementation is the work-around for M5 that lacks an actual scheduler.
@@ -1858,116 +1865,95 @@ public class CourseOfferingServiceImpl implements CourseOfferingService {
 
         ActivityOfferingInfo aoInfo = getActivityOffering(activityOfferingId, contextInfo);
 
-        ScheduleInfo scheduleInfo;
-        if (StringUtils.isNotBlank(aoInfo.getScheduleId())){
-            scheduleInfo = getSchedulingService().getSchedule(aoInfo.getScheduleId(),contextInfo);
-        } else {
-            scheduleInfo = new ScheduleInfo();
-        }
+        List<ScheduleRequestInfo> requests = getSchedulingService().getScheduleRequestsByRefObject(CourseOfferingServiceConstants.REF_OBJECT_URI_ACTIVITY_OFFERING, activityOfferingId, contextInfo);
 
         StatusInfo result = new StatusInfo();
 
-        /**
-         * If it's a colocated activity, look for the colocated schedule.
-         */
-        List<ScheduleRequestInfo> requests = new ArrayList<ScheduleRequestInfo>();
-        ColocatedOfferingSetInfo colocatedOfferingSetInfo = null;
-
-        if (aoInfo.getIsPartOfColocatedOfferingSet()){
-            List<ColocatedOfferingSetInfo> coloSet = getColocatedOfferingSetsByActivityOffering(activityOfferingId,contextInfo);
-            if (!coloSet.isEmpty()){
-                if (coloSet.size() > 1){
-                    throw new OperationFailedException("Multiple Colocated Set not supported.");
-                }
-                colocatedOfferingSetInfo = coloSet.get(0);
-                requests = schedulingService.getScheduleRequestsByRefObject(LuiServiceConstants.LUI_SET_COLOCATED_OFFERING_TYPE_KEY, coloSet.get(0).getId(), contextInfo);
-            }
-        } else {
-            requests = schedulingService.getScheduleRequestsByRefObject(CourseOfferingServiceConstants.REF_OBJECT_URI_ACTIVITY_OFFERING, activityOfferingId, contextInfo);
-        }
-
         String newScheduleId = "";
+        ScheduleInfo scheduleInfo;
 
-        if(requests.isEmpty()) {
+        List<String> scheduleInfoList = aoInfo.getScheduleIds();
+
+        if (requests.isEmpty()) {
 
             result.setSuccess(true);
             result.setMessage("No scheduling requests were found");
-
             /**
-             * When there are no RDLs, make sure to delete the ADLs
+             * When there are no RDLs, make sure to clear the ADLs from the AO
              */
-            if (StringUtils.isNotBlank(scheduleInfo.getId()) && !scheduleInfo.getScheduleComponents().isEmpty()){
-                scheduleInfo.getScheduleComponents().clear();
-                try {
-                    schedulingService.updateSchedule(scheduleInfo.getId(),scheduleInfo, contextInfo);
-                } catch (Exception e) {
-                    throw new OperationFailedException("Error clearing out the actual schedule components");
+            if (!scheduleInfoList.isEmpty()) {
+                for (String id : scheduleInfoList) {
+                    releaseScheduleResources(id, contextInfo);
                 }
+                scheduleInfoList.clear();
+                aoInfo.getScheduleIds().clear();
             }
-
-        } else {
-
-            // Should not be more than one request, grab the first one only
-            ScheduleRequestInfo request = requests.get(0);
-            // short cut the submission to the scheduler, and just translate requested delivery logistics to actual delivery logistics
-            SchedulingServiceUtil.requestToSchedule(request,scheduleInfo);
-
-            // set the term of the new schedule to the same term of the AO
-            scheduleInfo.setAtpId(aoInfo.getTermId());
-
-            try {
-                if (StringUtils.isNotBlank(scheduleInfo.getId())){
-                    schedulingService.updateSchedule(scheduleInfo.getId(),scheduleInfo, contextInfo);
-                } else {
-                    ScheduleInfo persistedSchedule = schedulingService.createSchedule(scheduleInfo.getTypeKey(), scheduleInfo, contextInfo);
-                    newScheduleId = persistedSchedule.getId();
-                }
-
-            } catch (Exception e) {
-                throw new OperationFailedException("createSchedule failed due to the following uncaught exception: " + e.getClass().getSimpleName() + " " + e.getMessage(), e);
-            }
-
-            result.setSuccess(true);
-            result.setMessage("New Schedule Successfully created");
-        }
-
-
-        /**
-         * If we created a new ADL, update the AO with this newly created schedule id.
-         */
-        if (StringUtils.isNotBlank(newScheduleId)){
-
-            aoInfo.setScheduleId(newScheduleId);
-
             try {
                 updateActivityOffering(aoInfo.getId(), aoInfo, contextInfo);
-            }catch (Exception e) {
-                throw new OperationFailedException("createSchedule failed due to the following uncaught exception: " + e.getClass().getSimpleName() + " " + e.getMessage(), e);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            // clean up the ao schedule id list to match the schedule requests
+            List<String> requestScheduleIds = new ArrayList<String>();
+
+            for (ScheduleRequestInfo request : requests) {
+                String scheduleInfoId = request.getScheduleId();
+                if(StringUtils.isNotBlank(scheduleInfoId)) {
+                    requestScheduleIds.add(scheduleInfoId);
+                }
             }
 
-            /**
-             * Update all the colocated activities with the same schedule id
-             */
-            if (colocatedOfferingSetInfo != null && !colocatedOfferingSetInfo.getActivityOfferingIds().isEmpty()){
+            for(String scheduleId : scheduleInfoList) {
+                if(!requestScheduleIds.contains(scheduleId)) {
+                    // release this schedule
+                    releaseScheduleResources(scheduleId, contextInfo);
+                    aoInfo.getScheduleIds().remove(scheduleId);
+                }
+            }
+            try {
+                updateActivityOffering(aoInfo.getId(), aoInfo, contextInfo);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
-                List<String> activityOfferingIds = new ArrayList<String>(colocatedOfferingSetInfo.getActivityOfferingIds());
-                activityOfferingIds.remove(aoInfo.getId());
+            for (ScheduleRequestInfo request : requests) {
+                String scheduleInfoId = request.getScheduleId();
+                if (StringUtils.isNotBlank(scheduleInfoId)) {
+                    aoInfo.getScheduleIds().add(newScheduleId);
+                    scheduleInfo = schedulingService.getSchedule(scheduleInfoId, contextInfo);
+                } else {
+                    scheduleInfo = new ScheduleInfo();
+                }
+                // short cut the submission to the scheduler, and just translate requested delivery logistics to actual delivery logistics
+                SchedulingServiceUtil.requestToSchedule(request, scheduleInfo);
 
-                if (!activityOfferingIds.isEmpty()) {
-                    List<ActivityOfferingInfo> aoInfos = getActivityOfferingsByIds(activityOfferingIds,contextInfo);
-
-                    for (ActivityOfferingInfo ao : aoInfos){
-                        ao.setScheduleId(newScheduleId);
-                        try {
-                            updateActivityOffering(ao.getId(),ao,contextInfo);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
+                if (StringUtils.equals(request.getStateKey(), SchedulingServiceConstants.SCHEDULE_REQUEST_STATE_CREATED) ||
+                        StringUtils.equals(request.getStateKey(), SchedulingServiceConstants.SCHEDULE_REQUEST_STATE_MODIFIED)) {
+                    try {
+                        if (StringUtils.isNotBlank(scheduleInfo.getId())) {
+                            schedulingService.updateSchedule(scheduleInfo.getId(), scheduleInfo, contextInfo);
+                            schedulingService.updateScheduleRequest(request.getId(), request, contextInfo);
+                        } else {
+                            ScheduleInfo persistedSchedule = schedulingService.createSchedule(scheduleInfo.getTypeKey(), scheduleInfo, contextInfo);
+                            newScheduleId = persistedSchedule.getId();
+                            request.setScheduleId(newScheduleId);
+                            schedulingService.updateScheduleRequest(request.getId(), request, contextInfo);
+                            aoInfo.getScheduleIds().add(newScheduleId);
+                            try {
+                                updateActivityOffering(aoInfo.getId(), aoInfo, contextInfo);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
                         }
+                    } catch (Exception e) {
+                        throw new OperationFailedException("createSchedule failed due to the following uncaught exception: " + e.getClass().getSimpleName() + " " + e.getMessage(), e);
                     }
                 }
             }
+            result.setSuccess(true);
+            result.setMessage("New Schedule Successfully created");
         }
-
 
         return result;
     }
@@ -2493,7 +2479,8 @@ public class CourseOfferingServiceImpl implements CourseOfferingService {
         List<String> aoIds = registrationGroupInfo.getActivityOfferingIds();
         for (String aoId: aoIds) {
             ActivityOfferingInfo aoInfo = getActivityOffering(aoId, context);
-            String scheduleId = aoInfo.getScheduleId();
+//  TODOSSR          String scheduleId = aoInfo.getScheduleId();
+            String scheduleId = null;     // TODOSSR
             boolean needToCheckScheduleRequest = true;
             if (scheduleId != null) {
                 // Check if there's a schedule with this ID (might not be)
@@ -3373,151 +3360,6 @@ public class CourseOfferingServiceImpl implements CourseOfferingService {
     }
 
     @Override
-    public ColocatedOfferingSetInfo getColocatedOfferingSet(String colocatedOfferingSetId,  ContextInfo contextInfo) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
-
-        LuiSetInfo luiSetInfo = getLuiService().getLuiSet(colocatedOfferingSetId,contextInfo);
-
-        ColocatedOfferingSetInfo colocatedOfferingSetInfo = new ColocatedOfferingSetInfo();
-        getColocatedOfferingSetTransformer().luiSet2ColocatedOfferingSet(luiSetInfo,colocatedOfferingSetInfo);
-
-        return colocatedOfferingSetInfo;
-    }
-
-    @Override
-    public List<ColocatedOfferingSetInfo> getColocatedOfferingSetsByIds(List<String> colocatedOfferingSetIds,  ContextInfo contextInfo) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
-        List<LuiSetInfo> luiSetInfos = getLuiService().getLuiSetsByIds(colocatedOfferingSetIds, contextInfo);
-
-        List<ColocatedOfferingSetInfo> colocatedOfferingSetInfos = new ArrayList<ColocatedOfferingSetInfo>();
-
-        for (LuiSetInfo luiSetInfo : luiSetInfos) {
-            ColocatedOfferingSetInfo colocatedOfferingSetInfo = new ColocatedOfferingSetInfo();
-            getColocatedOfferingSetTransformer().luiSet2ColocatedOfferingSet(luiSetInfo,colocatedOfferingSetInfo);
-            colocatedOfferingSetInfos.add(colocatedOfferingSetInfo);
-        }
-
-        return colocatedOfferingSetInfos;
-    }
-
-    @Override
-    public List<String> getColocatedOfferingSetIdsByType(String colocatedOfferingSetTypeKey,  ContextInfo contextInfo) throws InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
-        return getLuiService().getLuiSetIdsByType(colocatedOfferingSetTypeKey,contextInfo);
-    }
-
-    @Override
-    public List<String> searchForColocatedOfferingSetIds(QueryByCriteria criteria,  ContextInfo contextInfo) throws InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
-        GenericQueryResults<String> results = criteriaLookupService.lookupIds(ActivityOfferingClusterEntity.class, criteria);
-        return results.getResults();
-    }
-
-    @Override
-    public List<ColocatedOfferingSetInfo> searchForColocatedOfferingSets(QueryByCriteria criteria,  ContextInfo contextInfo) throws InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
-
-        GenericQueryResults<LuiSetEntity> results = criteriaLookupService.lookup(LuiSetEntity.class, criteria);
-        List<ColocatedOfferingSetInfo> infos = new ArrayList<ColocatedOfferingSetInfo>(results.getResults().size());
-
-        for(LuiSetEntity luiSetEntity : results.getResults()){
-            ColocatedOfferingSetInfo colocatedOfferingSetInfo = new ColocatedOfferingSetInfo();
-            LuiSetInfo luiSetInfo = luiSetEntity.toDto();
-            getColocatedOfferingSetTransformer().luiSet2ColocatedOfferingSet(luiSetInfo,colocatedOfferingSetInfo);
-            infos.add(colocatedOfferingSetInfo);
-        }
-
-        return infos;
-    }
-
-    @Override
-    public List<ValidationResultInfo> validateColocatedOfferingSet(String validationTypeKey, String colocatedOfferingSetTypeKey, ColocatedOfferingSetInfo colocatedOfferingSetInfo,  ContextInfo contextInfo) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
-        return new ArrayList<ValidationResultInfo>();
-    }
-
-    @Override
-    @Transactional(readOnly = false, noRollbackFor = {DoesNotExistException.class}, rollbackFor = {Throwable.class})
-    public ColocatedOfferingSetInfo createColocatedOfferingSet(String colocatedOfferingSetTypeKey,ColocatedOfferingSetInfo colocatedOfferingSetInfo,  ContextInfo contextInfo) throws DataValidationErrorException, DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, ReadOnlyException {
-
-        if (!StringUtils.equals(colocatedOfferingSetTypeKey,colocatedOfferingSetInfo.getTypeKey())) {
-            throw new InvalidParameterException(colocatedOfferingSetTypeKey + " does not match the corresponding value in the object " + colocatedOfferingSetInfo.getTypeKey());
-        }
-
-        LuiSetInfo luiSetInfo = new LuiSetInfo();
-        getColocatedOfferingSetTransformer().colocatedOfferingSet2LuiSet(colocatedOfferingSetInfo,luiSetInfo);
-
-        LuiSetInfo newLuiSetInfo;
-        try {
-            newLuiSetInfo = getLuiService().createLuiSet(colocatedOfferingSetTypeKey,luiSetInfo,contextInfo);
-        } catch (UnsupportedActionException e) {
-            throw new OperationFailedException(e.getMessage());
-        }
-
-        ColocatedOfferingSetInfo newCoLoSet = new ColocatedOfferingSetInfo();
-        getColocatedOfferingSetTransformer().luiSet2ColocatedOfferingSet(newLuiSetInfo,newCoLoSet);
-        return newCoLoSet;
-    }
-
-    @Override
-    @Transactional(readOnly = false, noRollbackFor = {DoesNotExistException.class}, rollbackFor = {Throwable.class})
-    public ColocatedOfferingSetInfo updateColocatedOfferingSet(String colocatedOfferingSetId, ColocatedOfferingSetInfo colocatedOfferingSetInfo,  ContextInfo contextInfo) throws DataValidationErrorException, DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, ReadOnlyException, VersionMismatchException {
-
-        if (!StringUtils.equals(colocatedOfferingSetId,colocatedOfferingSetInfo.getId())){
-            throw new InvalidParameterException(colocatedOfferingSetId + " does not match the corresponding value in the object " + colocatedOfferingSetInfo.getId());
-        }
-
-        LuiSetInfo luiSetInfo = getLuiService().getLuiSet(colocatedOfferingSetId,contextInfo);
-
-        if (!StringUtils.equals(luiSetInfo.getStateKey(),colocatedOfferingSetInfo.getStateKey())){
-            throw new OperationFailedException("Changing the ColocatedOfferingset state is not supported with updateColocatedOfferingSet(). Please call changeCourseOfferingState() for state changes.");
-        }
-
-        LuiSetInfo luiSetInfoToUpdate = new LuiSetInfo();
-        getColocatedOfferingSetTransformer().colocatedOfferingSet2LuiSet(colocatedOfferingSetInfo,luiSetInfoToUpdate);
-
-        LuiSetInfo updateSetInfo;
-        try {
-            updateSetInfo = getLuiService().updateLuiSet(luiSetInfoToUpdate.getId(),luiSetInfoToUpdate,contextInfo);
-        } catch (CircularRelationshipException e) {
-            throw new OperationFailedException("Error updating Colocated offering set",e);
-        } catch (UnsupportedActionException e) {
-            throw new OperationFailedException("Error updating Colocated offering set",e);
-        }
-
-        ColocatedOfferingSetInfo updatedCoLo = new ColocatedOfferingSetInfo();
-        getColocatedOfferingSetTransformer().luiSet2ColocatedOfferingSet(updateSetInfo,updatedCoLo);
-        return updatedCoLo;
-    }
-
-    @Override
-    @Transactional(readOnly = false, noRollbackFor = {DoesNotExistException.class}, rollbackFor = {Throwable.class})
-    public StatusInfo changeColocatedOfferingSetState(String colocatedOfferingSetId,
-                                                      String nextStateKey,
-                                                      ContextInfo contextInfo)
-            throws DoesNotExistException,
-            InvalidParameterException,
-            MissingParameterException,
-            OperationFailedException,
-            PermissionDeniedException {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-
-    @Override
-    public StatusInfo deleteColocatedOfferingSet(String colocatedOfferingSetId,  ContextInfo contextInfo) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
-        return getLuiService().deleteLuiSet(colocatedOfferingSetId,contextInfo);
-    }
-
-    @Override
-    public List<ColocatedOfferingSetInfo> getColocatedOfferingSetsByActivityOffering(String activityOfferingId,  ContextInfo contextInfo) throws InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
-        List<LuiSetInfo> luiSetInfos = getLuiService().getLuiSetsByLui(activityOfferingId,contextInfo);
-        List<ColocatedOfferingSetInfo> colocatedOfferingSets = new ArrayList<ColocatedOfferingSetInfo>();
-
-        for (LuiSetInfo luiSetInfo : luiSetInfos) {
-            ColocatedOfferingSetInfo coLo = new ColocatedOfferingSetInfo();
-            getColocatedOfferingSetTransformer().luiSet2ColocatedOfferingSet(luiSetInfo,coLo);
-            colocatedOfferingSets.add(coLo);
-        }
-
-        return colocatedOfferingSets;
-    }
-
-    @Override
     public StatusInfo changeCourseOfferingState(String courseOfferingId, String nextStateKey, ContextInfo contextInfo) throws DoesNotExistException, InvalidParameterException, MissingParameterException,
             OperationFailedException, PermissionDeniedException {
 
@@ -3916,14 +3758,6 @@ public class CourseOfferingServiceImpl implements CourseOfferingService {
 
     public void setStateTransitionsHelper(StateTransitionsHelper stateTransitionsHelper) {
         this.stateTransitionsHelper = stateTransitionsHelper;
-    }
-
-    public ColocatedOfferingSetTransformer getColocatedOfferingSetTransformer() {
-        return colocatedOfferingSetTransformer;
-    }
-
-    public void setColocatedOfferingSetTransformer(ColocatedOfferingSetTransformer colocatedOfferingSetTransformer) {
-        this.colocatedOfferingSetTransformer = colocatedOfferingSetTransformer;
     }
 
     public SearchService getSearchService() {
