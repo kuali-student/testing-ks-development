@@ -67,7 +67,6 @@ public class SchedulingServiceDataLoader {
     public final static String ROOM_ID = "Room1";
 
     private ContextInfo contextInfo;
-    public static final String REF_OBJECT_TYPE_KEY_ACTIVITY_OFFERING = "kuali.type.refobject.activity.offering";
 
     private AtpService atpService;
     private RoomService roomService;
@@ -152,6 +151,14 @@ public class SchedulingServiceDataLoader {
         CommonServiceConstants.setIsIdAllowedOnCreate(contextInfo, false);
 
         setupAtpAndRoomForDisplay(ATP_ID,ROOM_ID);
+
+        ScheduleInfo testSchedule1 = setupScheduleInfo("testScheduleId1", ATP_ID,false,ROOM_ID);
+        ScheduleInfo testSchedule2 = setupScheduleInfo("testScheduleId2", ATP_ID,false,ROOM_ID);
+        ScheduleInfo testSchedule3 = setupScheduleInfo("testScheduleId3", ATP_ID,false,ROOM_ID);
+        schedulingService.createSchedule(testSchedule1.getTypeKey(), testSchedule1, contextInfo);
+        schedulingService.createSchedule(testSchedule2.getTypeKey(), testSchedule2, contextInfo);
+        schedulingService.createSchedule(testSchedule3.getTypeKey(), testSchedule3, contextInfo);
+
     }
 
     private void loadTimeSlotInfo (String ts_id, String stateKey, String typeKey, List<Integer> weekdays, Long startTimeInMillisecs, Long endTimeInMillisecs)
@@ -170,12 +177,16 @@ public class SchedulingServiceDataLoader {
         schedulingService.createTimeSlot(typeKey, ts, contextInfo);
     }
 
-    public static ScheduleRequestInfo setupScheduleRequestInfo(String scheduleRequestInfoId, String scheduleRequestInfoRefObjectId,
+    public static ScheduleRequestInfo setupScheduleRequestInfo(String scheduleRequestInfoId,
                                                                String ScheduleRequestComponentInfoId, String scheduleRequestInfoName) {
         ScheduleRequestInfo scheduleRequestInfo = new ScheduleRequestInfo();
         scheduleRequestInfo.setId(scheduleRequestInfoId);
-        scheduleRequestInfo.setRefObjectId(scheduleRequestInfoRefObjectId);
-        scheduleRequestInfo.setRefObjectTypeKey(REF_OBJECT_TYPE_KEY_ACTIVITY_OFFERING);
+
+        // SSRTODO: Add real data here
+        scheduleRequestInfo.setScheduleId("schedule id");
+        scheduleRequestInfo.setScheduleRequestSetId("schedule request set id");
+
+
         scheduleRequestInfo.setTypeKey(SchedulingServiceConstants.SCHEDULE_REQUEST_TYPE_SCHEDULE_REQUEST);
         scheduleRequestInfo.setStateKey(SchedulingServiceConstants.SCHEDULE_REQUEST_STATE_CREATED);
         scheduleRequestInfo.setName(scheduleRequestInfoName);
@@ -225,7 +236,7 @@ public class SchedulingServiceDataLoader {
         List<ScheduleComponentInfo> scheduleComponents = new ArrayList<ScheduleComponentInfo>();
 
         ScheduleComponentInfo scheduleComponentInfo = new ScheduleComponentInfo();
-        scheduleComponentInfo.setId("ScheduleComponent1");
+        scheduleComponentInfo.setId(id + "-ScheduleComponent1");
         scheduleComponentInfo.setIsTBA(Boolean.valueOf(isTBA));
 
         List<String> timeSlotIds = new ArrayList();
