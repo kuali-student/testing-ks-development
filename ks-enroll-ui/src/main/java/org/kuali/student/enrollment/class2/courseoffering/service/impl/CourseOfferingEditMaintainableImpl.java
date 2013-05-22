@@ -530,6 +530,8 @@ public class CourseOfferingEditMaintainableImpl extends CourseOfferingMaintainab
                 Person user = GlobalVariables.getUserSession().getPerson();
 
                 boolean canOpenView = this.getDocumentDictionaryService().getDocumentAuthorizer(document).canOpen(document,user);
+
+                // Work around, should be fixed with KULRICE-8049
                 if (!canOpenView) {
                     throw new AuthorizationException(user.getPrincipalName(), "open", null,
                             "User '" + user.getPrincipalName() + "' is not authorized to open view", null);
@@ -543,10 +545,10 @@ public class CourseOfferingEditMaintainableImpl extends CourseOfferingMaintainab
                 }
                 return formObject;
             }
-        } catch (Exception e) {
-            if(e instanceof AuthorizationException){
-                throw new AuthorizationException(null,null,null,null);
-            }
+        }catch (AuthorizationException ae){
+            throw new AuthorizationException(ae.getUserId(), "open", null,
+                    "User '" + ae.getUserId() + "' is not authorized to open view", null);
+        }catch (Exception e) {
             throw new RuntimeException(e);
         }
         return null;
