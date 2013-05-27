@@ -25,5 +25,5 @@ import java.util.Map;
  */
 public interface TestStatePropagationViewHelperService {
     public String[] runTests() throws Exception;
-    public Map<String, Object> rolloverCourseOfferingFromSourceTermToTargetTerm(String courseOfferingCode, String sourceTermId, String targetTermId) throws Exception;
+    public Map<String, Object> rolloverCourseOfferingFromSourceTermToTargetTerm(String courseOfferingCode, String sourceTermCode, String targetTermCode) throws Exception;
 }

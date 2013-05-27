@@ -12,7 +12,7 @@
  * or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  *
- * Created by Charles on 5/7/13
+ * Created by Charles on 5/22/13
  */
 package org.kuali.student.enrollment.class2.courseoffering.service.exception;
 
@@ -22,13 +22,9 @@ package org.kuali.student.enrollment.class2.courseoffering.service.exception;
  * @author Kuali Student Team
  */
 public class AssertException extends Exception {
-    private final String assertType;
-
-    public AssertException(String message, String assertType) {
+    String typeOfError;
+    public AssertException(String message, String typeOfError) {
         super(message);
-        this.assertType = assertType;
-    }
-    public String getAssertType() {
-        return assertType;
+        this.typeOfError = typeOfError;
     }
 }

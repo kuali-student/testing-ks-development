@@ -28,10 +28,18 @@
         <property name="layoutManager.lineGroupPrototype.disclosure.render" value="true"/>
         <property name="layoutManager.lineGroupPrototype.header.headerText" value="@{#line.termNameForUI}"/>
         <property name="layoutManager.addLineGroup.header.render" value="false"/>
+        <property name="addLineActions">
+            <list>
+                <!-- Needed to prevent focus from moving to first line and re-validating, which always will cause an error
+                 since the first field is a validated dropdown -->
+                <bean parent="Uif-AddLineAction" p:focusOnIdAfterSubmit="SELF"/>
+            </list>
+        </property>
         <property name="lineActions">
             <list>
                 <bean id="term_official_button" parent="Uif-PrimaryActionButton" p:actionLabel="@{!#line.official ? 'Make Official' : 'Update Official'}"  p:disabled="@{#line.new}" p:methodToCall="makeTermOfficial" p:render="@{!#view.readOnly}"/>
-                <bean id="term_delete_button" parent="Uif-ActionLink" p:methodToCall="deleteTerm" p:actionLabel="Delete Draft" p:render="@{!#view.readOnly and !#line.new and !#line.official}"/>
+                <bean id="term_delete_button" parent="Uif-ActionLink" p:methodToCall="deleteTerm" p:actionLabel="Delete Draft" p:render="@{!#view.readOnly and !#line.new and !#line.official}"
+                      p:onClickScript="writeHiddenToForm(&quot;actionParameters[selectedLineIndex]&quot;, &quot;@{#index}&quot;);"/>
                 <bean id="term_cancel_button" parent="Uif-ActionLink" p:methodToCall="cancelTerm" p:actionLabel="Cancel"/>
             </list>
         </property>
@@ -40,16 +48,6 @@
                 <bean parent="Uif-HorizontalFieldGroup" p:fieldLabel.render="false">
                     <property name="items">
                         <list>
-                            <!-- Hidden field to set focus to instead of one with client side validation -->
-                            <bean parent="Uif-InputField" p:propertyName="termNameForUI">
-                                <property name="style" value="visibility:hidden;width:2px;height:2px;"/>
-                                <property name="control">
-                                    <bean parent="Uif-TextControl">
-                                        <property name="style" value="visibility:hidden;width:2px;height:2px;"/>
-                                        <property name="tabIndex" value="1"/>
-                                    </bean>
-                                </property>
-                            </bean>
                             <bean id="term_type" parent="Uif-InputField-LabelTop" p:propertyName="termType" p:render="@{#isAddLine}"
                                   p:label="Term Type" p:required="true">
                                 <property name="control">
@@ -66,7 +64,7 @@
                             </bean>
                             <bean id="term_start_date" parent="Uif-InputField-LabelTop" p:propertyName="startDate" p:label="Start Date" p:required="true">
                                 <property name="control">
-                                    <bean parent="Uif-DateControl" p:size="9" p:watermarkText="mm/dd/yyyy"/>
+                                    <bean parent="Uif-KS-Default-DateControl" p:size="9" p:watermarkText="mm/dd/yyyy"/>
                                 </property>
                                 <property name="validCharactersConstraint">
                                     <bean parent="BasicDatePatternConstraint" />
@@ -74,7 +72,7 @@
                             </bean>
                             <bean id="term_end_date" parent="Uif-InputField-LabelTop" p:propertyName="endDate" p:label="End Date" p:required="true">
                                 <property name="control">
-                                    <bean parent="Uif-DateControl" p:size="9" p:watermarkText="mm/dd/yyyy"/>
+                                    <bean parent="Uif-KS-Default-DateControl" p:size="9" p:watermarkText="mm/dd/yyyy"/>
                                 </property>
                                 <property name="validCharactersConstraint">
                                     <bean parent="BasicDatePatternConstraint" />
@@ -97,7 +95,8 @@
         </property>
     </bean>
 
-    <bean id="KS-KeyDatesGroup-EditSubSection" parent="KS-Uif-StackedCollectionSubSection-HorizontalSubCollectionFieldGroupWithDisclosure">
+    <bean id="KS-KeyDatesGroup-EditSubSection" parent="KS-Uif-StackedCollectionSubSection-HorizontalSubCollectionFieldGroupWithDisclosure"
+          p:onDocumentReadyScript="highlightElements(@{validationJSONString}, @{addLineValid});">
         <property name="id" value="acal-term-keydatesgroup"/>
         <property name="readOnly" value="@{#view.readOnly}"/>
         <property name="propertyName" value="keyDatesGroupWrappers" />
@@ -112,6 +111,13 @@
                 <value>ks-borderBottom3</value>
             </list>
         </property>
+        <property name="addLineActions">
+            <list>
+                <!-- Needed to prevent focus from moving to first line and re-validating, which always will cause an error
+                since the first field is a validated dropdown -->
+                <bean parent="Uif-AddLineAction" p:focusOnIdAfterSubmit="SELF"/>
+            </list>
+        </property>
         <property name="lineActions">
             <list>
                 <bean id="key_date_group_delete_button" parent="Uif-SecondaryActionButton-Small" p:methodToCall="deleteKeyDateGroup" p:actionLabel="delete keydate group"/>
@@ -119,17 +125,9 @@
         </property>
         <property name="items">
             <list>
-                <!-- Hidden field to set focus to instead of one with client side validation -->
-                <bean parent="Uif-InputField" p:propertyName="keyDateGroupNameUI">
-                    <property name="style" value="visibility:hidden;width:2px;height:2px;"/>
-                    <property name="control">
-                        <bean parent="Uif-HiddenControl">
-                            <property name="tabIndex" value="1"/>
-                        </bean>
-                    </property>
-                </bean>
                 <bean id="key_date_group_type" parent="Uif-InputField" p:propertyName="keyDateGroupType" p:render="@{#isAddLine}"
-                      p:label="Key Date Group Type" p:required="true" p:finalizeMethodToCall="populateKeyDateGroupTypes" >
+                      p:label="* Key Date Group Type"
+                      p:finalizeMethodToCall="populateKeyDateGroupTypes" > <!--p:required="true"-->
                     <property name="control">
                         <bean parent="Uif-DropdownControl"/>
                     </property>
@@ -167,22 +165,19 @@
         <property name="layoutManager.separateAddLine" value="false" />
         <property name="layoutManager.richTable.disableTableSort" value="true" />
         <property name="layoutManager.richTable.render" value="false" />
+        <property name="addLineActions">
+            <list>
+                <!-- Needed to prevent focus from moving to first line and re-validating, which always will cause an error
+                since the first field is a validated dropdown -->
+                <bean parent="Uif-AddLineAction" p:focusOnIdAfterSubmit="SELF"/>
+            </list>
+        </property>
         <property name="items">
             <list>
-                <!-- Hidden field to set focus to instead of one with client side validation -->
-                <bean parent="Uif-InputField" p:propertyName="keyDateNameUI">
-                    <property name="style" value="visibility:hidden;width:2px;height:2px;"/>
-                    <property name="control">
-                        <bean parent="Uif-TextControl">
-                            <property name="style" value="visibility:hidden;width:2px;height:2px;"/>
-                            <property name="tabIndex" value="1"/>
-                        </bean>
-                    </property>
-                </bean>
-                <bean id="key_date_type" parent="Uif-InputField" p:propertyName="keyDateType" p:required="true"
+                <bean id="key_date_type" parent="Uif-InputField" p:propertyName="keyDateType"
                       p:readOnly="@{!#isAddLine}" p:readOnlyDisplayReplacementPropertyName="keyDateNameUI"
-                      p:label="Key Date Type"
-                      p:finalizeMethodToCall="populateKeyDateTypes" p:style="font-weight:bold;">
+                      p:label="* Key Date Type"
+                      p:finalizeMethodToCall="populateKeyDateTypes" p:style="font-weight:bold;"> <!--p:required="true"-->
                     <property name="control">
                         <bean parent="Uif-DropdownControl"/>
                     </property>
@@ -191,9 +186,9 @@
                     </property>
                 </bean>
                 <bean id="key_date_start_date" parent="Uif-InputField" p:propertyName="startDate" p:readOnlyDisplayReplacementPropertyName="startDateUI"
-                      p:label="Start Date" p:required="true">
+                      p:label="* Start Date" >   <!--p:required="true"-->
                     <property name="control">
-                        <bean parent="Uif-DateControl" p:size="9" p:watermarkText="mm/dd/yyyy"/>
+                        <bean parent="Uif-KS-Default-DateControl" p:size="9" p:watermarkText="mm/dd/yyyy"/>
                     </property>
                     <property name="validCharactersConstraint">
                         <bean parent="BasicDatePatternConstraint" />
@@ -223,7 +218,7 @@
                       p:label="End Date" p:required="@{#lp.dateRange and !#isAddLine}"
                       p:refreshWhenChangedPropertyNames="#lp.dateRange">
                     <property name="control">
-                        <bean parent="Uif-DateControl" p:size="9" p:watermarkText="mm/dd/yyyy">
+                        <bean parent="Uif-KS-Default-DateControl" p:size="9" p:watermarkText="mm/dd/yyyy">
                             <property name="disabled" value="@{!#lp.dateRange}"/>
                         </bean>
                     </property>

@@ -50,7 +50,7 @@
             <bean parent="KRMS-Course-SuggestControl"/>
         </property-->
         <property name="control">
-            <bean parent="Uif-TextControl" p:style="margin-top:null 2px;" p:disabled="true"/>
+            <bean parent="Uif-TextControl" p:style="background-color: #DDDDDD;width:370px; margin-top:null 2px;" p:readOnly="true"/>
         </property>
         <property name="quickfinder">
             <bean parent="KRMS-Course-QuickFinder"/>
@@ -66,7 +66,7 @@
             <list merge="true">
                 <value>uif-collectionItem</value>
                 <value>uif-gridCollectionItem</value>
-                <value>ks-stackedCollectionItem</value>
+                <value>krms-stackedCollectionItem</value>
             </list>
         </property>
         <property name="footer">
@@ -158,7 +158,7 @@
         </property>
         <property name="cssClasses">
             <list merge="true">
-                <value>ks-stackedCollectionLayout</value>
+                <value>krms-stackedCollectionLayout</value>
             </list>
         </property>
     </bean>
@@ -177,7 +177,7 @@
                 <bean parent="Uif-DeleteLineAction">
                     <property name="cssClasses">
                         <list merge="true">
-                            <value>ks-stackedActionItem</value>
+                            <value>krms-stackedActionItem</value>
                         </list>
                     </property>
                 </bean>
@@ -214,7 +214,7 @@
                 <bean parent="Uif-InputField-LabelTop" p:style="width: 380px;">
                     <property name="propertyName" value="name"/>
                     <property name="control">
-                        <bean parent="Uif-TextControl" p:style="background-color: #DDDDDD;width:370px; margin-top:null 2px;" p:disabled="true">
+                        <bean parent="Uif-TextControl" p:style="background-color: #DDDDDD;width:370px; margin-top:null 2px;" p:readOnly="true">
                             <!--this is a hack-->
                             <!--property name="onMouseOverScript" value="disableMe(jq(this));"/>
                             <property name="onFocusScript" value="disableMe(jq(this));"/>
@@ -279,7 +279,7 @@
                 <bean parent="Uif-InputField-LabelTop" p:style="width: 280px;">
                     <property name="propertyName" value="code"/>
                     <property name="control">
-                        <bean parent="Uif-TextControl" p:style="background-color: #DDDDDD;margin-top:null 2px;" p:disabled="true">
+                        <bean parent="Uif-TextControl" p:style="background-color: #DDDDDD;margin-top:null 2px;" p:readOnly="true">
                             <!--this is a hack-->
                             <!--property name="onMouseOverScript" value="disableMe(jq(this));"/>
                             <property name="onFocusScript" value="disableMe(jq(this));"/>
@@ -328,7 +328,7 @@
                 <bean parent="Uif-DeleteLineAction">
                     <property name="cssClasses">
                         <list merge="true">
-                            <value>ks-stackedActionItem</value>
+                            <value>krms-stackedActionItem</value>
                         </list>
                     </property>
                 </bean>
@@ -394,8 +394,7 @@
         <property name="hidden" value="true"/>
         <property name="items">
             <list>
-
-                <bean parent="Uif-InputField-LabelTop" p:label="Progressive Disclose"
+                <bean parent="Uif-InputField-LabelTop" p:label="Select Course Range Type"
                       p:width="auto" p:propertyName="searchByCourseRange">
                     <property name="instructionalText" value="Search By" />
                     <property name="control">
@@ -421,7 +420,7 @@
                 <property name="items">
                     <list>
                         <bean parent="Uif-PrimaryActionButton-Small" p:actionLabel="Add Course Range" p:methodToCall="addRange"/>
-                        <bean parent="Uif-ActionLink" p:actionLabel="Cancel"  p:actionScript="jQuery.fancybox.close();" />
+                        <bean parent="Uif-ActionLink" p:actionLabel="Cancel" p:actionScript="jQuery.fancybox.close();"/>
                     </list>
                 </property>
             </bean>
@@ -430,11 +429,9 @@
     <bean id="KRMS-CourseRangeLightBox" parent="KRMS-CourseRangeLightBox-parent">
         <property name="items">
             <list merge="true">
-
                 <ref bean="KRMS-CourseNumber-RangeSection" />
                 <ref bean="KRMS-LearningObjective-RangeSection" />
                 <ref bean="KRMS-EffectiveDate-RangeSection" />
-
             </list>
         </property>
     </bean>

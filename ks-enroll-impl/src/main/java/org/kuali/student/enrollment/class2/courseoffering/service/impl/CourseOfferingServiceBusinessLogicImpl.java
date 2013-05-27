@@ -207,7 +207,7 @@ public class CourseOfferingServiceBusinessLogicImpl implements CourseOfferingSer
         requestSetToSchedule.setTypeKey( SchedulingServiceConstants.SCHEDULE_REQUEST_SET_TYPE_SCHEDULE_REQUEST_SET );
         requestSetToSchedule.setStateKey(SchedulingServiceConstants.SCHEDULE_REQUEST_STATE_CREATED);
         requestSetToSchedule.setRefObjectTypeKey( sourceAo.getTypeKey() );
-        List<String> targetRefObjIds = new ArrayList<>();
+        List<String> targetRefObjIds = new ArrayList<String>();
         targetRefObjIds.add( targetAo.getId() );
         requestSetToSchedule.setRefObjectIds( targetRefObjIds );
         requestSetToSchedule = schedulingService.createScheduleRequestSet( SchedulingServiceConstants.SCHEDULE_REQUEST_SET_TYPE_SCHEDULE_REQUEST_SET, sourceAo.getTypeKey(), requestSetToSchedule, context );

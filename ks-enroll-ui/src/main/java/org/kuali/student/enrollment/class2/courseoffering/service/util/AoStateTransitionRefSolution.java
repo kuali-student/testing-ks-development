@@ -70,13 +70,13 @@ public class AoStateTransitionRefSolution {
 
     public static PseudoUnitTestStateTransitionGrid getReferenceGridForState(String socState) {
         final int[][] stateTransition = SOC_STATE_TO_AO_TRANSITION.get(socState);
-        PseudoUnitTestStateTransitionGrid grid = new PseudoUnitTestStateTransitionGrid(AoStateTransitionRefSolution.AO_STATES_ORDERED);
+        PseudoUnitTestStateTransitionGrid grid = new PseudoUnitTestStateTransitionGrid(AoStateTransitionRefSolution.AO_STATES_ORDERED, "ao");
+        grid.setSocStateKey(socState);
         for (int from = 0; from < stateTransition.length; from++) {
             for (int to = 0; to < stateTransition.length; to++) {
-                grid.setTransition(from, to, stateTransition[from][to]);
+                grid.setTransition(TransitionGridEnum.EXPECTED, from, to, stateTransition[from][to]);
             }
         }
-        grid.setSocStateKey(socState);
         return grid;
     }
 }

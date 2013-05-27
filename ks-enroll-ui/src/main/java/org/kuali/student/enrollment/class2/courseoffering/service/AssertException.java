@@ -12,23 +12,23 @@
  * or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  *
- * Created by David Yin on 1/31/13
+ * Created by Charles on 5/7/13
  */
-package org.kuali.student.enrollment.uif.view;
-
-import org.kuali.rice.krad.uif.component.Component;
-import org.kuali.rice.krad.uif.service.ExpressionEvaluatorService;
-import org.kuali.rice.krad.uif.view.InquiryView;
-import org.kuali.rice.krad.uif.view.View;
-import org.kuali.student.enrollment.uif.form.KSUifForm;
-
-import java.util.Map;
+package org.kuali.student.enrollment.class2.courseoffering.service;
 
 /**
  * This class //TODO ...
  *
  * @author Kuali Student Team
  */
-public class KSInquiryView extends InquiryView {
+public class AssertException extends Exception {
+    private final String assertType;
 
+    public AssertException(String message, String assertType) {
+        super(message);
+        this.assertType = assertType;
+    }
+    public String getAssertType() {
+        return assertType;
+    }
 }

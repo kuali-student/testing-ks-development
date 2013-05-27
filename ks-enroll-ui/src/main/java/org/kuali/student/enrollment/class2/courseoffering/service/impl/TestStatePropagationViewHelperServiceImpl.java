@@ -25,6 +25,7 @@ import org.kuali.student.enrollment.class2.courseoffering.service.TestStatePropa
 import org.kuali.student.enrollment.class2.courseoffering.service.exception.PseudoUnitTestException;
 import org.kuali.student.enrollment.class2.courseoffering.service.util.AoStateTransitionRefSolution;
 import org.kuali.student.enrollment.class2.courseoffering.service.util.PseudoUnitTestStateTransitionGrid;
+import org.kuali.student.enrollment.class2.courseoffering.service.util.TransitionGridEnum;
 import org.kuali.student.enrollment.class2.courseoffering.util.CourseOfferingConstants;
 import org.kuali.student.enrollment.courseoffering.dto.ActivityOfferingInfo;
 import org.kuali.student.enrollment.courseoffering.dto.CourseOfferingInfo;
@@ -74,6 +75,7 @@ public class TestStatePropagationViewHelperServiceImpl extends ViewHelperService
     // List of objects used in test
     private SocInfo socInfo;
     private CourseOfferingInfo courseOfferingInfo;
+    private FormatOfferingInfo formatOfferingInfo;
     private RegistrationGroupInfo rgInfo;
     private List<ActivityOfferingInfo> aoInfos;
     // Constants
@@ -93,10 +95,58 @@ public class TestStatePropagationViewHelperServiceImpl extends ViewHelperService
         SOC_STATES_ORDERED.add(CourseOfferingSetServiceConstants.PUBLISHED_SOC_STATE_KEY);
     }
 
+    public static final List<String> FO_STATES_ORDERED;
+    static {
+        FO_STATES_ORDERED = new ArrayList<String>();
+        FO_STATES_ORDERED.add(LuiServiceConstants.LUI_FO_STATE_DRAFT_KEY);
+        FO_STATES_ORDERED.add(LuiServiceConstants.LUI_FO_STATE_PLANNED_KEY);
+        // can only get to this state if SOC state is publishing/published
+        FO_STATES_ORDERED.add(LuiServiceConstants.LUI_FO_STATE_OFFERED_KEY);
+    }
+
+    public static final List<String> CO_STATES_ORDERED;
+    static {
+        CO_STATES_ORDERED = new ArrayList<String>();
+        CO_STATES_ORDERED.add(LuiServiceConstants.LUI_CO_STATE_DRAFT_KEY);
+        CO_STATES_ORDERED.add(LuiServiceConstants.LUI_CO_STATE_PLANNED_KEY);
+        // can only get to this state if SOC state is publishing/published
+        CO_STATES_ORDERED.add(LuiServiceConstants.LUI_CO_STATE_OFFERED_KEY);
+    }
+
     public TestStatePropagationViewHelperServiceImpl() {
         CONTEXT = ContextUtils.createDefaultContextInfo();
         CONTEXT.setPrincipalId("carol");
         CONTEXT.setCurrentDate(new Date());
+    }
+
+    private void _resetFoCoDraft() throws Exception {
+        LuiInfo lui = luiService.getLui(formatOfferingInfo.getId(), CONTEXT);
+        lui.setStateKey(LuiServiceConstants.LUI_FO_STATE_DRAFT_KEY);
+        luiService.updateLui(lui.getId(), lui, CONTEXT);
+        // Reset CO to draft
+        lui = luiService.getLui(courseOfferingInfo.getId(), CONTEXT);
+        lui.setStateKey(LuiServiceConstants.LUI_CO_STATE_DRAFT_KEY);
+        luiService.updateLui(lui.getId(), lui, CONTEXT);
+    }
+
+    private void _resetFoCoPlanned() throws Exception {
+        LuiInfo lui = luiService.getLui(formatOfferingInfo.getId(), CONTEXT);
+        lui.setStateKey(LuiServiceConstants.LUI_FO_STATE_DRAFT_KEY);
+        luiService.updateLui(lui.getId(), lui, CONTEXT);
+        // Reset CO to draft
+        lui = luiService.getLui(courseOfferingInfo.getId(), CONTEXT);
+        lui.setStateKey(LuiServiceConstants.LUI_CO_STATE_DRAFT_KEY);
+        luiService.updateLui(lui.getId(), lui, CONTEXT);
+    }
+
+    private void _resetFoCoOffered() throws Exception {
+        LuiInfo lui = luiService.getLui(formatOfferingInfo.getId(), CONTEXT);
+        lui.setStateKey(LuiServiceConstants.LUI_FO_STATE_DRAFT_KEY);
+        luiService.updateLui(lui.getId(), lui, CONTEXT);
+        // Reset CO to draft
+        lui = luiService.getLui(courseOfferingInfo.getId(), CONTEXT);
+        lui.setStateKey(LuiServiceConstants.LUI_CO_STATE_DRAFT_KEY);
+        luiService.updateLui(lui.getId(), lui, CONTEXT);
     }
 
     private void _resetSocOnly() throws Exception {
@@ -141,6 +191,37 @@ public class TestStatePropagationViewHelperServiceImpl extends ViewHelperService
         }
     }
 
+    private String _computeFoState(String foId) throws Exception {
+        List<ActivityOfferingInfo> aoInfos = coService.getActivityOfferingsByFormatOffering(foId, CONTEXT);
+        List<String> aoStates = new ArrayList<String>();
+        for (ActivityOfferingInfo ao: aoInfos) {
+            aoStates.add(ao.getStateKey());
+        }
+        String foStateComputed = LuiServiceConstants.LUI_FO_STATE_DRAFT_KEY;
+        if (aoStates.contains(LuiServiceConstants.LUI_AO_STATE_OFFERED_KEY)) {
+            foStateComputed = LuiServiceConstants.LUI_FO_STATE_OFFERED_KEY;
+        } else if (aoStates.contains(LuiServiceConstants.LUI_AO_STATE_APPROVED_KEY)) {
+            foStateComputed = LuiServiceConstants.LUI_FO_STATE_PLANNED_KEY;
+        }
+        return foStateComputed;
+    }
+
+    private String _computeCoState() throws Exception {
+        // Use actual AOs to compute CO state, not FOs (which may not be accurate)
+        List<FormatOfferingInfo> foInfos = coService.getFormatOfferingsByCourseOffering(courseOfferingInfo.getId(), CONTEXT);
+        List<String> foStates = new ArrayList<String>();
+        for (FormatOfferingInfo fo: foInfos) {
+            foStates.add(_computeFoState(fo.getId()));
+        }
+        String coStateComputed = LuiServiceConstants.LUI_CO_STATE_DRAFT_KEY;
+        if (foStates.contains(LuiServiceConstants.LUI_FO_STATE_OFFERED_KEY)) {
+            coStateComputed = LuiServiceConstants.LUI_CO_STATE_OFFERED_KEY;
+        } else if (foStates.contains(LuiServiceConstants.LUI_FO_STATE_PLANNED_KEY)) {
+            coStateComputed = LuiServiceConstants.LUI_CO_STATE_PLANNED_KEY;
+        }
+        return coStateComputed;
+    }
+
     @Override
     public String[] runTests() throws Exception {
         _initServices();
@@ -161,16 +242,14 @@ public class TestStatePropagationViewHelperServiceImpl extends ViewHelperService
             System.err.println("---------------------- socState = " + socState);
             PseudoUnitTestStateTransitionGrid result =
                     testAoStateTransitionsInSocState(aoId, socInfo.getId(), socState);
-            PseudoUnitTestStateTransitionGrid expected =
-                    AoStateTransitionRefSolution.getReferenceGridForState(socState);
-            _compareGrids(expected, result);
+            _compareGrids(result);
             _resetSocOnly(); // Make sure to reset the SOC
         }
         return null;
     }
 
-    private void _compareGrids(PseudoUnitTestStateTransitionGrid expected, PseudoUnitTestStateTransitionGrid actual) {
-        List<Map<String, String>> results = PseudoUnitTestStateTransitionGrid.compareGrid(expected, actual);
+    private void _compareGrids(PseudoUnitTestStateTransitionGrid grid) {
+        List<Map<String, String>> results = grid.compare();
         for (int i = 0; i < results.size(); i++) {
             // Put socState in front
             Map<String, String> resultMap = results.get(i);
@@ -225,20 +304,23 @@ public class TestStatePropagationViewHelperServiceImpl extends ViewHelperService
         if (!socState.equals(CourseOfferingSetServiceConstants.DRAFT_SOC_STATE_KEY)) {
             _advanceSocState(socId, socState);
         }
-        PseudoUnitTestStateTransitionGrid expected = AoStateTransitionRefSolution.getReferenceGridForState(socState);
-        PseudoUnitTestStateTransitionGrid actualGrid = new PseudoUnitTestStateTransitionGrid(AoStateTransitionRefSolution.AO_STATES_ORDERED);
-        actualGrid.setSocStateKey(socState);
-        for (int i = 0; i < actualGrid.size(); i++) {
-            String fromState = actualGrid.getStateKeyAt(i);
-            for (int j = 0; j < actualGrid.size(); j++) {
-                String toState = actualGrid.getStateKeyAt(j);
-                boolean invalidTransition = expected.getTransition(fromState, toState) == -1;
+        PseudoUnitTestStateTransitionGrid foExpected = new PseudoUnitTestStateTransitionGrid(FO_STATES_ORDERED, "fo");
+        PseudoUnitTestStateTransitionGrid foActual = new PseudoUnitTestStateTransitionGrid(FO_STATES_ORDERED, "fo");
+        PseudoUnitTestStateTransitionGrid coExpected = new PseudoUnitTestStateTransitionGrid(CO_STATES_ORDERED, "co");
+        PseudoUnitTestStateTransitionGrid coActual = new PseudoUnitTestStateTransitionGrid(CO_STATES_ORDERED, "co");
+
+        PseudoUnitTestStateTransitionGrid aoGrid = AoStateTransitionRefSolution.getReferenceGridForState(socState);
+        for (int i = 0; i < aoGrid.size(); i++) {
+            String fromState = aoGrid.getStateKeyAt(i);
+            for (int j = 0; j < aoGrid.size(); j++) {
+                String toState = aoGrid.getStateKeyAt(j);
+                boolean invalidTransition = aoGrid.getTransition(TransitionGridEnum.EXPECTED, fromState, toState) == -1;
                 if (j == i || invalidTransition) {
                     if (invalidTransition) {
-                        actualGrid.setTransition(fromState, toState, -1);
+                        aoGrid.setTransition(TransitionGridEnum.ACTUAL, fromState, toState, -1);
                     } else {
                         // Illegal transition
-                        actualGrid.setTransition(fromState, toState, 1);
+                        aoGrid.setTransition(TransitionGridEnum.ACTUAL, fromState, toState, 1);
                     }
                     continue;
                 }
@@ -246,10 +328,10 @@ public class TestStatePropagationViewHelperServiceImpl extends ViewHelperService
                 _forceChangeAoState(aoId, fromState);
                 // Attempt to change toState using normal services call
                 boolean change = _tryChangingAoState(aoId, toState);
-                actualGrid.setTransition(fromState, toState, change ? 1 : 0);
+                aoGrid.setTransition(TransitionGridEnum.ACTUAL, fromState, toState, change ? 1 : 0);
             }
         }
-        return actualGrid;
+        return aoGrid;
     }
     public void testDraftAoStateToNewAoState(String aoId, String toState, PseudoUnitTestStateTransitionGrid grid) throws AssertException, PseudoUnitTestException {
         ActivityOfferingInfo aoInfo = null;
@@ -261,7 +343,7 @@ public class TestStatePropagationViewHelperServiceImpl extends ViewHelperService
         assertEquals(LuiServiceConstants.LUI_AO_STATE_DRAFT_KEY, aoInfo.getStateKey(), "");
         try {
             boolean change = _tryChangingAoState(aoInfo.getId(), toState);
-            grid.setTransition(aoInfo.getStateKey(), toState, change ? 1 : 0);
+            grid.setTransition(TransitionGridEnum.ACTUAL, aoInfo.getStateKey(), toState, change ? 1 : 0);
         } catch (PseudoUnitTestException e) {
             // do nothing
         }
@@ -271,25 +353,11 @@ public class TestStatePropagationViewHelperServiceImpl extends ViewHelperService
         _forceChangeAoState(aoId, fromState);
         try {
             boolean change = _tryChangingAoState(aoId, LuiServiceConstants.LUI_AO_STATE_DRAFT_KEY);
-            grid.setTransition(fromState, LuiServiceConstants.LUI_AO_STATE_DRAFT_KEY, change ? 1 : 0);
+            grid.setTransition(TransitionGridEnum.ACTUAL, fromState, LuiServiceConstants.LUI_AO_STATE_DRAFT_KEY, change ? 1 : 0);
         } catch (PseudoUnitTestException e) {
             // do nothing
         } catch (Exception e) {
             throw new PseudoUnitTestException("Something weird in testAoStateBackToDraft");
-        }
-    }
-
-    /**
-     * Test AO states of draft, approved, offered
-     * @param socState
-     */
-    public void testAOStateChangeWithSocState(String socId, String socState) throws Exception {
-        PseudoUnitTestStateTransitionGrid grid = new PseudoUnitTestStateTransitionGrid(AoStateTransitionRefSolution.AO_STATES_ORDERED);
-        _advanceSocState(socId, socState);
-        for (int fromIndex = 0; fromIndex < grid.size(); fromIndex++) {
-            for (int toIndex = 0; toIndex < grid.size(); toIndex++) {
-
-            }
         }
     }
 

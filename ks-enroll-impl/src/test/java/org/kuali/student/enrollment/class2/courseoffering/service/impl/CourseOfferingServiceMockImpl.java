@@ -1720,7 +1720,7 @@ public class CourseOfferingServiceMockImpl implements CourseOfferingService,
         //  Get the schedule components from all schedules and put them in a single ScheduleDisplayInfo.
         if (ao.getScheduleIds() != null && ! ao.getScheduleIds().isEmpty()) {
             List<ScheduleDisplayInfo> scheduleDisplays = schedulingService.getScheduleDisplaysByIds(ao.getScheduleIds(), contextInfo);
-            List<ScheduleComponentDisplayInfo> scheduleComponentDisplayInfos = new ArrayList<>();
+            List<ScheduleComponentDisplayInfo> scheduleComponentDisplayInfos = new ArrayList<ScheduleComponentDisplayInfo>();
             for (ScheduleDisplayInfo sdi : scheduleDisplays) {
                 scheduleComponentDisplayInfos.addAll((List<ScheduleComponentDisplayInfo>) sdi.getScheduleComponentDisplays());
             }

@@ -24,7 +24,7 @@ import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.web.controller.UifControllerBase;
 import org.kuali.rice.krad.web.form.UifFormBase;
-import org.kuali.student.enrollment.uif.util.KSControllerHelper;
+import org.kuali.student.common.uif.util.KSControllerHelper;
 import org.kuali.student.r2.core.constants.AcademicCalendarServiceConstants;
 import org.kuali.student.r2.core.acal.dto.AcademicCalendarInfo;
 import org.kuali.student.r2.core.acal.dto.HolidayCalendarInfo;
@@ -82,6 +82,23 @@ public class CalendarSearchController  extends UifControllerBase {
         String calendarSearchType = request.getParameter(CalendarConstants.CALENDAR_SEARCH_TYPE);
         if (null != calendarSearchType) {
             calendarSearchForm.setCalendarType(calendarSearchType);
+        }
+
+
+        String growlMessageKey = request.getParameter(CalendarConstants.GROWL_MESSAGE);
+
+
+        if(growlMessageKey!=null){
+            String growlTitle = request.getParameter(CalendarConstants.GROWL_TITLE);
+            String temp = request.getParameter(CalendarConstants.GROWL_MESSAGE_PARAMS);
+            String[] growlMessageParams;
+            if(temp!=null){
+                growlMessageParams = temp.split(",");
+            }
+            else{
+                growlMessageParams=new String[0];
+            }
+            GlobalVariables.getMessageMap().addGrowlMessage(growlTitle, growlMessageKey,growlMessageParams);
         }
 
         return super.start(form, result, request, response);
@@ -232,8 +249,8 @@ public class CalendarSearchController  extends UifControllerBase {
                                               HttpServletRequest request, HttpServletResponse response) throws Exception {
         String dialog = CalendarConstants.SEARCH_DELETE_CONFIRMATION_DIALOG;
         if (!hasDialogBeenDisplayed(dialog, searchForm)) {
-            searchForm.setSelectedCollectionPath(searchForm.getActionParamaterValue("selectedCollectionPath"));
-            searchForm.setSelectedLineIndex(searchForm.getActionParamaterValue("selectedLineIndex"));
+            searchForm.setSelectedCollectionPath(searchForm.getActionParamaterValue(UifParameters.SELLECTED_COLLECTION_PATH));
+            searchForm.setSelectedLineIndex(searchForm.getActionParamaterValue(UifParameters.SELECTED_LINE_INDEX));
             //redirect back to client to display lightbox
             return showDialog(dialog, searchForm, request, response);
         }else{
@@ -244,14 +261,14 @@ public class CalendarSearchController  extends UifControllerBase {
                     return getUIFModelAndView(searchForm);
                 }
             } else {
-                searchForm.setSelectedCollectionPath(searchForm.getActionParamaterValue("selectedCollectionPath"));
-                searchForm.setSelectedLineIndex(searchForm.getActionParamaterValue("selectedLineIndex"));
+                searchForm.setSelectedCollectionPath(searchForm.getActionParamaterValue(UifParameters.SELLECTED_COLLECTION_PATH));
+                searchForm.setSelectedLineIndex(searchForm.getActionParamaterValue(UifParameters.SELECTED_LINE_INDEX));
                 //redirect back to client to display lightbox
                 return showDialog(dialog, searchForm, request, response);
             }
         }
-        searchForm.getActionParameters().put("selectedCollectionPath",searchForm.getSelectedCollectionPath());
-        searchForm.getActionParameters().put("selectedLineIndex",searchForm.getSelectedLineIndex());
+        searchForm.getActionParameters().put(UifParameters.SELLECTED_COLLECTION_PATH,searchForm.getSelectedCollectionPath());
+        searchForm.getActionParameters().put(UifParameters.SELECTED_LINE_INDEX,searchForm.getSelectedLineIndex());
         Object atp = getSelectedAtp(searchForm, "delete");
 
          if(atp instanceof HolidayCalendarInfo){

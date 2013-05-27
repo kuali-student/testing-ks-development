@@ -12,19 +12,15 @@
  * or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  *
- * Created by David Yin on 2/3/13
+ * Created by Charles on 5/22/13
  */
-package org.kuali.student.enrollment.uif.form;
-
-import org.kuali.rice.krad.web.form.MaintenanceDocumentForm;
-
-import java.util.Map;
+package org.kuali.student.enrollment.class2.courseoffering.service.util;
 
 /**
  * This class //TODO ...
  *
  * @author Kuali Student Team
  */
-public class KSUifMaintenanceDocumentForm extends MaintenanceDocumentForm {
-
+public enum TransitionGridEnum {
+    ACTUAL, EXPECTED
 }

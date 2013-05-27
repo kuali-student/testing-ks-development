@@ -115,31 +115,31 @@ public class ActivityOfferingWrapper implements Serializable{
 
     public ActivityOfferingWrapper(){
         aoInfo = new ActivityOfferingInfo();
-        instructors = new ArrayList<>();
-        seatpools = new ArrayList<>();
-        populationsForSPValidation = new ArrayList<>();
+        instructors = new ArrayList<OfferingInstructorWrapper>();
+        seatpools = new ArrayList<SeatPoolWrapper>();
+        populationsForSPValidation = new ArrayList<PopulationInfo>();
         aoInfo.setStateKey(LuiServiceConstants.LUI_AO_STATE_DRAFT_KEY);
         aoInfo.setTypeKey(LuiServiceConstants.LECTURE_ACTIVITY_OFFERING_TYPE_KEY);
         formatOffering = new FormatOfferingInfo();
         term = new TermInfo();
-        scheduleComponentWrappers = new ArrayList<>();
+        scheduleComponentWrappers = new ArrayList<ScheduleComponentWrapper>();
         this.setReadOnlyView(false);
         this.setIsChecked(false);
-        actualScheduleComponents = new ArrayList<>();
-        requestedScheduleComponents = new ArrayList<>();
+        actualScheduleComponents = new ArrayList<ScheduleWrapper>();
+        requestedScheduleComponents = new ArrayList<ScheduleWrapper>();
         newScheduleRequest = new ScheduleWrapper();
-        colocatedActivities = new ArrayList<>();
+        colocatedActivities = new ArrayList<ColocatedActivity>();
         maxEnrollmentShared = true;
         editRenderHelper = new EditRenderHelper();
-        deletedScheduleComponents = new ArrayList<>();
+        deletedScheduleComponents = new ArrayList<ScheduleWrapper>();
     }
 
     public ActivityOfferingWrapper(ActivityOfferingInfo info){
         this();
         aoInfo = info;
-        instructors = new ArrayList<>();
-        seatpools = new ArrayList<>();
-        populationsForSPValidation = new ArrayList<>();
+        instructors = new ArrayList<OfferingInstructorWrapper>();
+        seatpools = new ArrayList<SeatPoolWrapper>();
+        populationsForSPValidation = new ArrayList<PopulationInfo>();
     }
 
     public String getAoClusterName() {

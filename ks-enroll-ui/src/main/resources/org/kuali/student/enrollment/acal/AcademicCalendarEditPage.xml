@@ -62,22 +62,36 @@ limitations under the License.
                 </bean>
             </list>
         </property>
+
         <property name="footer">
             <bean parent="Uif-FooterBase">
                 <property name="items">
                     <list>
-                        <bean parent="Uif-PrimaryActionButton" p:render="@{!#view.readOnly and !reload}"
-                              p:methodToCall="@{officialCalendar ? 'save' : 'makeAcalOfficial'}"
-                              p:actionLabel="@{officialCalendar ? 'Update Official' : 'Make Official'}"
-                              p:disabled="@{newCalendar}" p:performClientSideValidation="true"/>
-                        <bean parent="Uif-SecondaryActionButton" p:methodToCall="save" p:actionLabel="Save"
-                              p:performClientSideValidation="true" p:render="@{!officialCalendar and !#view.readOnly and !reload}" p:disabled="@{reload}"/>
-                        <bean parent="Uif-SecondaryActionButton" p:methodToCall="reload" p:actionLabel="Reload"
-                              p:performClientSideValidation="true" p:render="@{reload}"/>
-                        <bean parent="Uif-ActionLink" p:methodToCall="delete"
-                              p:actionLabel="Delete Draft"
-                              p:render="@{!reload and !newCalendar and !#view.readOnly and !officialUI}"/>
-                        <bean parent="Uif-ActionLink" p:actionLabel="Cancel" p:actionScript="stepBrowserBack()" p:render="@{!#view.readOnly}"/>
+                        <bean parent="Uif-HorizontalBoxGroup">
+                            <property name="cssClasses">
+                                <list merge="true">
+                                    <value>ac_stickyfooter</value>
+                                </list>
+                            </property>
+                            <property name="items">
+                                <list>
+                                    <bean parent="Uif-PrimaryActionButton" p:methodToCall="save" p:actionLabel="Save"
+                                          p:performClientSideValidation="true" p:render="@{!officialCalendar and !#view.readOnly and !reload}" p:disabled="@{reload}"
+                                          p:jumpToIdAfterSubmit="TOP"/>
+                                    <bean parent="Uif-SecondaryActionButton" p:render="@{!#view.readOnly and !reload}"
+                                          p:methodToCall="@{officialCalendar ? 'save' : 'makeAcalOfficial'}"
+                                          p:actionLabel="@{officialCalendar ? 'Update Official' : 'Make Official'}"
+                                          p:disabled="@{newCalendar}" p:performClientSideValidation="true"
+                                          p:jumpToIdAfterSubmit="TOP" />
+                                    <bean parent="Uif-SecondaryActionButton" p:methodToCall="reload" p:actionLabel="Reload"
+                                          p:performClientSideValidation="true" p:render="@{reload}" />
+                                    <bean parent="Uif-ActionLink" p:methodToCall="delete"
+                                          p:actionLabel="Delete Draft"
+                                          p:render="@{!reload and !newCalendar and !#view.readOnly and !officialUI}" />
+                                    <bean parent="Uif-ActionLink" p:actionLabel="Cancel" p:actionScript="stepBrowserBack()" p:render="@{!#view.readOnly}" />
+                                </list>
+                            </property>
+                        </bean>
                     </list>
                 </property>
             </bean>
@@ -127,7 +141,7 @@ limitations under the License.
                 <bean parent="Uif-InputField" p:propertyName="academicCalendarInfo.startDate"
                       p:label="Start Date" p:labelPlacement="TOP" p:required="true">
                     <property name="control">
-                        <bean parent="Uif-DateControl" p:size="10" p:watermarkText="mm/dd/yyyy" />
+                        <bean parent="Uif-KS-Default-DateControl"/>
                     </property>
                     <property name="validCharactersConstraint">
                         <bean parent="BasicDatePatternConstraint" />
@@ -136,7 +150,7 @@ limitations under the License.
                 <bean parent="Uif-InputField" p:propertyName="academicCalendarInfo.endDate"
                       p:label="End Date" p:labelPlacement="TOP" p:required="true">
                     <property name="control">
-                        <bean parent="Uif-DateControl" p:size="10" p:watermarkText="mm/dd/yyyy"/>
+                        <bean parent="Uif-KS-Default-DateControl"/>
                     </property>
                     <property name="validCharactersConstraint">
                         <bean parent="BasicDatePatternConstraint" />
@@ -185,7 +199,7 @@ limitations under the License.
                 <bean parent="Uif-InputField" p:propertyName="startDate" p:label="Start Date" p:required="true"
                       p:style="font-weight:normal;" p:readOnlyDisplayReplacementPropertyName="startDateUI">
                     <property name="control">
-                        <bean parent="Uif-DateControl" p:size="9" p:watermarkText="mm/dd/yyyy"/>
+                        <bean parent="Uif-KS-Default-DateControl" p:size="9" p:watermarkText="mm/dd/yyyy"/>
                     </property>
                      <property name="validCharactersConstraint">
                          <bean parent="BasicDatePatternConstraint" />
@@ -215,7 +229,7 @@ limitations under the License.
                       p:label="End Date" p:required="@{#lp.dateRange and !#isAddLine}"
                       p:refreshWhenChangedPropertyNames="#lp.dateRange">
                     <property name="control">
-                        <bean parent="Uif-DateControl" p:size="9" p:watermarkText="mm/dd/yyyy">
+                        <bean parent="Uif-KS-Default-DateControl" p:size="9" p:watermarkText="mm/dd/yyyy">
                             <property name="disabled" value="@{!#lp.dateRange}"/>
                         </bean>
                     </property>

@@ -194,7 +194,7 @@ public class TestCourseOfferingServiceBusinessLogicWithMocks {
         scheduleInfo.setTypeKey(SchedulingServiceConstants.SCHEDULE_TYPE_SCHEDULE);
         scheduleInfo.setAtpId(sourceCo.getTermId());
         scheduleInfo=schedulingService.createSchedule(scheduleInfo.getTypeKey(), scheduleInfo, callContext);
-        List<String> sourceScheduleIds = new ArrayList<>();
+        List<String> sourceScheduleIds = new ArrayList<String>();
         sourceScheduleIds.add(scheduleInfo.getId());
         sourceAo.setScheduleIds(sourceScheduleIds);
         sourceAo = coService.createActivityOffering(sourceAo.getFormatOfferingId(), sourceAo.getActivityId(), sourceAo.getTypeKey(), sourceAo, callContext);

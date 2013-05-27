@@ -59,15 +59,20 @@
                                 <property name="items">
                                     <list>
                                         <!-- Roll over details display -->
-                                        <bean parent="Uif-GridSubSection" p:colSpan="2" p:layoutManager.numberOfColumns="3" p:render="@{!socReleasedToDepts and statusField!='Finished'}" p:style="padding-left:113px; margin-bottom:-13px;">
+                                        <bean parent="Uif-GridSubSection" p:colSpan="2" p:layoutManager.numberOfColumns="3" p:render="@{!socReleasedToDepts and statusField!='Finished'}">
+                                            <property name="cssClasses">
+                                                <list merge="true">
+                                                    <value>ks-rolloverResultsInfoSection-gridSubsection</value>
+                                                </list>
+                                            </property>
                                             <property name="items">
                                                 <list>
-                                                    <bean parent="Uif-DataField" p:label="Status" p:fieldLabel.renderColon="false" p:propertyName="statusField" p:style="color:white; background-color:#858585;"/>
+                                                    <bean parent="KS-Lozenge-Grey-Uif-DataField" p:id="rollover-status" p:label="Status" p:fieldLabel.renderColon="false" p:propertyName="statusField" />
                                                     <bean parent="Uif-ActionLink" p:performClientSideValidation="true" p:actionLabel="Refresh" p:methodToCall="showRolloverResults" p:valign="bottom" p:onClickScript="writeHiddenToForm(&quot;rolloverTargetTermCode&quot;, &quot;@{rolloverTargetTermCode}&quot;);"/>
                                                 </list>
                                             </property>
                                         </bean>
-                                        <bean parent="Uif-DataField" p:label="Status" p:fieldLabel.renderColon="false" p:propertyName="statusField" p:render="@{!socReleasedToDepts and statusField=='Finished'}" p:style="color:white; background-color:#858585;"/>
+                                        <bean parent="KS-Lozenge-Grey-Uif-DataField" p:label="Status" p:fieldLabel.renderColon="false" p:propertyName="statusField" p:render="@{!socReleasedToDepts and statusField=='Finished'}"/>
                                         <bean parent="Uif-Message" p:messageText="&lt;b&gt;Status&lt;/b&gt; &#160; &#160;Released to Departments" p:render="@{socReleasedToDepts}" p:colSpan="2" p:style="padding-left:140px;"/>
                                         <bean parent="Uif-DataField" p:label="Date Initiated"
                                               p:fieldLabel.renderColon="false"
@@ -93,7 +98,7 @@
                             <bean parent="Uif-VerticalBoxSection" p:colSpan="3" p:width="20cm" p:render="@{rolloverTargetTermCode!='' and rolloverSourceTermDesc!=''}">
                                 <property name="items">
                                     <list>
-                                        <bean parent="Uif-Message" p:render="@{socReleasedToDepts}"
+                                        <bean parent="Uif-Message" p:render="@{socReleasedToDepts}" p:id="KS-RolloverResultsInfoSectionMsg"
                                               p:messageText="Course offerings for @{rolloverTargetTermDesc!='' ? rolloverTargetTermDesc : 'Unknown Term'} have been released to the departments."/>
                                     </list>
                                 </property>
@@ -110,7 +115,7 @@
                             </bean>
                             <bean parent="Uif-TableCollectionSection" p:headerText="Exceptions" p:style="padding-top:30px"
                                   p:layoutManager.numberOfColumns="3" p:renderAddLine="false"
-                                  p:renderLineActions="false" p:render="@{rolloverTargetTermCode!='' and rolloverSourceTermDesc!=''}">
+                                  p:renderLineActions="false" p:render="@{socRolloverResultItems.size() ge 1}">
                                 <property name="header.headerTagStyle" value="font-family:Arial;font-size:15px;font-weight:bold;font-style:normal;text-decoration:none;color:#000000;background-image:url('../ks-enroll/images/exclamation_diamond_frame.png');background-repeat: no-repeat;background-position: left;padding-left:20px;"/>
                                 <property name="collectionObjectClass" value="org.kuali.student.enrollment.class2.courseoffering.dto.SocRolloverResultItemWrapper"/>
                                 <property name="propertyName" value="socRolloverResultItems"/>

@@ -16,18 +16,20 @@
 package org.kuali.student.enrollment.class1.krms.controller;
 
 import org.kuali.rice.krad.uif.UifParameters;
+import org.kuali.rice.krad.util.ObjectUtils;
 import org.kuali.rice.krad.web.form.MaintenanceDocumentForm;
 import org.kuali.rice.krad.web.form.UifFormBase;
 import org.kuali.rice.krms.controller.RuleEditorController;
 import org.kuali.rice.krms.dto.AgendaEditor;
 import org.kuali.rice.krms.dto.RuleEditor;
 import org.kuali.rice.krms.dto.RuleManagementWrapper;
+import org.kuali.rice.krms.util.AgendaUtilities;
 import org.kuali.student.enrollment.class1.krms.dto.CORuleManagementWrapper;
 import org.kuali.student.enrollment.class1.krms.dto.CluSetInformation;
 import org.kuali.student.enrollment.class1.krms.dto.EnrolPropositionEditor;
 import org.kuali.student.enrollment.class1.krms.dto.EnrolRuleEditor;
 import org.kuali.student.enrollment.class1.krms.service.impl.EnrolRuleViewHelperServiceImpl;
-import org.kuali.student.enrollment.uif.util.KSControllerHelper;
+import org.kuali.student.common.uif.util.KSControllerHelper;
 import org.kuali.student.krms.KRMSConstants;
 import org.kuali.student.r2.core.search.dto.SearchParamInfo;
 import org.kuali.student.r2.lum.clu.dto.MembershipQueryInfo;
@@ -56,22 +58,15 @@ public class RuleStudentEditorController extends RuleEditorController {
     public ModelAndView addRule(@ModelAttribute("KualiForm") UifFormBase form, @SuppressWarnings("unused") BindingResult result,
                                 @SuppressWarnings("unused") HttpServletRequest request, @SuppressWarnings("unused") HttpServletResponse response) throws Exception {
 
+        //Clear the client state on new edit rule.
+        form.getClientStateForSyncing().clear();
         MaintenanceDocumentForm document = (MaintenanceDocumentForm) form;
-        RuleManagementWrapper ruleWrapper = (RuleManagementWrapper) document.getDocument().getNewMaintainableObject().getDataObject();
-        String typeId = document.getActionParamaterValue("ruleType");
 
-        EnrolRuleEditor ruleEditor = new EnrolRuleEditor();
-        ruleEditor.setTypeId(typeId);
-        for( AgendaEditor agenda : ruleWrapper.getAgendas()){
-            for( RuleEditor rule : agenda.getRuleEditors()){
-                if( (rule.getTypeId() != null) && (rule.getTypeId().equals(typeId))){
-                    ruleEditor.setRuleTypeInfo(rule.getRuleTypeInfo());
-                }
-            }
-        }
-        ruleWrapper.setRuleEditor(ruleEditor);
+        RuleEditor ruleEditor = AgendaUtilities.getSelectedRuleEditor(document);
+        EnrolRuleEditor enrolRuleEditor = new EnrolRuleEditor(ruleEditor.getKey(), false, ruleEditor.getRuleTypeInfo());
+        AgendaUtilities.getRuleWrapper(document).setRuleEditor(enrolRuleEditor);
 
-        this.getViewHelper(form).refreshInitTrees(ruleEditor);
+        this.getViewHelper(form).refreshInitTrees(enrolRuleEditor);
 
         form.getActionParameters().put(UifParameters.NAVIGATE_TO_PAGE_ID, "KRMS-RuleMaintenance-Page");
         return super.navigate(form, result, request, response);
@@ -87,6 +82,8 @@ public class RuleStudentEditorController extends RuleEditorController {
         EnrolPropositionEditor prop = (EnrolPropositionEditor) rule.getProposition();
 
         ruleWrapper.setClusInRange(this.getViewHelper(form).getCoursesInRange(prop.getCluSet().getMembershipQueryInfo()));
+        rule.setClusInRange(ruleWrapper.getClusInRange());
+        prop.getCluSet().setClusInRange(ruleWrapper.getClusInRange());
 
         form.setLightboxScript("showLightboxComponent('" + dialog + "');");
         return getUIFModelAndView(form);
@@ -131,6 +128,7 @@ public class RuleStudentEditorController extends RuleEditorController {
             membershipQueryInfo.setQueryParamValues(queryParams);
 
             rule.getCluSetRange().setCluSetRangeLabel("<b>Subject Code:</b> " + rule.getCluSetRange().getSubjectCode() + " <b>Course Number Range:</b> " + rule.getCluSetRange().getCourseNumberRange() + " <b>State:</b> Draft");
+            ruleWrapper.setClusInRange(this.getViewHelper(form).getCoursesInRange(prop.getCluSet().getMembershipQueryInfo()));
         } else if(rule.getSearchByCourseRange().equals("2")) {
             membershipQueryInfo.setSearchTypeKey("lu.search.loByDescCrossSearch");
             List<SearchParamInfo> queryParams = new ArrayList<SearchParamInfo>();
@@ -179,8 +177,6 @@ public class RuleStudentEditorController extends RuleEditorController {
         }
 
         form.setLightboxScript("jQuery.fancybox.close();");
-
-        // reload page1
         return getUIFModelAndView(form);
     }
 
