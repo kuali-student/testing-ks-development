@@ -16,6 +16,7 @@
 package org.kuali.student.r2.core.appointment.dto;
 
 import org.kuali.student.r2.common.dto.IdEntityInfo;
+import org.kuali.student.r2.core.appointment.infc.AppointmentSlotRule;
 import org.kuali.student.r2.core.appointment.infc.AppointmentWindow;
 
 import javax.xml.bind.Element;

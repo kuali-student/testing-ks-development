@@ -33,8 +33,8 @@ import org.kuali.student.r2.common.exceptions.DataValidationErrorException;
 /**
  * Refer to service contract javadoc
  *
- * @version 2.0
- * @author Sri komandur@uw.edu
+ * @Version 2.0
+ * @Author Sri komandur@uw.edu
  */
 public class MessageServiceDecorator implements MessageService {
 
@@ -77,16 +77,6 @@ public class MessageServiceDecorator implements MessageService {
     }
 
     @Override
-    public List<ValidationResultInfo> validateMessage(String validationTypeKey, MessageInfo messageInfo, ContextInfo contextInfo) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
-        return getNextDecorator().validateMessage(validationTypeKey, messageInfo, contextInfo);
-    }
-
-    @Override
-    public StatusInfo createMessage(LocaleInfo localeInfo, String messageGroupKey, String messageKey, MessageInfo messageInfo, ContextInfo contextInfo) throws DataValidationErrorException, DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
-        return getNextDecorator().createMessage(localeInfo, messageGroupKey, messageKey, messageInfo, contextInfo);
-    }
-
-    @Override
     public MessageInfo updateMessage(LocaleInfo localeInfo, String messageGroupKey, String messageKey, MessageInfo messageInfo, ContextInfo contextInfo) throws DataValidationErrorException, DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, ReadOnlyException, VersionMismatchException {
         return getNextDecorator().updateMessage(localeInfo, messageGroupKey, messageKey, messageInfo, contextInfo);
     }
@@ -95,4 +85,15 @@ public class MessageServiceDecorator implements MessageService {
     public StatusInfo deleteMessage(LocaleInfo localeInfo, String messageGroupKey, String messageKey, ContextInfo contextInfo) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
         return getNextDecorator().deleteMessage(localeInfo, messageGroupKey, messageKey, contextInfo);
     }
+
+    @Override
+    public StatusInfo createMessage(LocaleInfo localeInfo, String messageGroupKey, String messageKey, MessageInfo messageInfo, ContextInfo contextInfo) throws DataValidationErrorException, DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
+        return getNextDecorator().createMessage(localeInfo, messageGroupKey, messageKey, messageInfo, contextInfo);
+    }
+
+    public List<ValidationResultInfo> validateProposal(String validationTypeKey, MessageInfo messageInfo, ContextInfo contextInfo) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
+        return getNextDecorator().validateProposal(validationTypeKey, messageInfo, contextInfo);
+    }
+    
+    
 }

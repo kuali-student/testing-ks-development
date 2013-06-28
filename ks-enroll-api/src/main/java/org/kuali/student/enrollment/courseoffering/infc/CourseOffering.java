@@ -372,7 +372,7 @@ public interface CourseOffering
      * Indicates the type of final exam ('STANDARD', 'ALTERNATE',
      * 'NONE') to be given for this format Offering, if any
      *
-     * @name Final ExamOffering Type
+     * @name Final Exam Type
      */
     public String getFinalExamType();
 

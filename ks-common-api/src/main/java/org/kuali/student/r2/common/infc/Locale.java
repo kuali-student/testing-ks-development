@@ -16,6 +16,8 @@
 
 package org.kuali.student.r2.common.infc;
 
+import javax.xml.bind.annotation.XmlElement;
+
 /**
  * A common data structure for holding locale information.
  *

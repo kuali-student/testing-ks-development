@@ -29,6 +29,11 @@ import org.kuali.student.r2.core.acal.dto.TermInfo;
 public class AcademicCalendarServiceConstants {
 
     /**
+     * Application Config Params
+     */
+    public final static String CONFIG_PARAM_KEY_INSTRUCTIONAL_DAYS_DEFAULT = "kuali.ks.core.academiccalendar.instructionalDaysDefault";
+
+    /**
      * Reference Object URI's
      */
     // TODO replace "acal" in namespace with "academiccalendar"

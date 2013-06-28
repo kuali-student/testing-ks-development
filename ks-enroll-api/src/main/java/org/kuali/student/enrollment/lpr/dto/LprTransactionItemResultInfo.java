@@ -16,6 +16,7 @@
 package org.kuali.student.enrollment.lpr.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;

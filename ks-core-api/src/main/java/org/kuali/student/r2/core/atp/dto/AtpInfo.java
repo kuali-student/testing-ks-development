@@ -26,6 +26,8 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.kuali.student.r2.common.dto.IdEntityInfo;
 import org.kuali.student.r2.core.atp.infc.Atp;
+import org.kuali.student.r2.common.dto.KeyEntityInfo;
+//import org.w3c.dom.Element;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AtpInfo", propOrder = {

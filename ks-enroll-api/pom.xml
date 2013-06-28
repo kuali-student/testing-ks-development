@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.kuali.student.api</groupId>
         <artifactId>ks-api</artifactId>
-        <version>2.0.0-services-M7-SNAPSHOT</version>
+        <version>2.0.0-M6-patch1-SNAPSHOT</version>
     </parent>
     <artifactId>ks-enroll-api</artifactId>
     <name>KS Enroll API</name>
@@ -90,7 +90,6 @@
                         <configuration>
                             <classifier>sources</classifier>
                             <includeGroupIds>org.kuali</includeGroupIds>
-                            <excludeArtifactIds>ks-enroll-api,ks-core-api,ks-lum-api,ks-common-api</excludeArtifactIds>
                             <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
                             <outputDirectory>${project.build.directory}/dependency-sources</outputDirectory>
                         </configuration>
@@ -114,9 +113,6 @@
                             <!-- generate on all kuali dependencies -->
                             <sourceDirs>
                                 <sourceDir>${project.basedir}/src/main/java</sourceDir>
-                                <sourceDir>${project.basedir}/../ks-core-api/src/main/java</sourceDir>
-                                <sourceDir>${project.basedir}/../ks-common-api/src/main/java</sourceDir>
-                                <sourceDir>${project.basedir}/../ks-lum-api/src/main/java</sourceDir>
                                 <sourceDir>${project.build.directory}/dependency-sources</sourceDir>
                             </sourceDirs>
                         </configuration>
@@ -173,25 +169,6 @@
                             </sourceDirs>
                         </configuration>
                     </execution>
-                    <!-- This generates the conformance test java code-->
-                    <!--
-                    <execution>
-                        <id>generate-conformance-tests</id>
-                        <phase>${ks.conftest.phase}</phase>
-                        <goals>
-                            <goal>kscreateconftest</goal>
-                        </goals>
-                        <configuration>
-                            &lt;!&ndash; generate only on the kuali student api &ndash;&gt;
-                            <sourceDirs>
-                                <sourceDir>${project.basedir}/src/main/java</sourceDir>
-                                <sourceDir>${project.basedir}/../ks-core-api/src/main/java</sourceDir>
-                                <sourceDir>${project.basedir}/../ks-common-api/src/main/java</sourceDir>
-                                <sourceDir>${project.basedir}/../ks-lum-api/src/main/java</sourceDir>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
--->
                     <!-- generate only on the kuali student api -->
                     <execution>
                         <id>generate-validation-decorators</id>
@@ -300,18 +277,6 @@
                         <phase>${ks.java2ws.phase}</phase>
                         <configuration>
                             <className>org.kuali.student.enrollment.courseoffering.service.CourseOfferingService</className>
-                            <genWsdl>true</genWsdl>
-                            <verbose>true</verbose>
-                        </configuration>
-                        <goals>
-                            <goal>java2ws</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>courseOfferingSetService-wsdl</id>
-                        <phase>${ks.java2ws.phase}</phase>
-                        <configuration>
-                            <className>org.kuali.student.enrollment.courseofferingset.service.CourseOfferingSetService</className>
                             <genWsdl>true</genWsdl>
                             <verbose>true</verbose>
                         </configuration>

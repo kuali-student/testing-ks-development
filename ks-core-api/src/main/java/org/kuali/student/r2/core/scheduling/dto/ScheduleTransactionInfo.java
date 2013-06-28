@@ -18,6 +18,7 @@
 package org.kuali.student.r2.core.scheduling.dto;
 
 import org.kuali.student.r2.common.dto.IdEntityInfo;
+import org.kuali.student.r2.core.scheduling.infc.ScheduleRequest;
 import org.kuali.student.r2.core.scheduling.infc.ScheduleRequestComponent;
 import org.kuali.student.r2.core.scheduling.infc.ScheduleTransaction;
 //import org.w3c.dom.Element;
@@ -39,17 +40,17 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ScheduleTransactionInfo", propOrder = {"id", "typeKey", "stateKey", "name", "descr",
-        "scheduleBatchId", "refObjectId", "refObjectTypeKey", "scheduleRequestComponents",
-        "scheduleId", "statusMessage",
+        "scheduleRequestId", "existingScheduleId", "scheduleBatchId",
+        "scheduleId", "statusMessage", "scheduleRequestComponents",
         "meta", "attributes", "_futureElements" }) 
 public class ScheduleTransactionInfo extends IdEntityInfo implements ScheduleTransaction, Serializable {
 
     @XmlElement
+    private String scheduleRequestId;
+    @XmlElement
+    private String existingScheduleId;
+    @XmlElement
     private String scheduleBatchId;
-    @XmlElement
-    private String refObjectId;
-    @XmlElement
-    private String refObjectTypeKey;
     @XmlElement
     private String scheduleId;
     @XmlElement
@@ -65,8 +66,8 @@ public class ScheduleTransactionInfo extends IdEntityInfo implements ScheduleTra
     public ScheduleTransactionInfo(ScheduleTransaction scheduleTransaction) {
         super (scheduleTransaction);
         if (null != scheduleTransaction) {
-            this.refObjectId = scheduleTransaction.getRefObjectId();
-            this.refObjectTypeKey = scheduleTransaction.getRefObjectTypeKey();
+            this.scheduleRequestId = scheduleTransaction.getScheduleRequestId();
+            this.existingScheduleId = scheduleTransaction.getExistingScheduleId();
             this.scheduleId = scheduleTransaction.getScheduleId();
             this.scheduleBatchId = scheduleTransaction.getScheduleBatchId();
             this.statusMessage = scheduleTransaction.getStatusMessage();
@@ -78,12 +79,21 @@ public class ScheduleTransactionInfo extends IdEntityInfo implements ScheduleTra
     }
 
     @Override
-    public String getRefObjectTypeKey() {
-        return this.refObjectTypeKey;
+    public String getScheduleRequestId() {
+        return this.scheduleRequestId;
     }
 
-    public void setRefObjectTypeKey(String refObjectTypeKey) {
-        this.refObjectTypeKey = refObjectTypeKey;
+    public void setScheduleRequestId(String scheduleRequestId) {
+        this.scheduleRequestId = scheduleRequestId;
+    }
+
+    @Override
+    public String getExistingScheduleId() {
+        return this.existingScheduleId;
+    }
+
+    public void setExistingScheduleId(String existingScheduleId) {
+        this.existingScheduleId = existingScheduleId;
     }
 
     @Override
@@ -93,15 +103,6 @@ public class ScheduleTransactionInfo extends IdEntityInfo implements ScheduleTra
 
     public void setScheduleBatchId(String scheduleBatchId) {
         this.scheduleBatchId = scheduleBatchId;
-    }
-
-    @Override
-    public String getRefObjectId() {
-        return this.refObjectId;
-    }
-
-    public void setRefObjectId(String refObjectId) {
-        this.refObjectId = refObjectId;
     }
 
     @Override
