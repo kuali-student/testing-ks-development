@@ -300,9 +300,7 @@ public interface CourseOffering
      * @name Has Waitlist
      * @impl not sure how to store this, it depends on how we end up
      *       implementing waitlists.
-     * @deprecated Use the CourseWaitList service instead.
      */
-    @Deprecated
     public Boolean getHasWaitlist();
 
     /**
@@ -318,9 +316,7 @@ public interface CourseOffering
      * @name Waitlist Type Key
      * @impl TODO: decide if this this should be stored on the Lui or on a
      *       waitlist object?
-     * @deprecated Use the CourseWaitList service instead.
      */
-    @Deprecated
     public String getWaitlistTypeKey();
 
     /**
@@ -328,9 +324,7 @@ public interface CourseOffering
      *  ActivityOffering.  Values are in WaitListLevel enum.
      *
      * @name Waitlist Level Type Key
-     * @deprecated Use the CourseWaitList service instead.
      */
-    @Deprecated
     public String  getWaitlistLevelTypeKey();
 
     /**
@@ -338,9 +332,7 @@ public interface CourseOffering
      *
      * @name Waitlist Maximum
      * @impl maps to Lui.waitlistMaximum
-     * @deprecated Use the CourseWaitList service instead.
      */
-    @Deprecated
     public Integer getWaitlistMaximum();    
 
 
@@ -380,7 +372,7 @@ public interface CourseOffering
      * Indicates the type of final exam ('STANDARD', 'ALTERNATE',
      * 'NONE') to be given for this format Offering, if any
      *
-     * @name Final ExamOffering Type
+     * @name Final Exam Type
      */
     public String getFinalExamType();
 

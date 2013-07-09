@@ -16,10 +16,8 @@
 package org.kuali.student.enrollment.coursewaitlist.infc;
 
 import org.kuali.student.r2.common.infc.Relationship;
-import org.kuali.student.r2.common.infc.RichText;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Relates a Student to a CourseWaitList.  Essentially these entries are used to represent all students on a course wait list

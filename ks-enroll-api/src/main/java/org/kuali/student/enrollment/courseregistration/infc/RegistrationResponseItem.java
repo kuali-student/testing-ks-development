@@ -16,6 +16,7 @@
 
 package org.kuali.student.enrollment.courseregistration.infc;
 
+import org.kuali.student.r2.common.infc.HasAttributesAndMeta;
 import org.kuali.student.r2.common.infc.OperationStatus;
 
 /**

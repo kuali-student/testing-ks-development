@@ -217,9 +217,6 @@ public class StateServiceMockImpl
         throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
 
         Collection<String> stateKeys = this.lifeCycleStatesMap.get(lifecycleKey);
-        if (stateMap == null) {
-            throw new DoesNotExistException(lifecycleKey + " not found");
-        }
 
         return getStatesByKeys(new ArrayList<String>(stateKeys), contextInfo);
     }

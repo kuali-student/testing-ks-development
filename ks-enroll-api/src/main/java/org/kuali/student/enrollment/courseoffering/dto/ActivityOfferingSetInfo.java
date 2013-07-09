@@ -71,6 +71,10 @@ public class ActivityOfferingSetInfo
     public ActivityOfferingSetInfo(ActivityOfferingSet activityOfferingSet) {
         this.id = activityOfferingSet.getId();
 
+        if (activityOfferingSet == null) {
+            return;      
+        }
+
         this.activityOfferingType = activityOfferingSet.getActivityOfferingType();
 
         if (activityOfferingSet.getActivityOfferingIds() != null) {

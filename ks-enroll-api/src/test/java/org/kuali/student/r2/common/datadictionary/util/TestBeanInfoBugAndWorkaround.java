@@ -21,6 +21,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 
+import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
