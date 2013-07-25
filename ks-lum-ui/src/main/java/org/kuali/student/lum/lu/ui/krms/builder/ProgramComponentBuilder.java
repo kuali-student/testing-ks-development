@@ -27,7 +27,6 @@ import org.kuali.student.lum.lu.ui.krms.util.LUKRMSConstants;
 import org.kuali.student.r2.common.util.ContextUtils;
 import org.kuali.student.r2.core.constants.KSKRMSServiceConstants;
 import org.kuali.student.r2.core.constants.PopulationServiceConstants;
-import org.kuali.student.r2.core.population.dto.PopulationInfo;
 import org.kuali.student.r2.core.population.service.PopulationService;
 import org.kuali.student.r2.core.versionmanagement.dto.VersionDisplayInfo;
 import org.kuali.student.r2.lum.clu.dto.CluInfo;
@@ -59,8 +58,6 @@ public class ProgramComponentBuilder implements ComponentBuilder<LUPropositionEd
 
     private LRCService lrcService;
 
-    private PopulationService populationService;
-
     @Override
     public List<String> getComponentIds() {
         return null;
@@ -69,7 +66,6 @@ public class ProgramComponentBuilder implements ComponentBuilder<LUPropositionEd
     @Override
     public void resolveTermParameters(LUPropositionEditor propositionEditor, Map<String, String> termParameters) {
         String cluSetId = termParameters.get(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_PROGRAM_CLUSET_KEY);
-        String classStadingId = termParameters.get(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_CLASS_STANDING_KEY);
         if (cluSetId != null) {
             try {
                 ProgramCluSetInformation cluSetInfo = this.getProgramCluSetInformation(cluSetId);
@@ -79,19 +75,6 @@ public class ProgramComponentBuilder implements ComponentBuilder<LUPropositionEd
             }
 
         }
-        //if (classStadingId != null) {
-        //    try {
-        //        PopulationInfo populationInfo = this.getPopulationService().getPopulation(classStadingId, ContextUtils.getContextInfo());
-        //        PopulationWrapper populationWrapper = new PopulationWrapper();
-        //        propositionEditor.setPopulationWrapper(populationWrapper);
-        //        propositionEditor.getPopulationWrapper().setId(populationInfo.getId());
-        //        propositionEditor.getPopulationWrapper().setPopulationInfo(populationInfo);
-        //       propositionEditor.setClassStanding(populationInfo.getName());
-        //    } catch (Exception e) {
-        //        throw new RuntimeException(e);
-        //    }
-        //
-        //}
     }
 
     @Override
@@ -104,10 +87,6 @@ public class ProgramComponentBuilder implements ComponentBuilder<LUPropositionEd
                 termParameters.put(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_PROGRAM_CLUSET_KEY, null);
             }
         }
-        //if (propositionEditor.getClassStanding() != null){
-
-        //    termParameters.put(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_CLASS_STANDING_KEY, propositionEditor.getPopulationWrapper().getId());
-        //}
 
         return termParameters;
     }
@@ -380,12 +359,4 @@ public class ProgramComponentBuilder implements ComponentBuilder<LUPropositionEd
         }
         return lrcService;
     }
-
-    private PopulationService getPopulationService() {
-        if(populationService == null) {
-            populationService = (PopulationService) GlobalResourceLoader.getService(new QName(PopulationServiceConstants.NAMESPACE, "PopulationService"));
-        }
-        return this.populationService;
-    }
 }
-

@@ -44,8 +44,6 @@ public class LUPropositionEditor extends KSPropositionEditor {
     private String termCode2;
     private TermInfo termInfo;
     private TermInfo termInfo2;
-    private String population;
-    //private PopulationWrapper  populationWrapper;
 
     private static final String CLULIST_KEY = "kuali.term.parameter.type.course.nl.clu.list";
     private static final String CLUSETLIST_KEY = "kuali.term.parameter.type.course.nl.cluset.list";
@@ -71,8 +69,6 @@ public class LUPropositionEditor extends KSPropositionEditor {
         this.termCode2 = null;
         this.termInfo = null;
         this.termInfo2 = null;
-        this.population = null;
-        //this.populationWrapper = null;
     }
 
     public CourseInfo getCourseInfo() {
@@ -163,22 +159,6 @@ public class LUPropositionEditor extends KSPropositionEditor {
     public void setTermCode2(String termCode2) {
         this.termCode2 = termCode2;
     }
-
-    public String getPopulation() {
-        return population;
-    }
-
-    public void setPopulation(String population) {
-        this.population = population;
-    }
-
-    //public PopulationWrapper getPopulationWrapper() {
-    //    return populationWrapper;
-    //}
-
-    //public void setPopulationWrapper(PopulationWrapper populationWrapper) {
-    //    this.populationWrapper = populationWrapper;
-    //}
 
     @Override
     protected PropositionEditor createPropositionEditor(PropositionDefinitionContract definition){
