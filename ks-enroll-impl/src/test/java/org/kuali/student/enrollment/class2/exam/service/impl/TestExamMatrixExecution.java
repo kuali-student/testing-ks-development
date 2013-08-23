@@ -24,9 +24,11 @@ import org.kuali.rice.krms.api.engine.ExecutionFlag;
 import org.kuali.rice.krms.api.engine.ExecutionOptions;
 import org.kuali.rice.krms.api.engine.SelectionCriteria;
 import org.kuali.rice.krms.api.engine.TermResolver;
+import org.kuali.rice.krms.api.repository.action.ActionDefinition;
 import org.kuali.rice.krms.api.repository.agenda.AgendaDefinition;
 import org.kuali.rice.krms.api.repository.proposition.PropositionDefinition;
 import org.kuali.rice.krms.api.repository.proposition.PropositionParameter;
+import org.kuali.rice.krms.api.repository.proposition.PropositionParameterType;
 import org.kuali.rice.krms.api.repository.rule.RuleDefinition;
 import org.kuali.rice.krms.api.repository.term.TermDefinition;
 import org.kuali.rice.krms.api.repository.term.TermParameterDefinition;
@@ -47,10 +49,12 @@ import org.kuali.rice.krms.framework.engine.ProviderBasedEngine;
 import org.kuali.rice.krms.framework.engine.Rule;
 import org.kuali.rice.krms.impl.provider.repository.RepositoryToEngineTranslator;
 import org.kuali.rice.krms.impl.provider.repository.RepositoryToEngineTranslatorImpl;
+import org.kuali.rice.krms.impl.repository.ActionBoService;
 import org.kuali.rice.krms.impl.repository.KrmsRepositoryServiceLocator;
 import org.kuali.rice.krms.impl.repository.KrmsTypeRepositoryServiceImpl;
 import org.kuali.rice.krms.impl.repository.mock.KrmsTypeRepositoryServiceMockImpl;
 import org.kuali.rice.krms.impl.type.KrmsTypeResolverImpl;
+import org.kuali.rice.test.SQLDataLoader;
 import org.kuali.student.common.util.krms.ManualContextProvider;
 import org.kuali.student.common.util.krms.RulesExecutionConstants;
 import org.kuali.student.enrollment.class2.courseoffering.service.impl.CourseOfferingServiceTestDataLoader;
@@ -120,24 +124,25 @@ public class TestExamMatrixExecution extends KSKRMSTestCase {
     @Resource(name = "courseOfferingDataLoader")
     private CourseOfferingServiceTestDataLoader courseOfferingDataLoader;
 
-    private KRMSEvaluator evaluator;
-
     public static String principalId = "123";
     public ContextInfo callContext = new ContextInfo();
 
     @Before
     public void setUp() throws Exception {
-        //super.setUp();
+        super.setUp();
 
         callContext.setPrincipalId(principalId);
-        evaluator = new KRMSEvaluator() {
-        };
 
         if(schedulingServiceDataLoader!=null){
             schedulingServiceDataLoader.loadData();
             courseOfferingDataLoader.loadTerms();
             loadActivityOfferingData();
         }
+    }
+
+    @Override
+    protected void loadSuiteTestData() throws Exception {
+        new SQLDataLoader("classpath:ks-krms-exam-matrix.sql", "/").runSql();
     }
 
     @Test
@@ -147,27 +152,21 @@ public class TestExamMatrixExecution extends KSKRMSTestCase {
     }
 
     private void testRuleExecution() {
-        RuleDefinition ruleDefinition = getRuleConfigurationData();
 
+        RuleDefinition ruleDefinition = KrmsRepositoryServiceLocator.getRuleBoService().getRuleByRuleId("KS-KRMS-RULE-12037");
         Rule rule = KrmsRepositoryServiceLocator.getKrmsRepositoryToEngineTranslator().translateRuleDefinition(ruleDefinition);
-        AgendaTreeEntry entry3 = new BasicAgendaTreeEntry(rule);
-        BasicAgendaTree agendaTree = new BasicAgendaTree(entry3);
-
-        Agenda agenda = new BasicAgenda(Collections.singletonMap(AgendaDefinition.Constants.EVENT, "GEOG123 Course Requirements"), agendaTree);
+        BasicAgendaTree agendaTree = new BasicAgendaTree(new BasicAgendaTreeEntry(rule));
+        Agenda agenda = new BasicAgenda(Collections.singletonMap(AgendaDefinition.Constants.EVENT, "Exam Matrix"), agendaTree);
 
         List<TermResolver<?>> termResolvers = new ArrayList<TermResolver<?>>();
-        MatchingTimeSlotTermResolver termResolver = new MatchingTimeSlotTermResolver();
-        termResolver.setSchedulingService(schedulingService);
-        termResolver.setCourseOfferingService(courseOfferingService);
-        termResolvers.add(termResolver);
-        Context context = new BasicContext(Arrays.asList(agenda), termResolvers);
-        ContextProvider contextProvider = new ManualContextProvider(context);
+        termResolvers.add(getMatchingTimeSlotTermResolver());
 
         ProviderBasedEngine engine = new ProviderBasedEngine();
-        engine.setContextProvider(contextProvider);
+        Context context = new BasicContext(Arrays.asList(agenda), termResolvers);
+        engine.setContextProvider(new ManualContextProvider(context));
 
         Map<String, String> contextQualifiers = Collections.singletonMap(RulesExecutionConstants.DOCTYPE_CONTEXT_QUALIFIER, RulesExecutionConstants.STUDENT_ELIGIBILITY_DOCTYPE);
-        Map<String, String> agendaQualifiers = Collections.singletonMap(AgendaDefinition.Constants.EVENT, "GEOG123 Course Requirements");
+        Map<String, String> agendaQualifiers = Collections.singletonMap(AgendaDefinition.Constants.EVENT, "Exam Matrix");
         SelectionCriteria selectionCriteria = SelectionCriteria.createCriteria(new DateTime(), contextQualifiers, agendaQualifiers);
 
         Map<String, Object> executionFacts = new HashMap<String, Object>();
@@ -177,14 +176,11 @@ public class TestExamMatrixExecution extends KSKRMSTestCase {
         ExecutionOptions executionOptions = new ExecutionOptions();
         executionOptions.setFlag(ExecutionFlag.LOG_EXECUTION, true);
         executionOptions.setFlag(ExecutionFlag.EVALUATE_ALL_PROPOSITIONS, true);
+
         engine.execute(selectionCriteria, executionFacts, executionOptions);
     }
 
     private void testTermResolver() {
-        MatchingTimeSlotTermResolver termResolver = new MatchingTimeSlotTermResolver();
-        termResolver.setCourseOfferingService(courseOfferingService);
-        termResolver.setSchedulingService(schedulingService);
-
         Map<String, Object> resolvedPrereqs = new HashMap<String, Object>();
         resolvedPrereqs.put(KSKRMSServiceConstants.TERM_PREREQUISITE_CONTEXTINFO, callContext);
         resolvedPrereqs.put(KSKRMSServiceConstants.TERM_PREREQUISITE_AO_ID, "AO1");
@@ -194,40 +190,15 @@ public class TestExamMatrixExecution extends KSKRMSTestCase {
         parameters.put(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_TIMESLOT_START, "45000000");
         parameters.put(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_TIMESLOT_END, "49500000");
 
-        Boolean result = termResolver.resolve(resolvedPrereqs, parameters);
+        Boolean result = getMatchingTimeSlotTermResolver().resolve(resolvedPrereqs, parameters);
         assertTrue(result);
     }
 
-    private RuleDefinition getRuleConfigurationData() {
-        RuleDefinition rule = KrmsRepositoryServiceLocator.getRuleBoService().getRuleByRuleId("R1");
-        if(rule!=null){
-            return rule;
-        }
-
-        TermSpecificationDefinition termSpec = KrmsRepositoryServiceLocator.getTermBoService().getTermSpecificationByNameAndNamespace("MATCHTIMESLOT", "EXAM");
-        if(termSpec==null){
-            TermSpecificationDefinition.Builder termSpecBuilder = TermSpecificationDefinition.Builder.create(null, "MATCHTIMESLOT", "EXAM", "java.lang.Boolean");
-            termSpec = KrmsRepositoryServiceLocator.getTermBoService().createTermSpecification(termSpecBuilder.build());
-        }
-
-        TermDefinition term = KrmsRepositoryServiceLocator.getTermBoService().getTerm("10203");
-        if(term==null){
-            List<TermParameterDefinition.Builder> termParms = new ArrayList<TermParameterDefinition.Builder>();
-            termParms.add(TermParameterDefinition.Builder.create("TP1", null, KSKRMSServiceConstants.TERM_PARAMETER_TYPE_TIMESLOT_WEEKDAY_STRING, "MWF"));
-            TermSpecificationDefinition.Builder termSpecBuilder = TermSpecificationDefinition.Builder.create(termSpec);
-            TermDefinition.Builder termBuilder = TermDefinition.Builder.create(null, termSpecBuilder, termParms);
-            term = KrmsRepositoryServiceLocator.getTermBoService().createTerm(termBuilder.build());
-        }
-
-        List<PropositionParameter.Builder> parmBuilders = new ArrayList<PropositionParameter.Builder>();
-        parmBuilders.add(PropositionParameter.Builder.create("PP1", "P1", term.getId(), "T", 1));
-        parmBuilders.add(PropositionParameter.Builder.create("PP3", "P1", "true", "C", 2));
-        parmBuilders.add(PropositionParameter.Builder.create("PP2", "P1", "=", "O", 3));
-
-        PropositionDefinition.Builder propositionBuilder = PropositionDefinition.Builder.create("P1", "S", "R1", null, parmBuilders);
-        RuleDefinition.Builder ruleBuilder = RuleDefinition.Builder.create("R1", "Rule 1", "EXAM", null, "P1");
-        ruleBuilder.setProposition(propositionBuilder);
-        return KrmsRepositoryServiceLocator.getRuleBoService().createRule(ruleBuilder.build());
+    private MatchingTimeSlotTermResolver getMatchingTimeSlotTermResolver() {
+        MatchingTimeSlotTermResolver termResolver = new MatchingTimeSlotTermResolver();
+        termResolver.setCourseOfferingService(courseOfferingService);
+        termResolver.setSchedulingService(schedulingService);
+        return termResolver;
     }
 
     private void loadActivityOfferingData() throws Exception {
@@ -235,9 +206,9 @@ public class TestExamMatrixExecution extends KSKRMSTestCase {
         CourseOfferingInfo co1 = createCourseOffering("CO1", c1, "termId");
         FormatOfferingInfo fo1 = createFormatOffering("FO1", co1);
 
-        ActivityOfferingInfo ao1 = createActivityOffering("AO1", co1, fo1, "testScheduleId1");
-        ActivityOfferingInfo ao2 = createActivityOffering("AO2", co1, fo1, "testScheduleId2");
-        ActivityOfferingInfo ao3 = createActivityOffering("AO3", co1, fo1, "testScheduleId3");
+        createActivityOffering("AO1", co1, fo1, "testScheduleId1");
+        createActivityOffering("AO2", co1, fo1, "testScheduleId2");
+        createActivityOffering("AO3", co1, fo1, "testScheduleId3");
     }
 
     private CourseInfo createCanonicalCourse(String id, String code, String title) throws Exception {

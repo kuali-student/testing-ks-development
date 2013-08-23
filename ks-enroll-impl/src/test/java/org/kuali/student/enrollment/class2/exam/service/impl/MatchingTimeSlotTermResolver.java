@@ -67,7 +67,7 @@ public class MatchingTimeSlotTermResolver implements TermResolver<Boolean> {
 
     @Override
     public String getOutput() {
-        return "MATCHTIMESLOT";
+        return "matchingTimeSlot";
     }
 
     @Override
