@@ -16,10 +16,13 @@
 package org.kuali.student.enrollment.class1.krms.dto;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.rice.krms.api.repository.action.ActionDefinitionContract;
+import org.kuali.rice.krms.api.repository.proposition.PropositionDefinitionContract;
 import org.kuali.rice.krms.api.repository.rule.RuleDefinitionContract;
 import org.kuali.rice.krms.dto.ActionEditor;
+import org.kuali.rice.krms.dto.PropositionEditor;
 import org.kuali.rice.krms.dto.RuleEditor;
 import org.kuali.rice.krms.dto.RuleTypeInfo;
+import org.kuali.student.lum.lu.ui.krms.dto.LUPropositionEditor;
 import org.kuali.student.lum.lu.ui.krms.dto.LURuleEditor;
 import org.kuali.student.r2.common.util.date.DateFormatters;
 import org.kuali.student.r2.core.constants.KSKRMSServiceConstants;
@@ -156,6 +159,11 @@ public class FERuleEditor extends LURuleEditor {
         }
 
         return timeString;
+    }
+
+    @Override
+    protected PropositionEditor createPropositionEditor(PropositionDefinitionContract definition){
+        return new FEPropositionEditor(definition);
     }
 
 }
