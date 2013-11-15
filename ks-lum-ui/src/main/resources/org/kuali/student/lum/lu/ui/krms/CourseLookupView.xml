@@ -20,16 +20,16 @@ limitations under the License.
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="ProgramInformation" parent="ProgramInformation-parentBean"/>
-    <bean id="ProgramInformation-parentBean" abstract="true" parent="DataObjectEntry">
-        <property name="objectLabel" value="Program Info"/>
+    <bean id="CluInformation" parent="CluInformation-parentBean"/>
+    <bean id="CluInformation-parentBean" abstract="true" parent="DataObjectEntry">
+        <property name="objectLabel" value="Course Info"/>
         <property name="dataObjectClass" value="org.kuali.student.lum.lu.ui.krms.dto.CluInformation"/>
         <property name="titleAttribute" value="id"/>
         <property name="attributes">
             <list>
-                <ref bean="ProgramInformation.title"/>
-                <ref bean="ProgramInformation.code"/>
-                <ref bean="ProgramInformation.description"/>
+                <ref bean="CluInformation.title"/>
+                <ref bean="CluInformation.code"/>
+                <ref bean="CluInformation.description"/>
             </list>
         </property>
         <property name="primaryKeys">
@@ -39,12 +39,12 @@ limitations under the License.
         </property>
     </bean>
 
-    <bean id="ProgramInformation.title" parent="ProgramInformation.title-parentBean"/>
-    <bean id="ProgramInformation.title-parentBean" abstract="true" parent="AttributeDefinition">
+    <bean id="CluInformation.title" parent="CluInformation.title-parentBean"/>
+    <bean id="CluInformation.title-parentBean" abstract="true" parent="AttributeDefinition">
         <property name="name" value="title"/>
         <property name="dataType" value="STRING" />
-        <property name="label" value="Program Title"/>
-        <property name="shortLabel" value="Program Title"/>
+        <property name="label" value="Course Title"/>
+        <property name="shortLabel" value="Course Title"/>
         <property name="forceUppercase" value="false"/>
         <property name="maxLength" value="40"/>
         <property name="validCharactersConstraint">
@@ -55,12 +55,12 @@ limitations under the License.
         </property>
     </bean>
 
-    <bean id="ProgramInformation.code" parent="ProgramInformation.code-parentBean"/>
-    <bean id="ProgramInformation.code-parentBean" abstract="true" parent="AttributeDefinition">
+    <bean id="CluInformation.code" parent="CluInformation.code-parentBean"/>
+    <bean id="CluInformation.code-parentBean" abstract="true" parent="AttributeDefinition">
         <property name="name" value="code"/>
-        <property name="dataType" value="STRING"/>
-        <property name="label" value="Program Code(Subject/Number)"/>
-        <property name="shortLabel" value="Program Code"/>
+        <property name="dataType" value="STRING" />
+        <property name="label" value="Course Code(Subject/Number)"/>
+        <property name="shortLabel" value="Course"/>
         <property name="forceUppercase" value="false"/>
         <property name="maxLength" value="10"/>
         <property name="validCharactersConstraint">
@@ -71,14 +71,14 @@ limitations under the License.
         </property>
     </bean>
 
-    <bean id="ProgramInformation.description" parent="ProgramInformation.description-parentBean"/>
-    <bean id="ProgramInformation.description-parentBean" abstract="true" parent="AttributeDefinition">
+    <bean id="CluInformation.description" parent="CluInformation.description-parentBean"/>
+    <bean id="CluInformation.description-parentBean" abstract="true" parent="AttributeDefinition">
         <property name="name" value="description"/>
         <property name="dataType" value="STRING" />
         <property name="label" value="Phrase in Description"/>
-        <property name="shortLabel" value="Phrase in Description"/>
+        <property name="shortLabel" value="Description"/>
         <property name="forceUppercase" value="false"/>
-        <property name="maxLength" value="30"/>
+        <property name="maxLength" value="10"/>
         <property name="validCharactersConstraint">
             <bean parent="AnyCharacterPatternConstraint"/>
         </property>
@@ -87,44 +87,29 @@ limitations under the License.
         </property>
     </bean>
 
+    <bean id="KRMS-Course-LookupView" parent="KS-Uif-LookupView" p:breadcrumbs.render="false">
 
-    <bean id="KRMS-Program-LookupView" parent="KS-Uif-LookupView" p:breadcrumbs.render="false">
-        <property name="id" value="ProgramLookupView"/>
-        <property name="viewName" value="krmsProgramOnlyLookup"/>
-        <property name="headerText" value="Advanced Search: Programs Only" />
+        <property name="viewName" value="krmsCoursesOnlyLookup"/>
+        <property name="headerText" value="Advanced Search: Courses Only" />
         <property name="dataObjectClassName" value="org.kuali.student.lum.lu.ui.krms.dto.CluInformation" />
-        <property name="viewHelperServiceClass" value="org.kuali.student.lum.lu.ui.krms.service.impl.ProgramInfoLookupableImpl" />
+        <property name="viewHelperServiceClass" value="org.kuali.student.lum.lu.ui.krms.service.impl.CourseInfoLookupableImpl" />
         <property name="criteriaFields">
             <list>
-                <bean parent="Uif-LookupCriteriaInputField" p:propertyName="title" p:label="Program Title"/>
-                <bean parent="Uif-LookupCriteriaInputField" p:propertyName="code" p:label="Program Code(Subject/Number)"/>
+                <bean parent="Uif-LookupCriteriaInputField" p:propertyName="title" p:label="Course Title"/>
+                <bean parent="Uif-LookupCriteriaInputField" p:propertyName="code" p:label="Course Code(Subject/Number)"/>
                 <bean parent="Uif-LookupCriteriaInputField" p:propertyName="description" p:label="Phrase in Description"/>
+
             </list>
         </property>
         <property name="resultFields">
             <list>
-                <bean parent="Uif-InputField" p:propertyName="title">
-                    <property name="label" value="Name"/>
-                    <property name="shortLabel" value="Name"/>
-                 </bean>
-                <bean parent="Uif-InputField" p:propertyName="code" />
-
-                <bean parent="Uif-InputField" p:propertyName="state">
-                    <property name="label" value="State"/>
-                    <property name="shortLabel" value="State"/>
-               </bean>
-                <bean parent="Uif-InputField" p:propertyName="description">
-                    <property name="label" value="Description"/>
-                    <property name="shortLabel" value="Description"/>
-                </bean>
-
+                <bean parent="KS-Uif-DataField-Simple" p:propertyName="title" p:label="Course Title"/>
+                <bean parent="KS-Uif-DataField-Simple" p:propertyName="code" p:label="Course Code"/>
+                <bean parent="KS-Uif-DataField-Simple" p:propertyName="state" p:label="State"/>
+                <bean parent="KS-Uif-DataField-Simple" p:propertyName="description" p:label="Description"/>
             </list>
         </property>
-        <property name="additionalCssFiles">
-            <list>
-                <value>themes/ksboot/stylesheets/krms.css</value>
-            </list>
-        </property>
+
     </bean>
 
 </beans>
