@@ -77,11 +77,12 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<modules>
-                <module>ks-ap-sql</module>
+		                <module>ks-ap-sql</module>
 				<module>ks-ap-framework</module>
 				<module>ks-ap-impl</module>
 				<module>ks-ap-ui</module>
 				<module>ks-ap-web</module>
+				<module>ks-ap-deployment-resources</module>
 			</modules>
 		</profile>
         <profile>
@@ -97,6 +98,7 @@
 				<module>ks-ap-framework</module>
 				<module>ks-ap-ui</module>
 				<module>ks-ap-web</module>
+				<module>ks-ap-deployment-resources</module>
 			</modules>
 		</profile>
 		<profile>
@@ -105,6 +107,7 @@
 				<module>ks-ap-impl</module>
 				<module>ks-ap-framework</module>
 				<module>ks-ap-ui</module>
+				<module>ks-ap-deployment-resources</module>
 			</modules>
 		</profile>
 	</profiles>
