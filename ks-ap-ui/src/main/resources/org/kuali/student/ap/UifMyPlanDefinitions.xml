@@ -143,7 +143,7 @@
     <!-- THEMES ######################################################################################## -->
 
     <bean id="MyPlanTheme" abstract="true" parent="MyPlanTheme-parentBean"/>
-    <bean id="MyPlanTheme-parentBean" parent="Uif-KradTheme">
+    <bean id="MyPlanTheme-parentBean" parent="Uif-BaseTheme">
         <property name="cssFiles">
             <list merge="true">
                 <value>ks-myplan/jquery-popover/jquery.popover.css</value>
@@ -176,7 +176,7 @@
 
     <!--Myplan theme with different view-->
     <bean id="MyPlanRetrievedTheme" abstract="true" parent="MyPlanRetrievedTheme-parentBean"/>
-    <bean id="MyPlanRetrievedTheme-parentBean" parent="Uif-KradTheme">
+    <bean id="MyPlanRetrievedTheme-parentBean" parent="Uif-BaseTheme">
         <property name="cssFiles">
             <list merge="false"/>
         </property>

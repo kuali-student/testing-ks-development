@@ -119,13 +119,13 @@ public class PlannerItem implements
 		if (descr != null)
 			courseNote = descr.getPlain();
 
-        menuSuffix = "";
+			menuSuffix = "";
 		if (AcademicPlanServiceConstants.ItemCategory.PLANNED
 				.equals(planItem.getCategory()) && campusCode != null
 					&& KsapFrameworkServiceLocator.getShoppingCartStrategy()
 							.isCartAvailable(termId, campusCode)) {
 				menuSuffix = "_cartavailable";
-        }
+	    }
 	}
 
 	public String getParentUniqueId() {

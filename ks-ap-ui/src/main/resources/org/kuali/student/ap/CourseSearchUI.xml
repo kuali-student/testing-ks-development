@@ -205,7 +205,7 @@
 			</list>
 		</property>
         <property name="onDocumentReadyScript" value="registerCourseSearchResultsEvents(jQuery('#course_search_results'))" />
-        <property name="richTable.templateOptions">
+		<property name="richTable.templateOptions">
 			<map merge="true">
 				<entry key="oLanguage"
 					value="{

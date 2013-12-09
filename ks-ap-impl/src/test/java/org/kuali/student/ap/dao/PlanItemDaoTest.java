@@ -163,7 +163,7 @@ public class PlanItemDaoTest extends AbstractTransactionalDaoTest {
         pie.setTypeId(AcademicPlanServiceConstants.LEARNING_PLAN_ITEM_TYPE_COURSE);
 
 
-         Set<String> atps = new HashSet<String>();
+        Set<String> atps = new HashSet<String>();
         atps.add("atp1");
         atps.add("atp2");
         pie.setPlanPeriods(atps);

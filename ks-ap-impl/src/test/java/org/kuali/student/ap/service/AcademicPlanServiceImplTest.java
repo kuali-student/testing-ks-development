@@ -437,7 +437,7 @@ public class AcademicPlanServiceImplTest {
 		assertEquals(1, updatedPlanItem.getPlanPeriods().size());
 		assertTrue(updatedPlanItem.getPlanPeriods().contains("20114"));
 		assertFalse(originalUpdateDate.equals(updatedPlanItem.getMeta()
-                .getUpdateTime()));
+				.getUpdateTime()));
 	}
 
 	@Test
@@ -512,8 +512,8 @@ public class AcademicPlanServiceImplTest {
 			assertEquals("error.required", resultInfo.getMessage());
 		} catch (InvalidParameterException ipe) {
             assertEquals("Learning plan id was null.", ipe.getMessage());
-        }
-    }
+		}
+	}
 
 	@Test
 	public void addPlanItemNullCourseId() {

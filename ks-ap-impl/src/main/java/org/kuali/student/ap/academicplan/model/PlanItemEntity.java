@@ -45,7 +45,7 @@ import java.util.Set;
                     "pi.learningPlan = p " +
                     "and p.id =:learningPlanId " +
                     "and pi.category =:category"),
-        })
+})
 public class PlanItemEntity extends MetaEntity implements AttributeOwner<PlanItemAttributeEntity> {
 
     @NotNull
@@ -86,8 +86,7 @@ public class PlanItemEntity extends MetaEntity implements AttributeOwner<PlanIte
         super();
     }
 
-    @Override
-
+	@Override
 	public Set<PlanItemAttributeEntity> getAttributes() {
 		return this.attributes;
 	}

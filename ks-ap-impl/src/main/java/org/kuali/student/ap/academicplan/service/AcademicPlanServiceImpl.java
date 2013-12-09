@@ -113,7 +113,7 @@ public class AcademicPlanServiceImpl implements AcademicPlanService {
 		return planItemInfos;
 	}
 
-    @Override
+	@Override
     public List<PlanItemInfo> getPlanItemsInPlanByCategory(@WebParam(name = "learningPlanId") String learningPlanId,
             @WebParam(name = "category") AcademicPlanServiceConstants.ItemCategory category, @WebParam(name = "context") ContextInfo context)
             throws DoesNotExistException, InvalidParameterException, MissingParameterException,
