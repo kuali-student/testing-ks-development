@@ -12,7 +12,7 @@
  * or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  *
- * Created by Mezba Mahtab (mezba.mahtab@utoronto.ca) on 7/14/13
+ * Created by Mezba Mahtab (mezba.mahtab@utoronto.ca) on 2/8/13
  */
 package org.kuali.student.enrollment.examoffering.dto;
 
@@ -35,8 +35,8 @@ import java.util.List;
  * @author Mezba Mahtab (mezba.mahtab@utoronto.ca)
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ExamOfferingRelationInfo", propOrder = {"id", "typeKey", "stateKey", "name",
-        "descr", "meta", "attributes",
+@XmlType(name = "ExamOfferingRelationInfo", propOrder = {"id", "typeKey", "stateKey",
+        "effectiveDate", "expirationDate", "meta", "attributes",
         "formatOfferingId", "examOfferingId", "activityOfferingIds", "populationIds",
         "_futureElements"})
 public class ExamOfferingRelationInfo extends RelationshipInfo implements ExamOfferingRelation, Serializable {

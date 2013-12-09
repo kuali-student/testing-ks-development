@@ -12,7 +12,7 @@
  * or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  *
- * Created by Mezba Mahtab (mezba.mahtab@utoronto.ca) on 7/14/13
+ * Created by Mezba Mahtab (mezba.mahtab@utoronto.ca) on 1/18/13
  */
 package org.kuali.student.enrollment.examoffering.dto;
 

@@ -5,7 +5,7 @@ import org.kuali.student.r2.common.infc.IdEntity;
 /**
  * Created with IntelliJ IDEA.
  * User: Mezba Mahtab (mezba.mahtab@utoronto.ca)
- * Date: 7/15/13
+ * Date: 1/18/13
  * Time: 9:39 AM
  * Represents an ExamOffering in the ExamOffering Service. An ExamOffering is an
  * instantiation of a canonical exam, that is scheduled to be offered in an exam period.

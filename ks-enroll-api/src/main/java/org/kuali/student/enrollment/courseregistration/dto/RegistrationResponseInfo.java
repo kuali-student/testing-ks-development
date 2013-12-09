@@ -28,7 +28,6 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.kuali.student.enrollment.courseregistration.infc.RegistrationResponse;
 import org.kuali.student.enrollment.courseregistration.infc.RegistrationResponseItem;
-import org.kuali.student.r2.common.dto.OperationStatusInfo;
 import org.w3c.dom.Element;
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -115,7 +114,7 @@ public class RegistrationResponseInfo
         return messages;
     }
 
-    public void setMessagess(List<String> messages) {
+    public void setMessages(List<String> messages) {
         this.messages = messages;
     }
 

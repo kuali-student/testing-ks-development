@@ -1181,6 +1181,29 @@ public interface SchedulingService {
                 PermissionDeniedException;
 
     /**
+     * Evaluates if a TimeSlot can be updated
+     *
+     * @param timeSlotId      identifier for a TimeSlot
+     * @param contextInfo     Context information containing the principalId and
+     *                        locale information about the caller of service
+     *                        operation
+     * @return True if the TimeSlot can be updated, False otherwise
+     * @throws InvalidParameterException invalid contextInfo
+     * @throws MissingParameterException timeSlotId or contextInfo is
+     *                                   missing or null
+     * @throws OperationFailedException  unable to complete request
+     * @throws PermissionDeniedException an authorization failure occurred
+     * @impl    Currently a TimeSlot can be updated if it is not used in
+     *          ScheduleRequest (RDL) or Schedule (ADL)
+     */
+    public Boolean canUpdateTimeSlot(@WebParam(name = "timeSlotId") String timeSlotId,
+                                                 @WebParam(name = "contextInfo") ContextInfo contextInfo)
+            throws InvalidParameterException,
+            MissingParameterException,
+            OperationFailedException,
+            PermissionDeniedException;
+
+    /**
      * Calls R25 in our implementation ... the scheduled results may not be
      * available when this method returns. The method for scheduling
      * ActivityOfferings may be in the CourseOffering service.
@@ -1250,27 +1273,6 @@ public interface SchedulingService {
             OperationFailedException,
             PermissionDeniedException;
 
-    /**
-     * Retrieves a list of ScheduleBatches associated with a ScheduleTransaction
-     *
-     * @param scheduleTransactionId an identifier for a ScheduleBatch
-     * @param contextInfo         Context information containing the principalId
-     *                            and locale information about the caller of
-     *                            service operation
-     * @return a list of ScheduleTransaction identifiers matching
-     *         scheduleTransactionTypeKey or an empty list if none found
-     * @throws InvalidParameterException invalid contextInfo
-     * @throws MissingParameterException scheduleTransactionTypeKey or contextInfo
-     *                                   is missing or null
-     * @throws OperationFailedException  unable to complete request
-     * @throws PermissionDeniedException an authorization failure occurred
-     */
-    public List<ScheduleBatchInfo> getScheduleBatchesForScheduleTransaction(@WebParam(name = "scheduleTransactionId") String scheduleTransactionId,
-                                                                            @WebParam(name = "contextInfo") ContextInfo contextInfo)
-        throws InvalidParameterException,
-            MissingParameterException,
-            OperationFailedException,
-            PermissionDeniedException;
 
     /**
      * Retrieves a ScheduleTransaction

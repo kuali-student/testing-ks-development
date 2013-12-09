@@ -1,7 +1,7 @@
 /**
  * Created with IntelliJ IDEA.
  * User: Mezba Mahtab (mezba.mahtab@utoronto.ca)
- * Date: 7/14/13
+ * Date: 2/7/13
  * Time: 11:47 AM
  * Represents a relationship between a FormatOffering and an ExamOffering.
  */

@@ -174,7 +174,7 @@ Academic Time Period keys for which the item is planned.
         <property name="name" value="category"/>
     </bean>
 
-    <bean id="PlanItemInfo.typeKey-generated" abstract="true" parent="BaseKuali.typeKey">
+	<bean id="PlanItemInfo.typeKey-generated" abstract="true" parent="BaseKuali.typeKey">
 		<property name="name" value="typeKey"/>
 	</bean>
 

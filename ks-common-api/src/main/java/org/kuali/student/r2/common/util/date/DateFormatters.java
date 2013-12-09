@@ -39,7 +39,6 @@ public class DateFormatters {
     public static final String DEFAULT_MONTH_YEAR_TIME_DATE_FORMAT = "MM-dd-yyyy hh:mm a";            // 11-08-2012 02:52 pm
     public static final String DEFAULT_YEAR_MONTH_24HOUR_MILLISECONDS_FORMAT = "yyyy-MM-dd HH:mm:ss.S";                  // 2012-08-11 02:52:26.9
     public static final String QUERY_SERVICE_TIMESTAMP_FORMAT = "EEE MMM dd hh:mm:ss zzz yyyy";
-    public static final String YEAR_MONTH_DAY_DATE_FORMAT = "yyyy/MM/dd";                             // 2012/11/08
 
     /**
      * DO NOT USE THIS CONSTANT unless you absolutely have to and for Date->String only.
@@ -47,6 +46,8 @@ public class DateFormatters {
      * be format printted, but not parsed. EST is ambigious and cannot be parsed from a String to a Date.
      */
     public static final String DYNAMIC_ATTRIBUTE_SHORT_ZONE_DATE_FORMAT = "yyyy MMM d HH:mm:ss z";    // 2012 Nov 8 15:05:19 EST
+
+    public static final String MONTH_DATE_YEAR_TIME_COMMA_FORMAT = "MM/dd/yyyy, hh:mm aa";
 
 
     // Fast Thread Safe Formatter. Use this instead of SimpleDateFormat
@@ -68,5 +69,5 @@ public class DateFormatters {
     public static final KSDateTimeFormatter DEFAULT_MONTH_YEAR_TIME_DATE_FORMATTER = new KSDateTimeFormatter(DEFAULT_MONTH_YEAR_TIME_DATE_FORMAT);
     public static final KSDateTimeFormatter DEFAULT_YEAR_MONTH_24HOUR_MILLISECONDS_FORMATTER = new KSDateTimeFormatter(DEFAULT_YEAR_MONTH_24HOUR_MILLISECONDS_FORMAT);
     public static final KSDateTimeFormatter QUERY_SERVICE_TIMESTAMP_FORMATTER = new KSDateTimeFormatter(QUERY_SERVICE_TIMESTAMP_FORMAT);
-    public static final KSDateTimeFormatter YEAR_MONTH_DAY_DATE_FORMATTER = new KSDateTimeFormatter(YEAR_MONTH_DAY_DATE_FORMAT);
+    public static final KSDateTimeFormatter MONTH_DATE_YEAR_TIME_COMMA_FORMATTER = new KSDateTimeFormatter(MONTH_DATE_YEAR_TIME_COMMA_FORMAT);
 }

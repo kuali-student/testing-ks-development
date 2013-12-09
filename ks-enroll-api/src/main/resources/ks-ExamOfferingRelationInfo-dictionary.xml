@@ -1,5 +1,5 @@
 <!--
- Copyright 2011 The Kuali Foundation
+ Copyright 2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -54,6 +54,56 @@
 
     <bean id="ExamOfferingRelationInfo.stateKey" parent="ExamOfferingRelationInfo.stateKey-parent"/>
     <bean id="ExamOfferingRelationInfo.stateKey-parent" abstract="true" parent="ExamOfferingRelationInfo.stateKey-generated">
+        <!-- insert any overrides to the generated attribute definitions here -->
+    </bean>
+
+    <bean id="ExamOfferingRelationInfo.meta" parent="ExamOfferingRelationInfo.meta-parent"/>
+    <bean id="ExamOfferingRelationInfo.meta-parent" abstract="true" parent="ExamOfferingRelationInfo.meta-generated">
+        <!-- insert any overrides to the generated attribute definitions here -->
+    </bean>
+
+    <bean id="ExamOfferingRelationInfo.meta.versionInd" parent="ExamOfferingRelationInfo.meta.versionInd-parent"/>
+    <bean id="ExamOfferingRelationInfo.meta.versionInd-parent" abstract="true" parent="ExamOfferingRelationInfo.meta.versionInd-generated">
+        <!-- insert any overrides to the generated attribute definitions here -->
+    </bean>
+
+    <bean id="ExamOfferingRelationInfo.meta.createTime" parent="ExamOfferingRelationInfo.meta.createTime-parent"/>
+    <bean id="ExamOfferingRelationInfo.meta.createTime-parent" abstract="true" parent="ExamOfferingRelationInfo.meta.createTime-generated">
+        <!-- insert any overrides to the generated attribute definitions here -->
+    </bean>
+
+    <bean id="ExamOfferingRelationInfo.meta.createId" parent="ExamOfferingRelationInfo.meta.createId-parent"/>
+    <bean id="ExamOfferingRelationInfo.meta.createId-parent" abstract="true" parent="ExamOfferingRelationInfo.meta.createId-generated">
+        <!-- insert any overrides to the generated attribute definitions here -->
+    </bean>
+
+    <bean id="ExamOfferingRelationInfo.meta.updateTime" parent="ExamOfferingRelationInfo.meta.updateTime-parent"/>
+    <bean id="ExamOfferingRelationInfo.meta.updateTime-parent" abstract="true" parent="ExamOfferingRelationInfo.meta.updateTime-generated">
+        <!-- insert any overrides to the generated attribute definitions here -->
+    </bean>
+
+    <bean id="ExamOfferingRelationInfo.meta.updateId" parent="ExamOfferingRelationInfo.meta.updateId-parent"/>
+    <bean id="ExamOfferingRelationInfo.meta.updateId-parent" abstract="true" parent="ExamOfferingRelationInfo.meta.updateId-generated">
+        <!-- insert any overrides to the generated attribute definitions here -->
+    </bean>
+
+    <bean id="ExamOfferingRelationInfo.formatOfferingId" parent="ExamOfferingRelationInfo.formatOfferingId-parent"/>
+    <bean id="ExamOfferingRelationInfo.formatOfferingId-parent" abstract="true" parent="ExamOfferingRelationInfo.formatOfferingId-generated">
+        <!-- insert any overrides to the generated attribute definitions here -->
+    </bean>
+
+    <bean id="ExamOfferingRelationInfo.examOfferingId" parent="ExamOfferingRelationInfo.examOfferingId-parent"/>
+    <bean id="ExamOfferingRelationInfo.examOfferingId-parent" abstract="true" parent="ExamOfferingRelationInfo.examOfferingId-generated">
+        <!-- insert any overrides to the generated attribute definitions here -->
+    </bean>
+
+    <bean id="ExamOfferingRelationInfo.activityOfferingIds" parent="ExamOfferingRelationInfo.activityOfferingIds-parent"/>
+    <bean id="ExamOfferingRelationInfo.activityOfferingIds-parent" abstract="true" parent="ExamOfferingRelationInfo.activityOfferingIds-generated">
+        <!-- insert any overrides to the generated attribute definitions here -->
+    </bean>
+
+    <bean id="ExamOfferingRelationInfo.populationIds" parent="ExamOfferingRelationInfo.populationIds-parent"/>
+    <bean id="ExamOfferingRelationInfo.populationIds-parent" abstract="true" parent="ExamOfferingRelationInfo.populationIds-generated">
         <!-- insert any overrides to the generated attribute definitions here -->
     </bean>
 </beans>
