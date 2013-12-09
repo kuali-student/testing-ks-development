@@ -161,9 +161,9 @@ public class PlanController extends UifControllerBase {
 			PlanItem item = null;
 			try {
 				planItems = getAcademicPlanService().getPlanItemsInPlanByCategory(
-                        plan.getId(),
+						plan.getId(),
                         AcademicPlanServiceConstants.ItemCategory.WISHLIST,
-                        KsapFrameworkServiceLocator.getContext().getContextInfo());
+						KsapFrameworkServiceLocator.getContext().getContextInfo());
 			} catch (Exception e) {
 				throw new RuntimeException("Could not retrieve plan items.", e);
 			}
@@ -2968,7 +2968,7 @@ public class PlanController extends UifControllerBase {
 		try {
 			planItems = getAcademicPlanService().getPlanItemsInPlanByCategory(learningPlan.getId(),
                     AcademicPlanServiceConstants.ItemCategory.WISHLIST,
-                    KsapFrameworkServiceLocator.getContext().getContextInfo());
+					KsapFrameworkServiceLocator.getContext().getContextInfo());
 		} catch (Exception e) {
 			throw new RuntimeException("Could not retrieve plan items.", e);
 		}
@@ -3099,7 +3099,7 @@ public class PlanController extends UifControllerBase {
 
 				planItemList = getAcademicPlanService().getPlanItemsInPlanByCategory(learningPlanID,
                         AcademicPlanServiceConstants.ItemCategory.PLANNED,
-                        KsapFrameworkServiceLocator.getContext().getContextInfo());
+						KsapFrameworkServiceLocator.getContext().getContextInfo());
 
 				for (PlanItemInfo planItem : planItemList) {
 					String courseID = planItem.getRefObjectId();
@@ -3227,7 +3227,7 @@ public class PlanController extends UifControllerBase {
 
 				planItemList = getAcademicPlanService().getPlanItemsInPlanByCategory(learningPlanID,
                         AcademicPlanServiceConstants.ItemCategory.CART,
-                        KsapFrameworkServiceLocator.getContext().getContextInfo());
+						KsapFrameworkServiceLocator.getContext().getContextInfo());
 
 				for (PlanItemInfo planItem : planItemList) {
 					String courseID = planItem.getRefObjectId();
@@ -3298,7 +3298,7 @@ public class PlanController extends UifControllerBase {
 				String learningPlanID = learningPlan.getId();
 
 				planItemList = getAcademicPlanService().getPlanItemsInPlanByCategory(learningPlanID, category,
-                        KsapFrameworkServiceLocator.getContext().getContextInfo());
+						KsapFrameworkServiceLocator.getContext().getContextInfo());
 
 				for (PlanItemInfo planItem : planItemList) {
 					if (planItem.getRefObjectId().equalsIgnoreCase(courseId)) {

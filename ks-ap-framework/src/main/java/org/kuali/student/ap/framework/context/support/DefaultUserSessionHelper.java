@@ -184,7 +184,7 @@ public class DefaultUserSessionHelper implements UserSessionHelper {
 		}
 		if (person != null) {
 		    isStudent=person.hasAffiliationOfType(STUDENT_KEY);
-		}
+			}
         return isStudent;
 	}
 

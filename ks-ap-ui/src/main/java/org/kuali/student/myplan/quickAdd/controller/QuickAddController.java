@@ -519,7 +519,7 @@ public class QuickAddController extends UifControllerBase {
 		if (planItem == null) {
 			try {
 				planItem = getPlanItemByAtpAndCategory(learningPlan.getId(),
-                        courseId, atpId,
+						courseId, atpId,
                         AcademicPlanServiceConstants.ItemCategory.BACKUP);
 			} catch (Exception e) {
 				LOG.error("Could not retrieve plan items.", e);
@@ -530,7 +530,7 @@ public class QuickAddController extends UifControllerBase {
 		if (planItem == null) {
 			try {
 				planItem = getPlanItemByAtpAndCategory(learningPlan.getId(),
-                        courseId, atpId,
+						courseId, atpId,
                         AcademicPlanServiceConstants.ItemCategory.CART);
 			} catch (Exception e) {
 				LOG.error("Could not retrieve plan items.", e);
@@ -547,15 +547,15 @@ public class QuickAddController extends UifControllerBase {
 	 * Gets a plan item of a particular type for a particular ATP.
 	 * 
 	 *
-     * @param planId
-     *            The id of the learning plan
-     * @param courseId
-     *            The id of the course
-     * @param atpId
-     *            The ATP id
+	 * @param planId
+	 *            The id of the learning plan
+	 * @param courseId
+	 *            The id of the course
+	 * @param atpId
+	 *            The ATP id
      * @param planItemCategory
-     *            The plan item type key.
-     * @return A "planned" or "backup" plan item. Or 'null' if none exists.
+	 *            The plan item type key.
+	 * @return A "planned" or "backup" plan item. Or 'null' if none exists.
 	 * @throws RuntimeException
 	 *             on errors.
 	 */
@@ -734,10 +734,10 @@ public class QuickAddController extends UifControllerBase {
 
 				planItemList = KsapFrameworkServiceLocator
 						.getAcademicPlanService().getPlanItemsInPlanByCategory(
-                                learningPlanID,
+								learningPlanID,
                                 AcademicPlanServiceConstants.ItemCategory.PLANNED,
-                                KsapFrameworkServiceLocator.getContext()
-                                        .getContextInfo());
+								KsapFrameworkServiceLocator.getContext()
+										.getContextInfo());
 
 				for (PlanItemInfo planItem : planItemList) {
 					String courseID = planItem.getRefObjectId();
@@ -873,10 +873,10 @@ public class QuickAddController extends UifControllerBase {
 
 				planItemList = getAcademicPlanService()
 						.getPlanItemsInPlanByCategory(
-                                learningPlanID,
+								learningPlanID,
                                 AcademicPlanServiceConstants.ItemCategory.CART,
-                                KsapFrameworkServiceLocator.getContext()
-                                        .getContextInfo());
+								KsapFrameworkServiceLocator.getContext()
+										.getContextInfo());
 
 				for (PlanItemInfo planItem : planItemList) {
 					String courseID = planItem.getRefObjectId();
@@ -1084,10 +1084,10 @@ public class QuickAddController extends UifControllerBase {
 		try {
 			planItems = KsapFrameworkServiceLocator.getAcademicPlanService()
 					.getPlanItemsInPlanByCategory(
-                            learningPlan.getId(),
+							learningPlan.getId(),
                             AcademicPlanServiceConstants.ItemCategory.WISHLIST,
-                            KsapFrameworkServiceLocator.getContext()
-                                    .getContextInfo());
+							KsapFrameworkServiceLocator.getContext()
+									.getContextInfo());
 		} catch (Exception e) {
 			throw new RuntimeException("Could not retrieve plan items.", e);
 		}
@@ -1108,10 +1108,10 @@ public class QuickAddController extends UifControllerBase {
 	 * new plan item of a specific type.
 	 * 
 	 *
-     * @param plan
-     * @param atpId
+	 * @param plan
+	 * @param atpId
      * @param category
-     * @return True if the item can be added or false if not.
+	 * @return True if the item can be added or false if not.
 	 * @throws RuntimeException
 	 *             if things go wrong.
 	 */
@@ -1129,10 +1129,10 @@ public class QuickAddController extends UifControllerBase {
 		try {
 			planItems = KsapFrameworkServiceLocator.getAcademicPlanService()
 					.getPlanItemsInPlanByCategory(
-                            plan.getId(),
+							plan.getId(),
                             category,
-                            KsapFrameworkServiceLocator.getContext()
-                                    .getContextInfo());
+							KsapFrameworkServiceLocator.getContext()
+									.getContextInfo());
 		} catch (Exception e) {
 			throw new RuntimeException("Could not retrieve plan items.", e);
 		}

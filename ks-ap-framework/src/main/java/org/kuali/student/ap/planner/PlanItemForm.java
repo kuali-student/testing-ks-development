@@ -47,10 +47,10 @@ public interface PlanItemForm extends HasUniqueId {
 
 	/**
 	 * Set the expected plan item category.
-	 *
+	 * 
      * @param category
      *            The expected plan item category.
-     */
+	 */
 	void setExpectedPlanItemCategory(AcademicPlanServiceConstants.ItemCategory category);
 
 	/**

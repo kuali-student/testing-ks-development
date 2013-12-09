@@ -41,7 +41,7 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
         List<String> atpList = new ArrayList<String>();
         String atp = "19843";
         atpList.add( atp );
-        plan.setPlanPeriods(atpList);
+        plan.setPlanPeriods( atpList );
         plan.setCategory(AcademicPlanServiceConstants.ItemCategory.PLANNED);
         plan.setTypeKey(AcademicPlanServiceConstants.LEARNING_PLAN_ITEM_TYPE_COURSE);
 
@@ -230,7 +230,7 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
         plan.setRefObjectType( type );
         List<String> atps = new ArrayList<String>();
         atps.add("19843");
-        plan.setPlanPeriods(atps);
+        plan.setPlanPeriods( atps );
         plan.setCategory(AcademicPlanServiceConstants.ItemCategory.PLANNED);
         plan.setTypeKey(AcademicPlanServiceConstants.LEARNING_PLAN_ITEM_TYPE_COURSE);
 

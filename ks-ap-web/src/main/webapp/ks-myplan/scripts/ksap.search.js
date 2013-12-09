@@ -144,7 +144,8 @@ function searchForCourses(id, parentId) {
 						iDisplayLength : 20,
 						fnDrawCallback : function() {
 							if (Math
-									.ceil((this.fnSettings().fnRecordsDisplay())/ this.fnSettings()._iDisplayLength) > 1) {
+									.ceil((this.fnSettings().fnRecordsDisplay())
+											/ this.fnSettings()._iDisplayLength) > 1) {
 								jQuery(".dataTables_paginate .ui-button").not(
 										".first, .last").show();
 							} else {
@@ -452,5 +453,5 @@ function registerCourseSearchResultsFacetsEvents(jqObjects){
             .subscribe('UPDATE_FACETS', function() {
                 fnUpdateFacetList(this);
             });
-    });
+	});
 }
