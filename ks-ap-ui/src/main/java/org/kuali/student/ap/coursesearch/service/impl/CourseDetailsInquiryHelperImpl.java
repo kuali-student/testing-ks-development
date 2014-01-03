@@ -332,9 +332,7 @@ public class CourseDetailsInquiryHelperImpl extends KualiInquirableImpl {
 			for (StudentCourseRecordInfo studentInfo : studentCourseRecordInfos) {
 				AcademicRecordDataObject acadrec = new AcademicRecordDataObject();
 
-                //TODO KSAP-147: drop the following call when termId is added to StudentCourseRecordInfo
-                //Find associated termId by termName and containing the course begin/end dates
-                String termId = KsapFrameworkServiceLocator.getTermHelper().findTermIdByNameAndContainingDates(studentInfo.getCourseBeginDate(), studentInfo.getCourseEndDate(), studentInfo.getTermName());
+                String termId = studentInfo.getTermId();
 				acadrec.setAtpId(termId);
 				acadrec.setPersonId(studentInfo.getPersonId());
 				acadrec.setCourseCode(studentInfo.getCourseCode());
