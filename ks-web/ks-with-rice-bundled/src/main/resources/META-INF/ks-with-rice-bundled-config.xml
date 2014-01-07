@@ -29,6 +29,7 @@
     <param name="config.location">classpath:META-INF/common-config-locations.xml</param>
     
     <!-- BEGIN KUALI STUDENT SETTINGS -->
+    <param name="version">${project.name} :: ${project.version} :: ${project.build.timestamp}</param>
     <param name="config.location">classpath:META-INF/ks-core-config.xml</param>
     <param name="config.location">classpath:META-INF/ks-lum-config.xml</param>
     <param name="config.location">classpath:META-INF/ks-enroll-config.xml</param>
@@ -169,10 +170,9 @@
     <param name="ks.lum.gwt.metadata.enable.caching">true</param>
 
     <!-- change/override this to kradScriptFiles for a non minified javascript version -->
-    <param name="krad.js.scriptfiles">classpath:UifKRADJavascriptFiles.xml</param>
-    <!--
+    <!--<param name="krad.js.scriptfiles">classpath:UifKRADJavascriptFiles.xml</param>-->
+
     <param name="krad.js.scriptfiles">classpath:UifKRADJavascriptFilesMinified.xml</param>
-    -->
 
     <!-- default config files -->
     <param name="config.location">${user.home}/kuali/main/${environment}/ks-config.xml</param>
