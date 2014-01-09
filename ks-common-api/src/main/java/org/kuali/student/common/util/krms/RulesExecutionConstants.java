@@ -21,10 +21,10 @@ public class RulesExecutionConstants {
     public static final Term MILESTONES_BY_TYPE_TERM = new Term("milestonesByType");
     public static final Term MILESTONE_TERM = new Term("milestone");
     public static final Term STUDENT_REGISTRATION_HOLDS_TERM = new Term("studentRegistrationHolds");
-    public static final String ORG_PERMISSION_TERM = "orgPermission";
-    public static final String ADMIN_ORG_NUMBER_TERM = "adminOrgNumber";
-    public static final String NR_OF_COMPLETED_COURSES_TERM = "numberOfCompletedCourses";
-    public static final String COMPLETED_COURSE_TERM = "completedCourse";
+    public static final Term ORG_PERMISSION_TERM = new Term ("orgPermission");
+    public static final Term ADMIN_ORG_NUMBER_TERM = new Term ("adminOrgNumber");
+    public static final Term NR_OF_COMPLETED_COURSES_TERM = new Term ("numberOfCompletedCourses");
+    public static final Term COMPLETED_COURSE_TERM = new Term("completedCourse");
     // data
     public static final Term PROCESS_KEY_TERM = new Term("processKey");
     public static final Term CONTEXT_INFO_TERM = new Term("contextInfo");
@@ -45,8 +45,12 @@ public class RulesExecutionConstants {
     public static final Term COURSE_SERVICE_TERM = new Term("courseService");
     public static final Term POPULATION_SERVICE_TERM = new Term("populationService");
     public static final Term HOLD_SERVICE_TERM = new Term("holdService");
+    public static final Term GES_SERVICE_TERM = new Term("gesService");
     // factories
     public static final Term PROPOSITION_FACTORY_TERM = new Term("propositionFactory");
+    public static final Term LOAD_CALCULATOR_RULE_FACTORY_TERM = new Term("loadCalculatorRuleFactory");
+    // logic
+    public static final Term REGISTRATION_REQUEST_MERGER_TERM = new Term("registrationRequestMerger");
     /**
      * properties
      */
