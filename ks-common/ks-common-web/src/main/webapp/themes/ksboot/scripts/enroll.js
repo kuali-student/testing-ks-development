@@ -13,6 +13,33 @@ function toggleAddAOCButton(buttonId, controlId) {
     }
 }
 
+/* Disables the default-behavior for the ENTER-key in the
+ * "Move Activity > Private/Published Names"-fields; replaces instead with
+ * a click on the "Move"-button (but only if the button has previously been
+ * enabled by toggleAddAOCBUtton() )
+ */
+function submitMoveAoOnEnterKeyIfValid() {
+    var KEYCODE_ENTER = 13;
+    var moveAocButton = jQuery( "#moveAOCButton" );
+
+    // cross browser support, use jquery event.which property that normalizes event.keyCode and event.charCode
+    var keyPressed = event.which;
+
+    // redirect enter-key to submit via the "Move"-AOC button instead of the default page-submit
+    if( keyPressed == KEYCODE_ENTER ) {
+
+        // cross browser support
+        event.preventDefault ? event.preventDefault() : event.returnValue = false;
+        event.which = 0;
+
+        if( moveAocButton.attr( "disabled" ) == undefined ) {
+            moveAocButton.click();
+        }
+
+    }
+
+}
+
 function removeCheckboxColumns(column, componentId, functionToCall) {
     var components = jQuery('div[id^="' + componentId + '"]');
     jQuery.each(components, function (index) {
@@ -39,7 +66,7 @@ function removeCheckboxColumns(column, componentId, functionToCall) {
             var tf = jQuery('#' + tableId + ' tfoot tr').find('th:nth-child(' + column + ')');
             jQuery(tf).remove();
         } else {
-            var toggleCheckbox = jQuery("<input type='checkbox' id='" + tableId + "_toggle_control_checkbox'/>");
+            var toggleCheckbox = jQuery("<input type='checkbox' id='" + subComponentId + "_toggle_control_checkbox'/>");
             var isChecked = toggleCheckbox.prop('checked');
             toggleCheckbox.click(function (e) {
                 jQuery('#' + tableId + ' tbody > tr > td:nth-child(' + column + ')').find('[type=checkbox]').each(function () {
@@ -53,9 +80,44 @@ function removeCheckboxColumns(column, componentId, functionToCall) {
             });
             var th = jQuery('#' + tableId + ' thead tr').find('th:nth-child(' + column + ')');
             jQuery(th).append(toggleCheckbox);
+
+            var collectionCheckboxes = jQuery('div#'+ subComponentId +' tbody > tr').find('td:first input[type="checkbox"]');
+            var clickName;
+            collectionCheckboxes.each(function(ndx,ctl) {
+                clickName = "click." + subComponentId + "_row_" + ndx;
+                jQuery(this).on(clickName, function(){
+                    controlCheckboxStatus(subComponentId,this);
+                });
+            });
         }
 
     });
+}
+
+/*
+ *  Collection row checkboxes in the first cell will cause the control checkbox
+ *  to be set or unset.  The control checkbox should only be checked when all
+ *  collection checkboxes are set, otherwise it should be unchecked.
+ */
+function controlCheckboxStatus(collectionId,source) {
+    var controlCheckbox = jQuery("#" + collectionId + "_toggle_control_checkbox");
+
+    // if any row selection checkbox is false, the control checkbox is false also
+    if ( ! jQuery(source).prop('checked')) {
+        controlCheckbox.prop('checked',false);
+        return;
+    }
+
+    // if all row selection checkboxes are true, make the control checkbox true also
+    var areAllRowsChecked = true;
+    jQuery('div#' + collectionId + ' tbody > tr').find('td:first input[type="checkbox"]')
+        .each(function(ndx,ctl) {
+            if (!jQuery(this).prop('checked')) {
+                areAllRowsChecked = false;
+                return false; // exit .each()
+            }
+        });
+    controlCheckbox.prop('checked',areAllRowsChecked);
 }
 
 function addActionColumn(isReadOnly, componentId) {
@@ -280,84 +342,33 @@ function highlightElements(validationJSONString, isValid, url) {
  So on page load we are loading the component that krad is replacing the context bar with instead of the place holder.
  */
 // KSENROLL-9951 - Rice Trackback - topGroup should only be displayed when there are items to show
-function updateContextBar(srcId, contextBarId, dayOfYear, baseUrl) {
-    if (dayOfYear < 1) {
-        return;
-    }
-    var topGroupWrapper = jQuery("#Uif-TopGroupWrapper");
-    var topGroupWrapperPlaceHolder = jQuery("#Uif-TopGroupWrapper > #" + contextBarId);
-    var topGroupWrapperContent = jQuery("#Uif-TopGroupWrapper > #" + contextBarId + " > #" + srcId);
-    var topGroupUpdate = jQuery("#" + kradVariables.TOP_GROUP_UPDATE);
-    var topGroupUpdatePlaceHolder = jQuery("#" + kradVariables.TOP_GROUP_UPDATE + " > #" + contextBarId);
-    var topGroupUpdateContent = jQuery("#" + kradVariables.TOP_GROUP_UPDATE + " > #" + contextBarId + " > #" + srcId);
-    var contextBarContent = jQuery("#" + srcId);
-    var contextBarContentStandAlone = jQuery("#" + srcId).not("#" + contextBarId + " > #" + srcId);
-    var bc = jQuery("#Uif-BreadcrumbWrapper");
-    var vh = jQuery(".uif-viewHeader-contentWrapper.uif-sticky");
-    var contextBarHeight = 0;
-
+function updateContextBar(contextBarId) {
     if (!initialViewLoad) {
-        if (jQuery(contextBarContentStandAlone).length && (jQuery(topGroupUpdateContent).length)) {
-            jQuery(topGroupUpdateContent).replaceWith(contextBarContentStandAlone);
-        } else if (jQuery(topGroupUpdateContent).length) {
-            jQuery.extend(topGroupUpdateContent, contextBarContent);
-            jQuery(contextBarContent).show();
-        } else if (jQuery(topGroupUpdatePlaceHolder).length) {
-            if (jQuery(contextBarContent).length) {
-                jQuery(contextBarContent).appendTo(topGroupUpdatePlaceHolder);
-                jQuery(contextBarContent).show();
-            } else if (jQuery(topGroupWrapperContent).length) {
-                jQuery.extend(topGroupUpdatePlaceHolder, topGroupWrapperContent);
-            }
-        }
-        contextBarHeight = topGroupUpdate.outerHeight(true);
-    } else {
-        if (topGroupUpdatePlaceHolder.length) {
-            if (jQuery(contextBarContent).length) {
-                jQuery(contextBarContent).appendTo(topGroupUpdatePlaceHolder);
-                topGroupUpdate = jQuery("#" + kradVariables.TOP_GROUP_UPDATE).find("> div").detach();
-                if (topGroupUpdate.length) {
-                    jQuery("#Uif-TopGroupWrapper > div").replaceWith(topGroupUpdate);
+        var topGroupUpdateContextbar = jQuery("#" + kradVariables.TOP_GROUP_UPDATE + " > #" + contextBarId);
+        var bc = jQuery("#Uif-BreadcrumbWrapper");
+        var vh = jQuery(".uif-viewHeader-contentWrapper.uif-sticky");
+        var applicationHeaderWrapper = jQuery("#Uif-ApplicationHeader-Wrapper");
+
+        if (topGroupUpdateContextbar.length) {
+            var contextBarHeight = topGroupUpdateContextbar.outerHeight(true);
+            if (contextBarHeight > 0) {
+
+                var applicationHeaderWrapperHeight = 0;
+                if (applicationHeaderWrapper.length) {
+                    applicationHeaderWrapperHeight = applicationHeaderWrapper.outerHeight(true);
                 }
-                jQuery(contextBarContent).show();
+                var bcHeight = 0;
+                if (jQuery(bc).length) {
+                    bcHeight = bc.outerHeight(true);
+                }
+                var vhOffset = applicationHeaderWrapperHeight + bcHeight + contextBarHeight;
+                if (jQuery(vh).length) {
+                    vh.offset({top: vhOffset});
+                    vh.data("offset", vh.offset());
+                }
             }
         }
-        contextBarHeight = contextBarContent.outerHeight(true);
     }
-    if (jQuery(vh).length && jQuery(bc.length) && contextBarHeight > 0) {
-        var vhBottom = bc.offset().top + bc.outerHeight(true) + vh.outerHeight(true);
-        var cw = jQuery("#Uif-ViewContentWrapper");
-        var cwTop = cw.offset().top;
-        var vhTop = vhBottom - vh.outerHeight(true);
-        if (bc.offset().top < topGroupWrapper.offset().top + contextBarHeight) {
-            var bcDiff = topGroupWrapper.offset().top + contextBarHeight - bc.offset().top;
-            if(console){
-                console.log("The Bread Crumb is off by : " + bcDiff);
-            }
-            vhTop = vhTop + bcDiff;
-            vhBottom = vhBottom + bcDiff;
-        }
-        if (vhBottom > cwTop) {
-            var diff = vhBottom - cw.offset().top;
-//                vhTop = vhTop - diff;
-            cwTop = cwTop + diff + 15;
-        }
-        vh.offset({top: vhTop});
-        vh.data("offset", vh.offset());
-        cw.offset({top: cwTop});
-        cw.data("offset", cw.offset());
-        if (console) {
-            console.log("comp | TOP | HEIGHT");
-            console.log("tg   | " + topGroupWrapper.offset().top + "  |  " + contextBarHeight);
-            console.log("bc   | " + bc.offset().top + "  |  " + bc.outerHeight(true));
-            console.log("vh   | " + vh.offset().top + "  |  " + vh.outerHeight(true));
-            console.log("content Wrapper TOP : " + cwTop);
-            console.log("vhBottom = bc.offset().top + bc.outerHeight(true) + vh.outerHeight(true) =>" + vhBottom);
-            console.log("Sticky Header TOP : " + vhTop);
-            console.log("View TOP : " + cwTop);
-        }
-    }
-    setSeasonalColor(srcId, dayOfYear, baseUrl);
 }
 
 /*
@@ -416,6 +427,7 @@ function updateHeaderRightGroup(srcId, rightGroupId){
     if( rightGroup ) {
         var src = jQuery("#" + srcId);                  // grab the new header right group
         jQuery(rightGroup).html(jQuery(src).html());         // copy the content of the right group to the place holder
+        addBootstrapImageToLink(rightGroupId);          // add web-font (icons) to the links if there are any
     }
 }
 
@@ -445,7 +457,12 @@ function setSeasonalColor(elementToColor, dayOfYear, baseUrl) {
     }
     if (dayOfYear > 0 && dayOfYear <= 365) {
         var image = jQuery('<img src="' + baseUrl + '/themes/ksboot/images/season_gradient.png"/>');
-        var elemToColor = jQuery('#' + elementToColor);
+        var elemToColor;
+        if (!initialViewLoad) {
+            elemToColor = jQuery("#" + kradVariables.TOP_GROUP_UPDATE + " > #" + elementToColor);
+        }else{
+            elemToColor = jQuery('#' + elementToColor);
+        }
         var percentage = dayOfYear / 365;
 
         image.load(function () {
@@ -480,16 +497,21 @@ function rgbToHex(r, g, b) {
  go back to using the src attribute.
  */
 function addBootstrapImageToLink(containerId) {
-    jQuery("#" + containerId).find('img').each(function () {
+//    jQuery("#" + containerId).find('img').each(function () {
+    jQuery("#" + containerId + " img[style^=ks-fontello-icon-]").each(function () {
         /*Style is used instead of src to prevent errors in krad*/
         var src = jQuery(this).attr('style');
-        if (src.match("^icon-")) {
-            var anchor = jQuery(this).parent();
-            var aText = anchor.text();
-            anchor.text("");
-            var bsImage = '<i class="' + src + '"></i>' + jQuery.trim(aText);
-            jQuery(anchor).append(bsImage);
+        var anchor = jQuery(this).parent();
+        var imagePosition = jQuery(anchor).data("imageposition");
+        var aText = anchor.text();
+        anchor.text("");
+        var imageFont = '<i class="' + src + '"></i>';
+        if (imagePosition != undefined && imagePosition == 'right') {
+            imageFont = jQuery.trim(aText) + imageFont;
+        } else {
+            imageFont = imageFont + jQuery.trim(aText);
         }
+        jQuery(anchor).append(imageFont);
     });
 }
 
@@ -533,7 +555,10 @@ function findDirtyFields(returnFieldId){
  if you conduct a subject-search (say, WMST) they want the view-title to be "WMST: Women's Studies".
  */
 function updateViewHeaderText( value ) {
-    jQuery( 'div.uif-formView h1.uif-headerText span.uif-headerText-span' ).html( value );
+    //  If value is empty then don't update the view header (e.g. the session times out and the user clicks a breadcrumb).
+    if (value) {
+        jQuery( 'div.uif-formView h1.uif-headerText span.uif-headerText-span' ).html( value );
+    }
 }
 
 /**
@@ -726,8 +751,8 @@ jQuery(document).on("click", ".dataTable input[type=checkbox]", function() {
  */
 
 /* Set custom font icons for calendar datepickers */
-jQuery('.uif-inputField:has(input.uif-dateControl)').on('DOMNodeInserted', 'button.ui-datepicker-trigger', function() {
-    jQuery('button.ui-datepicker-trigger').empty().addClass('icon halflings calendar').attr('alt', 'Date picker').attr('value', 'Date picker');
+jQuery(document).on('DOMNodeInserted', 'button.ui-datepicker-trigger', function() {
+    jQuery(this).empty().addClass('btn-link ks-fontello-icon-calendar-1').attr('alt', 'Date picker').attr('value', 'Date picker');
 });
 
 /*
@@ -736,3 +761,72 @@ Skip dirty check
  function skipDirtyChecks() {
  dirtyFormState.skipDirtyChecks=true;
  }
+
+function retrieveFinalExamMatrix (id, methodToCall, dropdownId) {
+    var dropDownElement = jQuery('#' + dropdownId + '_control');
+    if (dropDownElement.val() != 'na') {
+        retrieveComponent(id, methodToCall);
+    }
+}
+
+function toggleButtonOnInput(fieldId, buttonId) {
+    var inputVal = jQuery('#' + fieldId + '_control').val();
+    if (inputVal != '') {
+        jQuery('#' + buttonId).removeAttr("disabled");
+    } else {
+        jQuery('#' + buttonId).attr("disabled", "disabled");
+    }
+}
+
+function toggleShowButton() {
+    var termCodeVal = jQuery("#termCodeField_control").val();
+    var inputCodeVal = jQuery("#inputCode_control").val();
+    if (termCodeVal != '' && inputCodeVal != '') {
+        jQuery("#show_button").removeAttr("disabled");
+    } else {
+        jQuery("#show_button").attr("disabled", "disabled");
+    }
+}
+
+/*
+ * Setup a blur on the given element once the window loads. This idea here is to make the client-side validation happen
+ * after the page is completely loaded, so that any server-side messages will be merged with the client side messages.
+ */
+function triggerFieldValidationAfterPageLoads(id) {
+    var element = jQuery(id);
+    if (element.val()) {
+        jQuery(window).load(function() { element.trigger('blur'); });
+    }
+}
+
+/* Disabling the enter key pressed in text fields, checkboxes, radio buttons, and option selection widgets
+ * so that the only the links, buttons will respond to the enter key.
+*/
+function dismissEnterKeyAction(event) {
+    // cross browser support, use jquery event.which property that normalizes event.keyCode and event.charCode
+    var keyPressed = event.which;
+
+    if (keyPressed == 13) {
+        if (event.target.type == "text" || event.target.type == "checkbox" ||
+            event.target.type == "radio" || event.target.type == "select-one") {
+
+            // cross browser support
+            event.preventDefault ? event.preventDefault() : event.returnValue = false;
+            event.which = 0;
+        }
+    }
+}
+
+/*
+ * TODO: KSENROLL-11002 - This is a hack to work around a Rice bug.
+ */
+function fixActionLinkJumpToIds(actionLinksId, jumpToElementId) {
+    var idSelector =  "[id^=" + actionLinksId + "]";
+    jQuery(idSelector).each(
+        function() {
+            var actionLink = jQuery( this );
+            var submitData = jQuery.parseJSON(actionLink.attr("data-submit_data"))
+            submitData.jumpToId = jumpToElementId;
+            actionLink.attr("data-submit_data", JSON.stringify(submitData));
+        });
+}
