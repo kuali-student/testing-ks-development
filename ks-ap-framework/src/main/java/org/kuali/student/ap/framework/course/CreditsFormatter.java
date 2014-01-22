@@ -2,6 +2,7 @@ package org.kuali.student.ap.framework.course;
 
 import org.apache.log4j.Logger;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
+import org.kuali.student.common.util.KSCollectionUtils;
 import org.kuali.student.r2.common.exceptions.DoesNotExistException;
 import org.kuali.student.r2.common.exceptions.InvalidParameterException;
 import org.kuali.student.r2.common.exceptions.MissingParameterException;
@@ -68,7 +69,9 @@ public class CreditsFormatter {
 		if (options.size() > 1) {
 			LOG.warn("Credit option list contained more than one value.");
 		}
-		ResultValuesGroupInfo rci = options.get(0);
+
+        // Aways use the first credit option if multiple are found.
+        ResultValuesGroupInfo rci = options.get(0);
 
 		/**
 		 * Credit values are provided in three formats: FIXED, LIST (Multiple),
@@ -81,7 +84,7 @@ public class CreditsFormatter {
 			boolean useAttributes = rci.getResultValueKeys().isEmpty();
 			if (!useAttributes)
 				try {
-					ResultValueInfo rv = lrc.getResultValue(rci.getResultValueKeys().get(0),
+					ResultValueInfo rv = lrc.getResultValue(KSCollectionUtils.getRequiredZeroElement(rci.getResultValueKeys()),
 							KsapFrameworkServiceLocator.getContext().getContextInfo());
 					if (rv == null)
 						useAttributes = true;

@@ -1,10 +1,13 @@
 package org.kuali.student.myplan.plan.dataobject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.kuali.student.ap.coursesearch.dataobject.ActivityOfferingItem;
 import org.kuali.student.ap.coursesearch.dataobject.CourseSummaryDetails;
+import org.kuali.student.ap.coursesearch.util.CollectionListPropertyEditor;
+import org.kuali.student.ap.coursesearch.util.ScheduledTermsPropertyEditor;
 
 /**
  * Captures a course detail object along with a single instance of its planned
@@ -92,4 +95,35 @@ public class PlannedCourseDataObject implements
 	public void setPlanActivities(List<ActivityOfferingItem> planActivities) {
 		this.planActivities = planActivities;
 	}
+
+    public String getScheduledForUI(){
+        ScheduledTermsPropertyEditor editor = new ScheduledTermsPropertyEditor();
+        editor.setValue(getCourseDetails());
+        return editor.getAsText();
+    }
+
+    public String getProjectedForUI(){
+        CollectionListPropertyEditor editor = new CollectionListPropertyEditor();
+        editor.setValue(getCourseDetails());
+        editor.setEmptyListMessage("Check with the department or your adviser for more information about this course.");
+        editor.setApplyClassOnItem(true);
+        if (editor.getEmptyListStyleClasses()==null) {
+            editor.setEmptyListStyleClasses(new ArrayList<String>());
+        }
+        editor.getEmptyListStyleClasses().add("empty");
+
+        return editor.getAsText();
+    }
+    public String getRequisitesForUI(){
+        CollectionListPropertyEditor editor = new CollectionListPropertyEditor();
+        editor.setValue(getCourseDetails().getRequisites());
+        editor.setEmptyListMessage("None");
+        return editor.getAsText();
+    }
+    public String getAbbrGenEdRequirementsForUI(){
+        CollectionListPropertyEditor editor = new CollectionListPropertyEditor();
+        editor.setValue(getCourseDetails().getAbbrGenEdRequirements());
+        editor.setEmptyListMessage("&nbsp;");
+        return editor.getAsText();
+    }
 }

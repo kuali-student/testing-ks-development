@@ -6,7 +6,7 @@
 
     <!--Single Plan Item View-->
 
-    <bean id="SingleTerm-InquiryView" parent="MyPlanInquiryView">
+    <bean id="SingleTerm-InquiryView" parent="KSAPInquiryView">
         <property name="headerText" value="Single Term View"/>
         <property name="header.render" value="false"/>
         <property name="viewName" value="SingleTerm-InquiryView"/>
@@ -17,7 +17,7 @@
         <property name="page.header.render" value="false"/>
         <property name="cssClasses">
             <list merge="true">
-                <value>myplan-view</value>
+                <value>ksap-view</value>
             </list>
         </property>
         <property name="items">
@@ -32,7 +32,7 @@
                     <property name="items">
                         <list>
                             <ref bean="single_collection_data"/>
-                            <bean parent="myplan_section" p:style="width:310px; margin:0;">
+                            <bean parent="ksap_section" p:style="width:310px; margin:0;">
                                 <property name="items">
                                     <list>
                                         <ref bean="messages_widget"/>
@@ -53,7 +53,7 @@
         <property name="validationMessages.render" value="false"/>
         <property name="cssClasses">
             <list merge="true">
-                <value>myplan-remove-margin</value>
+                <value>ksap-remove-margin</value>
             </list>
         </property>
         <property name="items">
@@ -73,7 +73,7 @@
         <property name="layoutManager.id" value="course_details_section_datatable"/>
         <property name="cssClasses">
             <list merge="true">
-                <value>myplan-course-sections</value>
+                <value>ksap-course-sections</value>
             </list>
         </property>
         <property name="renderAddLine" value="false"/>
@@ -132,11 +132,6 @@
                       p:render="@{#line.activityOfferingItem ne null}">
                     <property name="fieldLabel.render" value="false"/>
                     <property name="group.validationMessages.render" value="false"/>
-                    <property name="cssClasses">
-                        <list merge="true">
-                            <value>fl-text-align-center</value>
-                        </list>
-                    </property>
                     <property name="items">
                         <list>
                             <!--<bean parent="Uif-DataField" p:propertyName="activityOfferingItem.activityOfferingType"
@@ -202,18 +197,12 @@
                     </property>
                     <property name="cssClasses">
                         <list merge="true">
-                            <value>myplan-course-item</value>
+                            <value>ksap-course-item</value>
                         </list>
                     </property>
                     <property name="items">
                         <list>
-                            <bean parent="Uif-MessageField" p:messageText="@{#line.courseDetails.code}">
-                                <property name="cssClasses">
-                                    <list merge="true">
-                                        <value>fl-text-bold</value>
-                                    </list>
-                                </property>
-                            </bean>
+                            <bean parent="Uif-MessageField" p:messageText="@{#line.courseDetails.code}" />
                             <bean parent="Uif-SpaceField"/>
                             <bean parent="Uif-Link"
                                   p:linkText="@{#line.courseDetails.courseTitle} (@{#line.courseDetails.credit})"
@@ -270,18 +259,13 @@
                 <property name="validationMessages.render" value="false"/>
                 <property name="cssClasses">
                     <list merge="true">
-                        <value>myplan-credit-total</value>
+                        <value>ksap-credit-total</value>
                     </list>
                 </property>
                 <property name="items">
                     <list>
                         <bean parent="Uif-MessageField" p:label="Credits" p:messageText="@{dataObject.credits}">
                             <property name="fieldLabel.renderColon" value="false"/>
-                            <property name="cssClasses">
-                                <list merge="true">
-                                    <value>fl-text-bold</value>
-                                </list>
-                            </property>
                         </bean>
                     </list>
                 </property>
@@ -303,7 +287,7 @@
         <property name="layoutManager.id" value="course_details_section_datatable"/>
         <property name="cssClasses">
             <list merge="true">
-                <value>myplan-course-sections</value>
+                <value>ksap-course-sections</value>
             </list>
         </property>
         <property name="renderAddLine" value="false"/>
@@ -345,11 +329,6 @@
                 <bean parent="Uif-VerticalFieldGroup" p:label="Section">
                     <property name="fieldLabel.render" value="false"/>
                     <property name="group.validationMessages.render" value="false"/>
-                    <property name="cssClasses">
-                        <list merge="true">
-                            <value>fl-text-align-center</value>
-                        </list>
-                    </property>
                     <property name="items">
                         <list>
                             <bean parent="Uif-DataField" p:propertyName="code" p:label="Section"
@@ -360,12 +339,6 @@
                                   p:actionLabel="View more" p:style="margin:0 0 4px 0;">
                                 <property name="actionScript"
                                           value="toggleSectionDetails(jQuery(this).parents('tr.row'), jQuery(this), 'View more', 'View less')"/>
-                                <property name="cssClasses">
-                                    <list merge="true">
-                                        <value>fl-font-size-80</value>
-                                        <value>fl-text-align-center</value>
-                                    </list>
-                                </property>
                             </bean>
 
                             <bean parent="Uif-VerticalBoxSection" p:style="margin:0 0 0 56px; display:none;">
@@ -449,11 +422,6 @@
                 <bean parent="Uif-VerticalFieldGroup" p:label="Type (Credit)">
                     <property name="fieldLabel.render" value="false"/>
                     <property name="group.validationMessages.render" value="false"/>
-                    <property name="cssClasses">
-                        <list merge="true">
-                            <value>fl-text-align-center</value>
-                        </list>
-                    </property>
                     <property name="items">
                         <list>
                             <bean parent="Uif-DataField" p:propertyName="activityOfferingType"
@@ -517,7 +485,6 @@
                     <property name="cssClasses">
                         <list merge="true">
                             <value>ksap-add</value>
-                            <value>fl-text-align-center</value>
                         </list>
                     </property>
                     <property name="onClickScript" value="
@@ -542,8 +509,7 @@
                       p:render="@{#line.planItemId ne null ? true : false}">
                     <property name="cssClasses">
                         <list merge="true">
-                            <value>myplan-delete</value>
-                            <value>fl-text-align-center</value>
+                            <value>ksap-delete</value>
                         </list>
                     </property>
                     <property name="dataAttributes">

@@ -16,6 +16,7 @@ import org.kuali.student.ap.coursesearch.service.impl.CourseDetailsInquiryHelper
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
 import org.kuali.student.ap.framework.context.PlanConstants;
 import org.kuali.student.ap.framework.context.TermHelper;
+import org.kuali.student.common.util.KSCollectionUtils;
 import org.kuali.student.enrollment.academicrecord.dto.StudentCourseRecordInfo;
 import org.kuali.student.enrollment.academicrecord.service.AcademicRecordService;
 import org.kuali.student.r2.core.acal.infc.Term;
@@ -102,7 +103,7 @@ public class SingleQuarterInquiryHelperImpl extends KualiInquirableImpl {
 		String[] params = {};
 
 		TermHelper th = KsapFrameworkServiceLocator.getTermHelper();
-		List<Term> publishedTerms = th.getPublishedTerms();
+		List<Term> publishedTerms = th.getOfficialTerms();
 
 		/************* PlannedCourseList **************/
 		List<PlannedCourseDataObject> plannedCoursesList = new ArrayList<PlannedCourseDataObject>();
@@ -117,7 +118,7 @@ public class SingleQuarterInquiryHelperImpl extends KualiInquirableImpl {
 		for (PlannedCourseDataObject pl : plannedCoursesList) {
 			Term pt = th.getTerm(pl.getPlanItemDataObject().getAtp());
 			try {
-				pl.setShowAlert(!KsapFrameworkServiceLocator.getTermHelper()
+				pl.setShowAlert(!KsapFrameworkServiceLocator.getCourseHelper()
 						.isCourseOffered(pt,
 								KsapFrameworkServiceLocator.getCourseService().getCourse(
 										pl.getCourseDetails().getCourseId(),
@@ -169,7 +170,7 @@ public class SingleQuarterInquiryHelperImpl extends KualiInquirableImpl {
 		for (PlannedCourseDataObject pl : backupCoursesList) {
 			Term pt = th.getTerm(pl.getPlanItemDataObject().getAtp());
 			try {
-				pl.setShowAlert(!KsapFrameworkServiceLocator.getTermHelper()
+				pl.setShowAlert(!KsapFrameworkServiceLocator.getCourseHelper()
 						.isCourseOffered(pt,
 								KsapFrameworkServiceLocator.getCourseService().getCourse(
 										pl.getCourseDetails().getCourseId(),
@@ -221,10 +222,13 @@ public class SingleQuarterInquiryHelperImpl extends KualiInquirableImpl {
 					.getPlanItemsInPlan(learningPlanID, context);
 
 			for (PlanItemInfo planItem : planItemList) {
-				if (planItem.getPlanPeriods() != null
-						&& planItem.getPlanPeriods().size() > 0
-						&& planItem.getPlanPeriods().get(0)
-								.equalsIgnoreCase(termId)
+				String planPeriod;
+                try{
+                    planPeriod = KSCollectionUtils.getRequiredZeroElement(planItem.getPlanPeriods());
+                }catch(OperationFailedException e){
+                    planPeriod = "NULL";
+                }
+                if (planPeriod.equalsIgnoreCase(termId)
 						&& planItem.getRefObjectType().equalsIgnoreCase(
 								PlanConstants.COURSE_TYPE)) {
 					PlannedCourseDataObject plannedCourseDO = new PlannedCourseDataObject();

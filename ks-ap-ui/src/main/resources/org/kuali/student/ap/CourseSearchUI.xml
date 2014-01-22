@@ -15,12 +15,12 @@
 	<bean id="CourseSearch-FormView" parent="CourseSearch-FormView-parent">
 		<property name="id" value="CourseSearch-FormView" />
 	</bean>
-	<bean abstract="true" id="CourseSearch-FormView-parent" parent="MyPlanFormView">
+	<bean abstract="true" id="CourseSearch-FormView-parent" parent="KSAPFormView">
 		<property name="headerText" value="Find Courses" />
 		<property name="entryPageId" value="course_search" />
 		<property name="cssClasses">
 			<list merge="true">
-				<value>myplan-view</value>
+				<value>ksap-view</value>
 			</list>
 		</property>
 		<property name="header">
@@ -28,7 +28,7 @@
 		</property>
 		<property name="additionalScriptFiles">
 			<list>
-				<value>ks-myplan/scripts/ksap.search.js</value>
+				<value>ks-ap/scripts/ksap.search.js</value>
 			</list>
 		</property>
 		<property name="items">
@@ -50,17 +50,17 @@
 		</property>
 		<property name="items">
 			<list>
-				<ref bean="myplan_dialog_anchor" />
+				<ref bean="ksap_dialog_anchor" />
 				<ref bean="course_search_result_section" />
-				<ref bean="myplan_section" />
+				<ref bean="ksap_section" />
 			</list>
 		</property>
         <property name="stickyFooter" value="false"/>
 	</bean>
 
 	<!-- Layout for Empty Course Search Form Page -->
-	<bean id="course_search_section" parent="Uif-VerticalBoxSubSection"
-		p:style="width: 710px; margin-right: 10px;">
+    <bean id="course_search_section" parent="course_search_section-parent"/>
+    <bean id="course_search_section-parent" abstract="true" parent="Uif-VerticalBoxSubSection" >
 		<property name="items">
 			<list>
 				<ref bean="course_search_panel" />
@@ -69,7 +69,8 @@
 	</bean>
 
 	<!-- Layout for Course Search Result Page -->
-	<bean id="course_search_result_section" parent="Uif-VerticalBoxSubSection" p:style="width:73%">
+    <bean id="course_search_result_section" parent="course_search_result_section-parent"/>
+    <bean id="course_search_result_section-parent" abstract="true" parent="Uif-VerticalBoxSubSection">
 		<property name="items">
 			<list>
 				<ref bean="course_search_panel" />
@@ -79,28 +80,29 @@
 	</bean>
 
 	<!-- Group for Search Fields Container -->
-	<bean id="course_search_panel" parent="Uif-VerticalBoxGroup">
+    <bean id="course_search_panel" parent="course_search_panel-parent"/>
+    <bean id="course_search_panel-parent" abstract="true" parent="Uif-VerticalBoxGroup">
 		<property name="cssClasses">
 			<list merge="true">
-				<value>myplan-course-search-panel</value>
+				<value>ksap-course-search-panel</value>
 			</list>
 		</property>
 		<property name="items">
 			<list>
 				<ref bean="course_search_fields" />
-				<ref bean="course_search_params" />
 			</list>
 		</property>
 	</bean>
 
 	<bean id="course_search_criteria_input" parent="course_search_criteria_input-parent" />
-	<bean id="course_search_criteria_input-parent" parent="Uif-TextControl"
+	<bean id="course_search_criteria_input-parent" abstract="true" parent="Uif-TextControl"
 		p:watermarkText="#{T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTextHelper().getText('SEARCH_SEARCHTERMS_PLACEHOLDER_TEXT')}">
 		<property name="onDocumentReadyScript"
                   value="setupCourseSearchCriteriaActions(jQuery('#text_searchQuery_control'), jQuery('#searchForCourses'))"/>
 	</bean>
 
-	<bean id="text_searchQuery" parent="Uif-InputField"
+    <bean id="text_searchQuery" parent="text_searchQuery-parent"/>
+	<bean id="text_searchQuery-parent" abstract="true" parent="Uif-InputField"
 		p:propertyName="searchQuery" p:label="Search for"
 		p:fieldLabel.renderColon="false">
 		<property name="control">
@@ -115,7 +117,8 @@
 		</property>
 	</bean>
 
-	<bean id="select_searchTerm" parent="Uif-InputField"
+    <bean id="select_searchTerm" parent="select_searchTerm-parent"/>
+	<bean id="select_searchTerm-parent" abstract="true" parent="Uif-InputField"
 		p:propertyName="searchTerm" p:label="in" p:fieldLabel.renderColon="false"
 		p:validationMessages.render="false">
 
@@ -123,70 +126,49 @@
 			<bean parent="Uif-DropdownControl" />
 		</property>
 		<property name="optionsFinder">
-			<bean class="org.kuali.student.ap.utils.PublishedTermsListBuilder">
-				<property name="suffix" value=" only" />
+			<bean class="org.kuali.student.ap.coursesearch.keyvalue.PublishedTermsListBuilder">
 				<property name="additionalListItemsTop">
 					<map>
 						<entry key="any" value="Any term" />
-						<entry key="projected" value="Projected terms only" />
-						<entry key="scheduled" value="Scheduled terms only" />
+						<!--<entry key="projected" value="Projected terms only" />-->
+						<entry key="scheduled" value="Scheduled terms" />
 					</map>
 				</property>
 			</bean>
 		</property>
 	</bean>
 
-	<!-- Group for Search Input Fields -->
+    <bean id="searchForCourses" parent="Uif-PrimaryActionButton"
+          p:actionLabel="Search" p:disabled="true">
+        <property name="actionScript"
+                  value="searchForCourses('course_search_results','course_search_results_panel');" />
+        <property name="cssClasses">
+            <list merge="true">
+                <value>course-search-submit</value>
+            </list>
+        </property>
+    </bean>
+
+	<!-- Group for Search Fields and button-->
 	<bean id="course_search_fields" parent="course_search_fields-parent" />
-	<bean id="course_search_fields-parent" parent="Uif-HorizontalFieldGroup"
-		p:style="margin:0 0 20px 0;" p:group.validationMessages.render="false">
+	<bean id="course_search_fields-parent" abstract="true" parent="Uif-HorizontalFieldGroup" p:group.validationMessages.render="false">
 		<property name="items">
 			<list>
 				<ref bean="text_searchQuery" />
 				<ref bean="select_searchTerm" />
 				<ref bean="hidden_savedCourses" />
-
+                <ref bean="searchForCourses" />
 			</list>
-		</property>
-	</bean>
-
-	<!-- Group for Search Input Parameters -->
-	<bean id="course_search_params" parent="Uif-HorizontalFieldGroup">
-		<property name="cssClasses">
-			<list merge="true">
-				<value>myplan-course-search-params</value>
-			</list>
-		</property>
-		<property name="items">
-			<list>
-                <bean p:id="searchForCourses" parent="Uif-PrimaryActionButton"
-                      p:actionLabel="Search" p:disabled="true">
-                    <property name="actionScript"
-                              value="
-                        searchForCourses('course_search_results','course_search_results_panel');
-                    " />
-                    <property name="cssClasses">
-                        <list merge="true">
-                            <value>course-search-submit</value>
-                        </list>
-                    </property>
-                </bean>
-                <bean p:id="clearSearch"
-                      parent="Uif-SecondaryActionButton-Small"
-                      p:actionLabel="Clear">
-                    <property name="actionScript"
-                              value="fnClearSearch();"/>
-                </bean>
-			</list>	
 		</property>
 	</bean>
 
 	<!-- Layout for Search Facets and Search Results -->
-	<bean id="course_search_results_panel" parent="Uif-HorizontalBoxGroup"
-		p:style="display: none;">
+    <bean id="course_search_results_panel" parent="course_search_results_panel-parent"/>
+	<bean id="course_search_results_panel-parent" abstract="true" parent="Uif-HorizontalBoxGroup">
         <property name="cssClasses">
             <list merge="true">
-                <value>myplan-course-search-results</value>
+                <value>ksap-course-search-results</value>
+                <value>ksap-hide</value>
             </list>
         </property>
 		<property name="items">
@@ -198,7 +180,7 @@
 	</bean>
 
 	<bean id="course_search_results" parent="course_search_results-parent" />
-	<bean id="course_search_results-parent" parent="Uif-DataTable">
+	<bean id="course_search_results-parent" abstract="true" parent="Uif-DataTable">
 		<property name="cssClasses">
 			<list merge="true">
 				<value>ksap-course-search-results-datatable</value>
@@ -209,7 +191,7 @@
 			<map merge="true">
 				<entry key="oLanguage"
 					value="{
-							'sEmptyTable' : '&lt;div class=&quot;ksap-course-search-empty&quot;&gt;&lt;p class=&quot;fl-font-size-130&quot;&gt;We couldn\'t find anything matching your search.&lt;/p&gt;&lt;p&gt;A few suggestions:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Check your spelling&lt;/li&gt;&lt;li&gt;Try a more general search (Any quarter, ENGL 1xx)&lt;/li&gt;&lt;li&gt;Use at least 3 characters&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;',
+							'sEmptyTable' : '&lt;div class=&quot;ksap-course-search-empty&quot;&gt;&lt;p&gt;We couldn\'t find anything matching your search.&lt;/p&gt;&lt;p&gt;A few suggestions:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Check your spelling&lt;/li&gt;&lt;li&gt;Try a more general search (Any quarter, ENGL 1xx)&lt;/li&gt;&lt;li&gt;Use at least 3 characters&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;',
 							'sInfo' : 'Showing _START_-_END_ of _TOTAL_ results',
 							'sInfoEmpty' : '0 results found',
 							'sInfoFiltered' : '',
@@ -262,8 +244,8 @@
 
 	<!-- Group for Search Facets -->
 	<bean id="course_search_results_facets" parent="course_search_results_facets-parent" />
-	<bean id="course_search_results_facets-parent" parent="Uif-VerticalBoxGroup"
-		p:headerText="Narrow Results" p:style="width:146px; margin-right: 10px;">
+	<bean id="course_search_results_facets-parent" abstract="true" parent="Uif-VerticalBoxGroup"
+		p:headerText="Narrow Results">
 		<property name="header">
 			<bean parent="Uif-HeaderFive">
 				<property name="cssClasses">
@@ -275,7 +257,7 @@
 		</property>
 		<property name="cssClasses">
 			<list merge="true">
-				<value>myplan-facets-panel</value>
+				<value>ksap-facets-panel</value>
 			</list>
 		</property>
 		<property name="items">
@@ -310,6 +292,13 @@
 				<value>ksap-facets-group</value>
 			</list>
 		</property>
+        <property name="disclosure">
+            <bean parent="Uif-Disclosure">
+                <!-- Blank images, real ones are set by css-->
+                <property name="collapseImageSrc" value="@{#ConfigProperties['ks.ap.externalizable.images.url']}pixel.gif"/>
+                <property name="expandImageSrc" value="@{#ConfigProperties['ks.ap.externalizable.images.url']}pixel.gif"/>
+            </bean>
+        </property>
 	</bean>
 
 	<bean id="facet_quarter" parent="facet-parent" p:headerText="Term">
@@ -330,31 +319,25 @@
 	<bean id="facet_keywords" parent="facet-parent" p:headerText="Keywords" />
 
 	<!--Add Course Menu -->
-	<bean id="add_course_items" parent="Uif-VerticalBoxSubSection"
-		p:cssClasses="ksap-container-75" p:style="margin: 0;">
+    <bean id="add_course_items" parent="add_course_items-parent"/>
+	<bean id="add_course_items-parent" abstract="true" parent="Uif-VerticalBoxSubSection"
+		p:cssClasses="ksap-container-75 ksap-no-margin">
 		<property name="hidden" value="true" />
 		<property name="items">
 			<list>
                 <bean parent="Uif-ActionLink" p:actionLabel="Add to Plan"
                       p:title="Add to Plan">
                     <!--@TODO: KSAP-254: Refactor this JS into ksap.search.js-->
-                    <property name="actionScript" value="
-                        var retrieveData = {action:'plan', viewId:'PlannedCourse-FormView', methodToCall:'startAddDialog', courseId:jQuery(this).data('courseid'),pageId:'add_dialog_page'};
-                        var popupStyle = {width:'300px', height:'16px'};
-                        var popupOptions = {tail:{hidden:true}, align:'top', close:true};
-                        var pageId = 'add_dialog_page.'+ jQuery(this).data('coursexid');
-                        openPopup(pageId, retrieveData, 'plan', popupStyle, popupOptions, e);
-                    "/>
+                    <property name="actionScript"
+                              value="ksapPlannerOpenDialog('course_add_course','planner','startDialog', this, e);"/>
                 </bean>
+
 
 				<bean parent="Uif-Link" p:target="" p:href="#" p:linkText="Bookmark"
                       p:title="Bookmark"
-                      p:style="margin:0;">
+                      p:cssClasses="ksap-no-margin">
                     <!--@TODO: KSAP-254: Refactor this JS into ksap.search.js-->
-                    <property name="onClickScript" value="
-                        var additionalFormData = {viewId:'PlannedCourse-FormView', methodToCall:'addSavedCourse', courseId:jQuery(this).data('courseid')};
-                        submitHiddenForm('plan', additionalFormData, e);
-                    "/>
+                    <property name="onClickScript" value="bookmarkCourse(jQuery(this).data('courseid'), e);"/>
 				</bean>
 
 			</list>
@@ -365,8 +348,9 @@
 		by openMenu() with data from the HTML5 data-foo attribute on the popup box 
 		element. This allows course details to be passed in statically instead of 
 		relying on a server call for "quick" details. -->
-	<bean id="course_quick_detail" parent="Uif-VerticalBoxSubSection"
-		p:cssClasses="myplan-quick-detail" p:style="margin: 0;">
+    <bean id="course_quick_detail" parent="course_quick_detail-parent"/>
+	<bean id="course_quick_detail-parent" abstract="true" parent="Uif-VerticalBoxSubSection"
+        p:cssClasses="ksap-no-margin">
 		<property name="hidden" value="true" />
 		<property name="headerText" value="__KSAP__COURSEHEADER__" />
 		<property name="items">
@@ -380,7 +364,7 @@
 								p:validationMessages.render="false">
 								<property name="cssClasses">
 									<list merge="true">
-										<value>myplan-course-detail-label</value>
+										<value>ksap-course-detail-label</value>
 									</list>
 								</property>
 								<property name="items">
@@ -395,7 +379,7 @@
 								p:validationMessages.render="false">
 								<property name="cssClasses">
 									<list merge="true">
-										<value>myplan-course-detail-field</value>
+										<value>ksap-course-detail-field</value>
 									</list>
 								</property>
 								<property name="items">
@@ -415,7 +399,7 @@
 								p:validationMessages.render="false">
 								<property name="cssClasses">
 									<list merge="true">
-										<value>myplan-course-detail-label</value>
+										<value>ksap-course-detail-label</value>
 									</list>
 								</property>
 								<property name="items">
@@ -430,7 +414,7 @@
 								p:validationMessages.render="false">
 								<property name="cssClasses">
 									<list merge="true">
-										<value>myplan-course-detail-field</value>
+										<value>ksap-course-detail-field</value>
 									</list>
 								</property>
 								<property name="items">
@@ -444,7 +428,7 @@
 				</bean>
 				<bean parent="Uif-Message" p:messageText="__KSAP__SECTIONS__" />
 				<bean parent="Uif-Link" p:target="" p:href="__KSAP__INQUIRYURL__"
-					p:linkText="Full details..." p:title="Course Details" p:style="margin:0;" />
+					p:linkText="Full details..." p:title="Course Details" p:cssClasses="ksap-no-margin"/>
 			</list>
 		</property>
 	</bean>

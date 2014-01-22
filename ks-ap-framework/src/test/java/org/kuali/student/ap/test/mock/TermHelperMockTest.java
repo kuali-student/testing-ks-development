@@ -2,6 +2,7 @@ package org.kuali.student.ap.test.mock;
 
 import org.kuali.student.ap.framework.context.TermHelper;
 import org.kuali.student.ap.framework.context.YearTerm;
+import org.kuali.student.r2.core.acal.infc.AcademicCalendar;
 import org.kuali.student.r2.core.acal.infc.Term;
 import org.kuali.student.r2.lum.course.infc.Course;
 
@@ -170,7 +171,7 @@ public class TermHelperMockTest implements TermHelper {
      *         if not.
      */
     @Override
-    public boolean isPublished(String termId) {
+    public boolean isOfficial(String termId) {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -178,23 +179,11 @@ public class TermHelperMockTest implements TermHelper {
      * Returns true if an ATP is considered present or greater in the context of
      * the current term's term. Otherwise, false.
      *
-     * @param termId
+     * @param atpId
      * @return
      */
     @Override
     public boolean isCompleted(String atpId) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    /**
-     * Determines whether a course is in a specific term.
-     *
-     * @param term
-     * @param course
-     * @return
-     */
-    @Override
-    public boolean isCourseOffered(Term term, Course course) {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -204,7 +193,7 @@ public class TermHelperMockTest implements TermHelper {
      * @return
      */
     @Override
-    public List<Term> getPublishedTerms() {
+    public List<Term> getOfficialTerms() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -238,7 +227,7 @@ public class TermHelperMockTest implements TermHelper {
     }
 
     /**
-     * @param termId - Id of a term
+     * @param term - a term
      * @return YearTerm holding information for the term
      */
     @Override
@@ -246,13 +235,65 @@ public class TermHelperMockTest implements TermHelper {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * Gets the current term based on the current date.
+     *
+     * @return Current Term
+     */
     @Override
-    public String findTermIdByNameAndContainingDates(Date termBeginDate, Date termEndDate, String termName) {
+    public Term getCurrentTerm() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * Gets the current academic calendar based on the current date
+     *
+     * @return Current academic calendar
+     */
     @Override
-    public List<Term> getCalendarTerms(Term startTerm) {
+    public AcademicCalendar getCurrentAcademicCalendar() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    /**
+     * Sort a list by its start date
+     *
+     * @param terms     - List of Terms to be sorted
+     * @param ascending - If True sort ascending, else sort descending
+     * @return - A list of sorted terms
+     */
+    @Override
+    public List<Term> sortTermsByStartDate(List<Term> terms, boolean ascending) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    /**
+     * Sort a list by its end date
+     *
+     * @param terms     - List of Terms to be sorted
+     * @param ascending - If True sort ascending, else sort descending
+     * @return - A list of sorted terms
+     */
+    @Override
+    public List<Term> sortTermsByEndDate(List<Term> terms, boolean ascending) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    /**
+     * Get a list of the current Academic Terms and make sure the SOC state associated
+     * with the term is published, and return the list of the terms.
+     * @return - A list of current terms
+     */
+    public List<Term> getCurrentTermsWithPublishedSOC (){
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    /**
+     * Get a list of the future Academic Terms and make sure the SOC state associated
+     * with the term is published, and return the list of the terms.
+     * @return - A list of future terms
+     */
+    public List<Term> getFutureTermsWithPublishedSOC (){
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

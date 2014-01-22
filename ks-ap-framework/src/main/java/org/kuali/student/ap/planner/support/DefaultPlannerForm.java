@@ -11,6 +11,7 @@ import org.kuali.student.ap.planner.PlannerForm;
 import org.kuali.student.ap.planner.PlannerItem;
 import org.kuali.student.ap.planner.PlannerTerm;
 import org.kuali.student.ap.planner.PlannerTermNote;
+import org.kuali.student.common.util.KSCollectionUtils;
 import org.kuali.student.enrollment.academicrecord.dto.StudentCourseRecordInfo;
 import org.kuali.student.r2.core.acal.infc.Term;
 import org.kuali.student.ap.academicplan.infc.LearningPlan;
@@ -137,7 +138,12 @@ public class DefaultPlannerForm extends AbstractPlanItemForm implements
         if (creditsForPlanItem == null && courseCredit != null) {
             BigDecimal minCredit = BigDecimal.ZERO;
             BigDecimal maxCredit = ONE_HUNDRED;
-            ResultValuesGroupInfo rci = course.getCreditOptions().get(0);
+            ResultValuesGroupInfo rci;
+            try{
+                rci = KSCollectionUtils.getRequiredZeroElement(course.getCreditOptions());
+            }catch (OperationFailedException e){
+                throw new RuntimeException("Invalid Credit Options", e);
+            }
             String type = rci.getTypeKey();
             if (type.equals("kuali.result.values.group.type.fixed")) {
                 boolean useAttributes = rci.getResultValueKeys().isEmpty();
@@ -145,9 +151,9 @@ public class DefaultPlannerForm extends AbstractPlanItemForm implements
                     try {
                         ResultValueInfo rv = KsapFrameworkServiceLocator
                                 .getLrcService().getResultValue(
-                                        rci.getResultValueKeys().get(0),
-                                        KsapFrameworkServiceLocator
-                                                .getContext().getContextInfo());
+                                        KSCollectionUtils.getRequiredZeroElement(rci.getResultValueKeys()),
+                                                KsapFrameworkServiceLocator
+                                                        .getContext().getContextInfo());
                         if (rv == null)
                             useAttributes = true;
                         else
@@ -374,7 +380,7 @@ public class DefaultPlannerForm extends AbstractPlanItemForm implements
 
 			if (completedRecords != null)
 				for (StudentCourseRecordInfo completedRecord : completedRecords) {
-					String termId = KsapFrameworkServiceLocator.getTermHelper().findTermIdByNameAndContainingDates(completedRecord.getCourseBeginDate(), completedRecord.getCourseEndDate(), completedRecord.getTermName());
+					String termId =completedRecord.getTermId();
 					termIds.add(termId);
 					List<PlannerItem> itemList = completed.get(termId);
 					if (itemList == null)
@@ -421,37 +427,27 @@ public class DefaultPlannerForm extends AbstractPlanItemForm implements
             for(String tempId : termIds){
                 tempTerms.add(termHelper.getTerm(tempId));
             }
-            String firstTermId = termIds.first();
+            String firstTermId;
+            if(termIds.isEmpty()){
+                firstTermId = termHelper.getCurrentTerm().getId();
+            }else{
+                firstTermId = termIds.first();
+            }
             Term firstTerm;
             if(tempTerms.size()>0){
-                Collections.sort(tempTerms, new Comparator<Term>() {
-                    @Override
-                    public int compare(Term o1, Term o2) {
-                        return o1.getStartDate().compareTo(o2.getStartDate());
-                    }
-                });
+                tempTerms = termHelper.sortTermsByStartDate(tempTerms,true);
                 firstTerm = tempTerms.get(0);
-                firstTermId = tempTerms.get(0).getId();
+                firstTermId = firstTerm.getId();
             }else{
                 firstTerm = termHelper.getTerm(firstTermId);
             }
 			termHelper.frontLoadForPlanner(firstTermId);
 
-			List<Term> calendarTerms = termHelper.getCalendarTerms(firstTerm);
-			String focusTermId = termHelper.getPlanningTerms().get(0).getId();
+			List<Term> calendarTerms = KsapFrameworkServiceLocator.getPlanHelper().getCalendarTerms(firstTerm);
+			String focusTermId = KsapFrameworkServiceLocator.getPlanHelper().getStartTermId();
 
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(firstTerm.getStartDate());
-
-			// TODO: convert to configuration
-			if (cal.get(Calendar.YEAR) < 2008) {
-				cal.set(Calendar.YEAR, 2008);
-			}
-
-			for (Term term : termHelper.getTermsByDateRange(cal.getTime(),
-					calendarTerms.get(0).getEndDate())) {
-				termIds.add(term.getId());
-			}
 
 			CommentService commentService = KsapFrameworkServiceLocator
 					.getCommentService();

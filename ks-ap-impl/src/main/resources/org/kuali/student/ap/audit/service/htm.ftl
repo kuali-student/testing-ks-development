@@ -42,7 +42,7 @@
 }>
 <html>
 <head>
-<link href="/student/ks-myplan/css/audit.css" rel="stylesheet" type="text/css"/>
+<link href="/student/ks-ap/css/audit.css" rel="stylesheet" type="text/css"/>
 </head>    
 <div class="ksap-audit-report">
 	<h1>${dpTitle1?xml}</h1>   
@@ -645,7 +645,7 @@ headerline:
 </#if> 
 
 <#if showIncludeBottomText>
-    <div class="fl-text-align-center" >
+    <div>
     <#list includeBottomText as bottomTextLine>
 	${bottomTextLine?replace("*", "")?replace("_", "")?replace("END OF ANALYSIS", "<br/>END OF ANALYSIS")?trim }      
     </#list>

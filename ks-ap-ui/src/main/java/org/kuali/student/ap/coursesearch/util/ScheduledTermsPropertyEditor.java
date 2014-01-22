@@ -24,7 +24,7 @@ import org.kuali.student.ap.framework.context.YearTerm;
 import org.kuali.student.ap.coursesearch.dataobject.CourseSummaryDetails;
 
 public class ScheduledTermsPropertyEditor extends PropertyEditorSupport {
-	protected CollectionListPropertyEditorHtmlListType listType = CollectionListPropertyEditorHtmlListType.DL;
+//	protected CollectionListPropertyEditorHtmlListType listType = CollectionListPropertyEditorHtmlListType.UL;
 
 	@Override
 	public void setValue(Object value) {
@@ -34,28 +34,35 @@ public class ScheduledTermsPropertyEditor extends PropertyEditorSupport {
 	// TODO: KULRICE-6286 Upgrade to list with rice 2.2.1 
 	@Override
 	public String getAsText() {
-		CourseSummaryDetails courseSummaryDetails = (CourseSummaryDetails) super
-				.getValue();
-		StringBuffer formattedText = new StringBuffer();
-		formattedText.append(String.format("<%s class=\"scheduled\">",
-				listType.getListElementName()));
+		CourseSummaryDetails courseSummaryDetails = (CourseSummaryDetails) super.getValue();
+		StringBuilder formattedText = new StringBuilder();
+		formattedText.append(String.format("<%s class=\"scheduled\">", "span"));
 		TermHelper th = KsapFrameworkServiceLocator.getTermHelper();
-		if (courseSummaryDetails != null
+
+        if (courseSummaryDetails != null
 				&& courseSummaryDetails.getScheduledTerms() != null
 				&& courseSummaryDetails.getScheduledTerms().size() > 0) {
-			for (String termId : courseSummaryDetails.getScheduledTerms()) {
-				YearTerm yt = th.getYearTerm(termId);
+
+            int counter = 0;
+
+            for (String termId : courseSummaryDetails.getScheduledTerms()) {
+
+                if (counter > 0) {
+                    formattedText.append(", ");
+                }
+
+                YearTerm yt = th.getYearTerm(termId);
 				String text = yt.getShortName();
-				formattedText.append(String.format("<%s class=\"%s\">%s</%s>",
-						listType.getListItemElementName(),
-						text.replaceAll("\\d*$", "").trim(), text,
-						listType.getListItemElementName()));
+				formattedText.append(String.format("<%s class=\"%s\">%s</%s>", "span", text.replaceAll("\\d*$", "").trim(), text, "span"));
+
+                counter++;
 			}
 		} else {
-			formattedText.append("Not currently scheduled");
+			formattedText.append(String.format("<%s>%s</%s>", "span", "Not currently scheduled", "span"));
 		}
-		formattedText.append(String.format("</%s>",
-				listType.getListElementName()));
+
+        formattedText.append(String.format("</%s>", "span"));
+
 		return formattedText.toString();
 	}
 

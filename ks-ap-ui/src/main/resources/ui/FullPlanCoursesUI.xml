@@ -22,7 +22,8 @@
     <!-- ################# Tabular view of full academic plan ############################# -->
 
     <!--Bean for the Full Academic Plan View  -->
-    <bean id="FullPlannedCourses-LookupView" parent="MyPlanBaseLookupView">
+    <bean id="FullPlannedCourses-LookupView" parent="FullPlannedCourses-LookupView-parent"/>
+    <bean id="FullPlannedCourses-LookupView-parent" abstract="true" parent="KSAPBaseLookupView">
         <property name="viewName" value="FullPlannedCourses-LookupView"/>
         <property name="dataObjectClassName" value="org.kuali.student.myplan.plan.dataobject.PlannedTerm"/>
         <property name="viewHelperServiceClass"
@@ -31,7 +32,7 @@
         <property name="page.header.render" value="false"/>
         <property name="cssClasses">
             <list merge="true">
-                <value>myplan-view</value>
+                <value>ksap-view</value>
             </list>
         </property>
         <property name="style" value="width:682px;"/>
@@ -73,13 +74,14 @@
         <property name="footer.render" value="false"/>
     </bean>
 
-    <bean id="full_planned_courses" parent="Uif-VerticalBoxSection">
+    <bean id="full_planned_courses" parent="full_planned_courses-parent"/>
+    <bean id="full_planned_courses-parent" abstract="true" parent="Uif-VerticalBoxSection">
         <property name="validationMessages.render" value="false"/>
         <property name="style" value="border:solid 1px #ddd; border-radius:5px; margin-top:20px;"/>
         <property name="items">
             <list>
                 <bean parent="Uif-HeaderOne" p:style="border-bottom:solid 1px #ddd; padding:10px; margin:0;">
-                    <property name="headerText" value="Student Academic Plan (MyPlan)"/>
+                    <property name="headerText" value="Student Academic Plan (KSAP)"/>
                 </bean>
                 <bean parent="Uif-VerticalBoxGroup" p:style="border-bottom:solid 1px #ddd; padding:10px; margin:0;">
                     <property name="validationMessages.render" value="false"/>
@@ -89,12 +91,7 @@
                                   p:messageText="@{T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getUserSessionHelper().getStudentName()} (@{T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getUserSessionHelper().getStudentNumber() ne null ? T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getUserSessionHelper().getStudentNumber() : 'No student number'})">
                                 <property name="fieldLabel.cssClasses">
                                     <list merge="true">
-                                        <value>myplan-text-normal</value>
-                                    </list>
-                                </property>
-                                <property name="cssClasses">
-                                    <list merge="true">
-                                        <value>fl-text-bold</value>
+                                        <value>ksap-text-normal</value>
                                     </list>
                                 </property>
                             </bean>
@@ -104,12 +101,7 @@
                                 <property name="style" value="margin:0;"/>
                                 <property name="fieldLabel.cssClasses">
                                     <list merge="true">
-                                        <value>myplan-text-normal</value>
-                                    </list>
-                                </property>
-                                <property name="cssClasses">
-                                    <list merge="true">
-                                        <value>fl-text-bold</value>
+                                        <value>ksap-text-normal</value>
                                     </list>
                                 </property>
                             </bean>
@@ -138,7 +130,7 @@
                     <property name="style" value="padding:10px; margin:0;"/>
                     <property name="fieldLabel.cssClasses">
                         <list merge="true">
-                            <value>myplan-text-normal</value>
+                            <value>ksap-text-normal</value>
                         </list>
                     </property>
                 </bean>
@@ -146,23 +138,24 @@
         </property>
     </bean>
 
-    <bean id="full_planned_courses_detail" parent="Uif-VerticalBoxSubSection" p:headerText="Entire Academic Plan">
+    <bean id="full_planned_courses_detail" parent="full_planned_courses_detail-parent"/>
+    <bean id="full_planned_courses_detail-parent" abstract="true" parent="Uif-VerticalBoxSubSection" p:headerText="Entire Academic Plan">
         <property name="style" value="padding:10px;"/>
         <property name="onDocumentReadyScript" value="
             jQuery('th, td').removeAttr('width');
-            jQuery('td.uif-subCollection').each(function() {
+            jQuery('div.uif-subCollection').each(function() {
                 var maxHeight = 0;
-                jQuery(this).find('.myplan-term > .uif-boxLayout').each(function() {
+                jQuery(this).find('.ksap-term > .uif-horizontalBoxLayout').each(function() {
                     if (jQuery(this).height() > maxHeight) maxHeight = jQuery(this).height();
                 });
-                jQuery(this).find('.myplan-term > .uif-boxLayout').each(function() {
+                jQuery(this).find('.ksap-term > .uif-horizontalBoxLayout').each(function() {
                     jQuery(this).height(maxHeight);
                 });
             });
         "/>
         <property name="cssClasses">
             <list merge="true">
-                <value>myplan-full-plan-detail</value>
+                <value>ksap-full-plan-detail</value>
             </list>
         </property>
         <property name="header">
@@ -175,36 +168,31 @@
                     <property name="items">
                         <list>
                             <bean parent="Uif-HeaderThree" p:headerText="Year" p:cssClasses=""
-                                  p:style="display:block; width:74px; visibility:hidden; margin:0; padding:5px 0;"/>
+                                  p:style="width:77px; visibility:hidden;"/>
 
 
                             <bean parent="Uif-HeaderThree"
-                                  p:cssClasses="fl-text-align-center fl-text-bold"
-                                  p:style="width:@{535/T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getNumberOfTermsInAcademicYear()}px; display:block; border-left:solid 1px #a9a9a9; margin:0; padding:5px 0;">
+                                  p:style="width:@{535/T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getNumberOfTermsInAcademicYear()}px; border-left:solid 1px #a9a9a9;">
                                 <property name="headerText" value="@{T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getTermNameInAcadmicYear(0)}"/>
                                 <property name="render" value="@{!#empty(T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getTermNameInAcadmicYear(0))}"/>
                                   </bean>
                             <bean parent="Uif-HeaderThree"
-                                  p:cssClasses="fl-text-align-center fl-text-bold"
-                                  p:style="width:@{535/T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getNumberOfTermsInAcademicYear()}px; display:block; border-left:solid 1px #a9a9a9; margin:0; padding:5px 0;">
+                                  p:style="width:@{535/T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getNumberOfTermsInAcademicYear()}px; border-left:solid 1px #a9a9a9;">
                                 <property name="headerText" value="@{T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getTermNameInAcadmicYear(1)}"/>
                                 <property name="render" value="@{!#empty(T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getTermNameInAcadmicYear(1))}"/>
                                   </bean>
                             <bean parent="Uif-HeaderThree"
-                                  p:cssClasses="fl-text-align-center fl-text-bold"
-                                  p:style="width:@{535/T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getNumberOfTermsInAcademicYear()}px; display:block; border-left:solid 1px #a9a9a9; margin:0; padding:5px 0;">
+                                  p:style="width:@{535/T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getNumberOfTermsInAcademicYear()}px; border-left:solid 1px #a9a9a9;">
                                 <property name="headerText" value="@{T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getTermNameInAcadmicYear(2)}"/>
                                 <property name="render" value="@{!#empty(T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getTermNameInAcadmicYear(2))}"/>
                                   </bean>
                             <bean parent="Uif-HeaderThree"
-                                  p:cssClasses="fl-text-align-center fl-text-bold"
-                                  p:style="width:@{535/T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getNumberOfTermsInAcademicYear()}px; display:block; border-left:solid 1px #a9a9a9; margin:0; padding:5px 0;">
+                                  p:style="width:@{535/T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getNumberOfTermsInAcademicYear()}px; border-left:solid 1px #a9a9a9;">
                                 <property name="headerText" value="@{T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getTermNameInAcadmicYear(3)}"/>
                                 <property name="render" value="@{!#empty(T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getTermNameInAcadmicYear(3))}"/>
                                   </bean>
                             <bean parent="Uif-HeaderThree"
-                                  p:cssClasses="fl-text-align-center fl-text-bold"
-                                  p:style="width:@{535/T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getNumberOfTermsInAcademicYear()}px; display:block; border-left:solid 1px #a9a9a9; margin:0; padding:5px 0;">
+                                  p:style="width:@{535/T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getNumberOfTermsInAcademicYear()}px; border-left:solid 1px #a9a9a9;">
                                 <property name="headerText" value="@{T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getTermNameInAcadmicYear(4)}"/>
                                 <property name="render" value="@{!#empty(T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getTermNameInAcadmicYear(4))}"/>
                             </bean>
@@ -217,7 +205,8 @@
     </bean>
 
     <!--Collection list of the Full Plan Items-->
-    <bean id="academicYearCollection" parent="Uif-StackedCollectionGroup" p:style="margin:0;">
+    <bean id="academicYearCollection" parent="academicYearCollection-parent"/>
+    <bean id="academicYearCollection-parent" abstract="true" parent="Uif-StackedCollectionGroup" p:style="margin:0;">
         <property name="validationMessages.render" value="false"/>
         <property name="cssClasses" value=""/>
         <property name="collectionObjectClass"
@@ -250,7 +239,7 @@
                     <property name="fieldLabel.render" value="false"/>
                     <property name="cssClasses">
                         <list merge="true">
-                            <value>@{#line.currentYear ? 'myplan-current-year':''}</value>
+                            <value>@{#line.currentYear ? 'ksap-current-year':''}</value>
                         </list>
                     </property>
                 </bean>
@@ -263,9 +252,10 @@
         </property>
     </bean>
 
-    <bean id="termsCollection" parent="UifMyPlan-HorizontalStackedSubCollection-WithinSection">
+    <bean id="termsCollection" parent="termsCollection-parent"/>
+    <bean id="termsCollection-parent" abstract="true" parent="UifKSAP-HorizontalStackedSubCollection-WithinSection">
         <property name="validationMessages.render" value="false"/>
-        <property name="cssClasses" value="myplan-remove-margin"/>
+        <property name="cssClasses" value="ksap-remove-margin"/>
         <property name="collectionObjectClass"
                   value="org.kuali.student.myplan.plan.dataobject.PlannedTerm"/>
         <property name="propertyName" value="terms"/>
@@ -276,13 +266,13 @@
         <property name="layoutManager.lineGroupPrototype.header.render" value="false"/>
         <property name="layoutManager.lineGroupPrototype.validationMessages.render" value="false"/>
         <property name="layoutManager">
-            <bean parent="UifMyPlan-HorizontalStackedCollectionLayout">
+            <bean parent="UifKSAP-HorizontalStackedCollectionLayout">
                 <property name="lineGroupPrototype">
                     <bean parent="Uif-CollectionHorizontalBoxItem">
                         <property name="cssClasses">
                             <list merge="true">
-                                <value>myplan-term</value>
-                                <value>@{#line.currentTermForView ? 'myplan-current-term':''}</value>
+                                <value>ksap-term</value>
+                                <value>@{#line.currentTermForView ? 'ksap-current-term':''}</value>
                             </list>
                         </property>
                         <property name="style" value="width:@{535/T(org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator).getTermHelper().getNumberOfTermsInAcademicYear()}px;"/>
@@ -305,12 +295,7 @@
                             <property name="fieldLabel.style" value="color:#999;"/>
                             <property name="fieldLabel.cssClasses">
                                 <list merge="true">
-                                    <value>myplan-text-normal</value>
-                                </list>
-                            </property>
-                            <property name="cssClasses">
-                                <list merge="true">
-                                    <value>fl-text-bold</value>
+                                    <value>ksap-text-normal</value>
                                 </list>
                             </property>
                         </bean>
@@ -327,7 +312,8 @@
         </property>
     </bean>
 
-    <bean id="academicRecordDOCollection" parent="Uif-StackedCollectionGroup" p:headerText="Registered">
+    <bean id="academicRecordDOCollection" parent="academicRecordDOCollection-parent"/>
+    <bean id="academicRecordDOCollection-parent" abstract="true" parent="Uif-StackedCollectionGroup" p:headerText="Registered">
         <property name="validationMessages.render" value="false"/>
         <property name="header">
             <bean parent="Uif-HeaderFour"/>
@@ -373,7 +359,8 @@
         <property name="collectionLookup.quickfinderAction.render" value="false"/>
     </bean>
 
-    <bean id="plannedCourseDOCollection" parent="Uif-StackedCollectionGroup" p:headerText="Planned">
+    <bean id="plannedCourseDOCollection" parent="plannedCourseDOCollection-parent"/>
+    <bean id="plannedCourseDOCollection-parent" abstract="true" parent="Uif-StackedCollectionGroup" p:headerText="Planned">
         <property name="validationMessages.render" value="false"/>
         <property name="header">
             <bean parent="Uif-HeaderFour"/>

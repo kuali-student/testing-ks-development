@@ -9,6 +9,7 @@
  */
 function ksapLoadPlannerItems(loaded,pageSize) {
     if(!loaded){
+        setupImages();
         retrieveComponent('planner_courses_detail','load');
     }else{
         ksapInitializePlannerItems(pageSize);
@@ -160,7 +161,7 @@ function ksapPlannerUpdateCategory(backup, target, e) {
 			planItemId : t.data('planitemid'),
 			courseId : t.data('courseid'),
 			uniqueId : t.data('uniqueid'),
-			backup : backup,
+			backup : backup
 		});
 	var form = jQuery("<form/>")
 			.attr("action", "planner")
@@ -210,7 +211,11 @@ function ksapPlannerUpdateEvent(response, textStatus, jqXHR) {
 			} else if (key == "UPDATE_NEW_TERM_TOTAL_CREDITS"
 					|| key == "UPDATE_OLD_TERM_TOTAL_CREDITS") {
 				ksapPlannerUpdateCredits(data);
-			}
+			} else if (key == "BOOKMARK_ADDED"){
+                ksapBookmarkAddItem(data);
+            } else if (key == "UPDATE_BOOKMARK_TOTAL"){
+                ksapBookmarkUpdateTotal(data);
+            }
 		}
 
         // Display success response message in growl message
@@ -236,37 +241,53 @@ function ksapPlannerUpdateEvent(response, textStatus, jqXHR) {
  * @param data - Data for the new object
  */
 function ksapPlannerAddPlanItem (data) {
-    var item = jQuery("#planner_item_template").html();
-    for (var key in data)
-		if (data.hasOwnProperty(key))
-			item = eval("item.replace(/__KSAP__"+key.toUpperCase()+"__/gi,'"+data[key]+"')");
-    item = item.replace(/id=\"(u\d+)\"/gi,"id=\""+data.uid+"_$1\"");
-    var termUid = data.termId.replace(/\./g,'-');
-    var itemElement = jQuery("<div/>").html(item);
-    if(data.courseNoteRender == 'false'){
-        itemElement.find(".coursenote").addClass("invisible");
-    }else{
-        itemElement.find(".coursenote").removeClass("invisible");
+    // Add plan item to the planner calendar
+    if(jQuery("#planner_item_template").length){
+        var item = jQuery("#planner_item_template").html();
+        for (var key in data)
+            if (data.hasOwnProperty(key))
+                item = eval("item.replace(/__KSAP__"+key.toUpperCase()+"__/gi,'"+data[key]+"')");
+        item = item.replace(/id=\"(u\d+)\"/gi,"id=\""+data.uid+"_$1\"");
+        var termUid = data.termId.replace(/\./g,'-');
+        var itemElement = jQuery("<div/>").html(item);
+        if(data.courseNoteRender == 'false'){
+            itemElement.find(".coursenote").addClass("invisible");
+        }else{
+            itemElement.find(".coursenote").removeClass("invisible");
+        }
+        itemElement.find("input[data-for='"+data.uid+"']")
+            .removeAttr("script")
+            .attr("name", "script");
+        itemElement
+                .attr("id", data.uid+"_wrap")
+                .attr("class", "uif-group uif-boxGroup uif-verticalBoxGroup ks-plan-Bucket-collection uif-collectionItem uif-boxCollectionItem uif-boxLayoutHorizontalItem")
+                .prependTo("." + termUid + ".ksap-term-" + data.category + " .uif-stackedCollectionLayout")
+                .css({backgroundColor:"#ffffcc"})
+                .hide()
+                .fadeIn(250, function() {
+                    var bucket = jQuery(".ksap-term-" + data.category + "." + termUid);
+                    var unitcell = bucket.find(".ksap-carousel-term-total");
+                    unitcell.addClass("ks-plan-Bucket-footer-show");
+                    unitcell.removeClass("ks-plan-Bucket-footer-hide");
+                })
+                .animate({backgroundColor:"#ffffff"}, 1500, function() {
+                    runHiddenScripts(data.uid);
+                });
+        //KSAP-543 - Set static id on course code element for AFTs
+        ksapSetStaticCourseCodeID( data.uid + "_code" );
     }
-    itemElement.find("input[data-for='"+data.uid+"']")
-		.removeAttr("script")
-		.attr("name", "script");
-    itemElement
-    		.attr("id", data.uid+"_wrap")
-    		.attr("class", "uif-group uif-boxGroup uif-verticalBoxGroup ks-plan-Bucket-collection uif-collectionItem uif-boxCollectionItem uif-boxLayoutHorizontalItem")
-    		.prependTo("." + termUid + ".ksap-term-" + data.category + " .uif-stackedCollectionLayout")
-    		.css({backgroundColor:"#ffffcc"})
-    		.hide()
-    		.fadeIn(250, function() {
-    	        var bucket = jQuery(".ksap-term-" + data.category + "." + termUid);
-    	        var unitcell = bucket.find(".ksap-carousel-term-total");
-    	    	unitcell.addClass("ks-plan-Bucket-footer-show");
-    	    	unitcell.removeClass("ks-plan-Bucket-footer-hide");
-    		})
-    		.animate({backgroundColor:"#ffffff"}, 1500, function() {
-    			runHiddenScripts(data.uid);
-    		});
 
+    // Change status on the course search page
+    if(jQuery("#"+data.courseId+"_status").length){
+        var item = jQuery("#"+data.courseId+"_status");
+        item.addClass("planned").html("Planned");
+    }
+
+    // Hide add to plan button on the course details page
+    if(jQuery("#"+data.courseId+"_addPlannedCourse").length){
+        var item = jQuery("#"+data.courseId+"_addPlannedCourse");
+        item.hide();
+    }
 }
 
 /**
@@ -327,17 +348,13 @@ function ksapPlannerUpdateCredits (data) {
  * @param data - Data needed to removed the object
  */
 function ksapPlannerUpdateTermNote (data) {
-    jQuery("#"+data.uniqueId+"_termnote_message_span").fadeOut(250, function() {
-    	if (data.termNote == null || data.termNote == "") {
-            jQuery(this).text("No term notes").addClass("ks-plan-TermNote-input-empty").fadeIn(250);
-            jQuery("#"+data.uniqueId+"_termNote").attr("title","");
-            jQuery("#"+data.uniqueId+"_termNote").addClass('invisible');
-        } else {
-            jQuery(this).text(data.termNote).removeClass("ks-plan-TermNote-input-empty").fadeIn(250);
-            jQuery("#"+data.uniqueId+"_termNote").attr("title",data.termNote);
-            jQuery("#"+data.uniqueId+"_termNote").removeClass('invisible');
-    	}
-    });
+    if (data.termNote == null || data.termNote == "") {
+        jQuery("#"+data.uniqueId+"_termNote").attr("title","");
+        jQuery("#"+data.uniqueId+"_termNote").attr("src","../ks-ap/images/btnAdd.png");
+    } else {
+        jQuery("#"+data.uniqueId+"_termNote").attr("title",data.termNote);
+        jQuery("#"+data.uniqueId+"_termNote").attr("src","../ks-ap/images/iconInfo.png");
+    }
 
 }
 
@@ -358,4 +375,95 @@ function registerClosePopups(){
  */
 function doNothing(){
 
+}
+
+/**
+ * Adds an html object into the bookmark sidebar by copying a hidden template copy
+ * and filling in placeholders with the needed data
+ *
+ * @param data - Data for the new object
+ */
+function ksapBookmarkAddItem (data) {
+    // Add Bookmark sidebar item
+    if(jQuery("#bookmark_sidebar_item_template").length){
+        var item = jQuery("#bookmark_sidebar_item_template").html();
+        for (var key in data)
+            if (data.hasOwnProperty(key))
+                item = eval("item.replace(/__KSAP__"+key.toUpperCase()+"__/gi,'"+data[key]+"')");
+        item = item.replace(/id=\"(u\d+)\"/gi,"id=\""+data.uid+"_$1\"");
+        var itemElement = jQuery("<li/>").html(jQuery("<div/>").html(item));
+        itemElement.find(".ksap-text-ellipsis-holder").addClass("ksap-text-ellipsis").removeClass("ksap-text-ellipsis-holder");
+        itemElement.find("input[data-for='"+data.uid+"']")
+            .removeAttr("script")
+            .attr("name", "script");
+        itemElement
+            .prependTo("#bookmark_summary ul")
+            .animate({backgroundColor:"#ffffff"}, 1500, function() {
+                runHiddenScripts(data.uid);
+            });
+        truncateField('bookmark_summary');
+    }
+
+    // Change status on course search page
+    if(jQuery("#"+data.courseId+"_status").length){
+        var item = jQuery("#"+data.courseId+"_status");
+        item.addClass("bookmarked").html("Bookmarked");
+    }
+
+    // Hide bookmark button on course detail page
+    if(jQuery("#"+data.courseId+"_addSavedCourse").length){
+        var item = jQuery("#"+data.courseId+"_addSavedCourse");
+        item.hide();
+    }
+}
+
+/**
+ * Updates the html object containing the total number of bookmarks for the bookmark side bar.y
+ *
+ * @param data - Data for the new object
+ */
+function ksapBookmarkUpdateTotal (data) {
+    if(jQuery("#bookmark_summary_number").length){
+        var item = jQuery("#bookmark_summary_number");
+        item.attr("title","View all "+data.bookmarkTotal+" courses in full details");
+        item.html("View all "+data.bookmarkTotal+" courses in full details");
+    }
+}
+
+/**
+ * Constructs a static ID for the course code element and replaces the existing one
+ *
+ * From KSAP-543 - Set static IDs on course code elements for AFTs
+ *
+ * @param courseCodeUniqueId - Course code Uif-message div element ID
+ */
+function ksapSetStaticCourseCodeID(courseCodeUniqueId){
+    var courseCodeJqObj = jQuery("#" + courseCodeUniqueId);
+    var termIdFormatted = courseCodeJqObj.data('termid').replace(/\./g,'-').replace(' ', '-');
+    var courseCode = courseCodeJqObj.data('coursecode');
+
+    //find the parent container
+    //examples: planner_planned... | planner_backup... | planner_completed...
+    var collectionType = courseCodeJqObj.closest("div[id^='planner_']").attr('id').split("_")[1];
+    var newCourseId = termIdFormatted + "_" + collectionType + "_" + courseCode + "_code";
+    courseCodeJqObj.attr('id', newCourseId);
+}
+
+/**
+ * Utility function to focus on an element
+ *
+ * @param jqObject - Element to focus
+ */
+function focusOnElement(jqObject){
+    jqObject.focus();
+}
+
+/**
+ * Set message length options for planner notes
+ *
+ * @param jqObject - Element to set options on
+ * @param opts - Options to set
+ */
+function setPlannerNoteMessageLength(jqObject, opts){
+    jqObject.characterCount(opts);
 }

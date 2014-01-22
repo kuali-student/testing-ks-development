@@ -21,7 +21,7 @@
     -->
 
     <!-- Inquiry View -->
-    <bean id="DegreeAuditDetails-InquiryView" parent="MyPlanInquiryView">
+    <bean id="DegreeAuditDetails-InquiryView" parent="KSAPInquiryView">
         <property name="headerText" value="Audit Degree"/>
         <property name="dataObjectClassName" value="org.kuali.student.ap.audit.dataobject.DegreeAuditItem"/>
         <property name="viewHelperServiceClass"
@@ -31,22 +31,12 @@
         <property name="singlePageView" value="true"/>
         <property name="cssClasses">
             <list merge="true">
-                <value>myplan-view</value>
+                <value>ksap-view</value>
             </list>
         </property>
         <property name="header">
             <bean parent="Uif-HeaderTwo"/>
         </property>
-        <!--<property name="additionalScriptFiles">
-            <list>
-                <value>ks-myplan/scripts/ksap.audit.js</value>
-            </list>
-        </property>
-        <property name="additionalCssFiles">
-            <list>
-                <value>ks-myplan/css/audit.css</value>
-            </list>
-        </property>-->
         <property name="Items">
             <list>
                 <!-- <bean parent="Uif-Page" p:id="degree_audit_details_page"
@@ -58,7 +48,7 @@
                     <property name="items">
                         <list>
                             <ref bean="degree_audit_details_section"/>
-                            <bean parent="myplan_section" p:headerText="AUDIT">
+                            <bean parent="ksap_section" p:headerText="AUDIT">
                                 <property name="items">
                                     <list>
                                         <ref bean="degree_audits_list"/>
@@ -93,7 +83,7 @@
     <bean id="degree_audit_details_overview" parent="Uif-GridGroup">
         <property name="cssClasses">
             <list merge="true">
-                <value>myplan-course-details</value>
+                <value>ksap-course-details</value>
             </list>
         </property>
         <property name="layoutManager.numberOfColumns" value="2"/>
@@ -107,7 +97,7 @@
     </bean>
 
     <!-- Lookup View -->
-    <bean id="DegreeAuditsSummary-LookupView" parent="MyPlanBaseLookupView">
+    <bean id="DegreeAuditsSummary-LookupView" parent="KSAPBaseLookupView">
         <property name="headerText" value="Recent Audit Reports"/>
         <property name="page.header.render" value="false"/>
         <property name="header.render" value="false"/>
@@ -118,7 +108,7 @@
         <property name="singlePageView" value="true"/>
         <property name="cssClasses">
             <list merge="true">
-                <value>myplan-view</value>
+                <value>ksap-view</value>
             </list>
         </property>
         <property name="criteriaFields">
@@ -151,13 +141,14 @@
         </property>
         <property name="cssClasses">
             <list merge="true">
-                <value>myplan-recent-audit</value>
+                <value>ksap-recent-audit</value>
             </list>
         </property>
-        <property name="onDocumentReadyScript" value="
+        <!-- Disabled until Audit page work starts -->
+        <!--<property name="onDocumentReadyScript" value="
             getPendingAudit('degree_audits_summary','degree');
              indicateViewingAudit('degree_audits_summary','degreeAudit');
-        "/>
+        "/>-->
         <property name="layoutManager.lineGroupPrototype.disclosure.render" value="false"/>
         <property name="layoutManager.lineGroupPrototype.header.render" value="false"/>
         <property name="collectionObjectClass" value="org.kuali.student.ap.audit.dataobject.DegreeAuditItem"/>
@@ -172,7 +163,7 @@
                 <bean parent="Uif-VerticalFieldGroup" p:fieldLabel.render="false" p:id="@{#line.report.auditId}" p:title="@{#line.programTitle}">
                     <property name="cssClasses">
                         <list merge="true">
-                            <value>myplan-click</value>
+                            <value>ksap-click</value>
                         </list>
                     </property>
                     <property name="onClickScript"
@@ -183,18 +174,17 @@
                                   p:fieldLabel.render="true" p:fieldLabel.renderColon="false">
                                 <property name="cssClasses">
                                     <list merge="true">
-                                        <value>myplan-audit-title</value>
+                                        <value>ksap-audit-title</value>
                                     </list>
                                 </property>
                             </bean>
                             <bean parent="Uif-DataField" p:propertyName="report.runDate" p:label=""
-                                  p:fieldLabel.renderColon="false" p:fieldLabel.cssClasses="myplan-text-normal"
+                                  p:fieldLabel.renderColon="false" p:fieldLabel.cssClasses="ksap-text-normal"
                                   p:fieldLabel.render="true" p:escapeHtmlInPropertyValue="false">
                                 <property name="propertyEditor" ref="timestamp_formatter"/>
                                 <property name="cssClasses">
                                     <list merge="true">
-                                        <value>myplan-text-gray</value>
-                                        <value>fl-font-size-90</value>
+                                        <value>ksap-text-gray</value>
                                     </list>
                                 </property>
                             </bean>
@@ -222,12 +212,6 @@
         <property name="items">
             <list>
                 <bean parent="Uif-HorizontalBoxGroup" p:style="padding: 1em 0px;">
-
-                    <property name="cssClasses">
-                        <list merge="true">
-                            <value>fl-text-align-center</value>
-                        </list>
-                    </property>
                     <property name="items">
                         <list>
                             <bean parent="Uif-Message"

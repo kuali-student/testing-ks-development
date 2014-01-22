@@ -34,7 +34,6 @@ import org.kuali.student.ap.coursesearch.dataobject.CourseOfferingInstitution;
 import org.kuali.student.ap.coursesearch.dataobject.CourseOfferingTerm;
 import org.kuali.student.ap.coursesearch.dataobject.CourseSummaryDetails;
 import org.kuali.student.ap.coursesearch.dataobject.MeetingDetails;
-import org.kuali.student.myplan.plan.controller.PlanController;
 import org.kuali.student.myplan.plan.dataobject.AcademicRecordDataObject;
 import org.kuali.student.myplan.plan.dataobject.PlanItemDataObject;
 import org.kuali.student.myplan.plan.dataobject.PlannedCourseSummary;
@@ -58,7 +57,6 @@ import org.kuali.student.r2.core.scheduling.infc.ScheduleComponentDisplay;
 import org.kuali.student.r2.core.scheduling.infc.TimeSlot;
 import org.kuali.student.r2.lum.course.dto.CourseInfo;
 
-@SuppressWarnings("deprecation")
 public class CourseDetailsInquiryHelperImpl extends KualiInquirableImpl {
 
 	private static final long serialVersionUID = 4933435913745621395L;
@@ -116,7 +114,7 @@ public class CourseDetailsInquiryHelperImpl extends KualiInquirableImpl {
 	 * @param course
 	 * @return
 	 */
-	protected CourseSummaryDetails retrieveCourseSummary(CourseInfo course) {
+	public CourseSummaryDetails retrieveCourseSummary(CourseInfo course) {
 
 		if (null == course) {
 			return null;
@@ -334,9 +332,7 @@ public class CourseDetailsInquiryHelperImpl extends KualiInquirableImpl {
 			for (StudentCourseRecordInfo studentInfo : studentCourseRecordInfos) {
 				AcademicRecordDataObject acadrec = new AcademicRecordDataObject();
 
-                //TODO KSAP-147: drop the following call when termId is added to StudentCourseRecordInfo
-                //Find associated termId by termName and containing the course begin/end dates
-                String termId = KsapFrameworkServiceLocator.getTermHelper().findTermIdByNameAndContainingDates(studentInfo.getCourseBeginDate(), studentInfo.getCourseEndDate(), studentInfo.getTermName());
+                String termId = studentInfo.getTermId();
 				acadrec.setAtpId(termId);
 				acadrec.setPersonId(studentInfo.getPersonId());
 				acadrec.setCourseCode(studentInfo.getCourseCode());
@@ -344,7 +340,7 @@ public class CourseDetailsInquiryHelperImpl extends KualiInquirableImpl {
 				acadrec.setCourseId(studentInfo.getId());
 				acadrec.setCredit(studentInfo.getCreditsEarned());
 				acadrec.setGrade(studentInfo.getCalculatedGradeValue());
-				acadrec.setRepeated(studentInfo.getIsRepeated());
+				acadrec.setRepeated(studentInfo.getIsRepeated()!=null?studentInfo.getIsRepeated():false);
 				acadrec.setActivityCode(studentInfo.getActivityCode());
 
 				if (course.getId().equalsIgnoreCase(studentInfo.getId())) {
@@ -573,7 +569,7 @@ public class CourseDetailsInquiryHelperImpl extends KualiInquirableImpl {
 
 		TermHelper th = KsapFrameworkServiceLocator.getTermHelper();
 		boolean published = false;
-		for (Term t : th.getPublishedTerms())
+		for (Term t : th.getOfficialTerms())
 			published = published || t.getId().equals(termId);
 		if (published) {
 			boolean openForPlanning = th.isPlanning(termId);
@@ -852,31 +848,6 @@ public class CourseDetailsInquiryHelperImpl extends KualiInquirableImpl {
 	 */
 	public boolean isCourseIdValid(String courseId) {
 		return KsapFrameworkServiceLocator.getCourseHelper().getCourseInfo(courseId) != null;
-	}
-
-	/**
-	 * Checks if the Given refObjId for a section (eg: com 453 A or com 453 AA
-	 * or can use a versionIndependentId) for the given atpId exists in
-	 * Plan/backup returns planItemId if exists otherwise returns null.
-	 * 
-	 * @param refObjId
-	 * @param atpId
-	 * @return
-	 */
-	public String getPlanItemId(String refObjId, String atpId) {
-		String planItemId = null;
-		try {
-			PlanController planController = new PlanController();
-			PlanItemInfo planItem = planController.getPlannedOrBackupPlanItem(refObjId, atpId);
-			if (planItem != null) {
-				planItemId = planItem.getId();
-			}
-
-		} catch (Exception e) {
-			LOG.error(" Exception loading plan item :" + refObjId + " for atp: " + atpId + " " + e.getMessage());
-			return null;
-		}
-		return planItemId;
 	}
 
 }

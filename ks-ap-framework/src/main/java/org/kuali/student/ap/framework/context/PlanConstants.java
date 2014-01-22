@@ -1,6 +1,7 @@
 package org.kuali.student.ap.framework.context;
 
 import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.r2.core.constants.AtpServiceConstants;
 import org.kuali.student.r2.lum.clu.CLUConstants;
 
 public class PlanConstants extends AcademicPlanServiceConstants {
@@ -74,7 +75,7 @@ public class PlanConstants extends AcademicPlanServiceConstants {
 	/* Query keys for getting the termInfos from the academic calender */
 	public static final String PLANNING = "%kuali.atp.state.Planning%";
 	public static final String INPROGRESS = "%kuali.atp.state.Inprogress%";
-	public static final String PUBLISHED = "kuali.atp.state.Official";
+	public static final String PUBLISHED = AtpServiceConstants.ATP_OFFICIAL_STATE_KEY;
 
 	public static final String WITHDRAWN_GRADE = "W";
 
@@ -93,26 +94,16 @@ public class PlanConstants extends AcademicPlanServiceConstants {
 	 * outcome of a plan item request.
 	 */
 	public static enum JS_EVENT_NAME {
-		/* (atpId), type, courseId, courseCode, courseTitle, courseCredits */
 		PLAN_ITEM_ADDED,
-		/*
-		 * (atpId), type, courseId, courseCode, courseTitle, sectionCode,
-		 * primarySection, courseCredits
-		 */
 		SECTION_ITEM_ADDED,
-		/* atpId, type, courseId */
 		PLAN_ITEM_DELETED,
-		/* atpId, courseId, sectionCode, primarySection, courseCredits */
 		SECTION_ITEM_DELETED,
-		/* atpId, newTotalCredits */
 		UPDATE_NEW_TERM_TOTAL_CREDITS,
-		/* atpId, oldTotalCredits */
 		UPDATE_OLD_TERM_TOTAL_CREDITS,
-        /* atpId, planItemId */
         PLAN_NOTE_UPDATED,
-        /*atpId*/
         TERM_NOTE_UPDATED,
-        /*courseId, type*/
-        COURSE_ADDED
+        COURSE_ADDED,
+        BOOKMARK_ADDED,
+        UPDATE_BOOKMARK_TOTAL
 	}
 }

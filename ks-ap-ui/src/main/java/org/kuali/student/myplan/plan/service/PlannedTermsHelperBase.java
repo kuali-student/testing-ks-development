@@ -13,6 +13,7 @@ import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
 import org.kuali.student.ap.framework.context.TermHelper;
 import org.kuali.student.ap.framework.context.YearTerm;
 import org.kuali.student.ap.framework.context.support.DefaultTermHelper;
+import org.kuali.student.common.util.KSCollectionUtils;
 import org.kuali.student.enrollment.academicrecord.dto.StudentCourseRecordInfo;
 import org.kuali.student.r2.core.acal.infc.Term;
 import org.kuali.student.myplan.plan.dataobject.AcademicRecordDataObject;
@@ -45,16 +46,16 @@ public class PlannedTermsHelperBase {
 		YearTerm focusQuarterYear;
 		if (StringUtils.isEmpty(focusAtpId)) {
 			   try{
-	                focusQuarterYear = th.getYearTerm(th.getCurrentTerms().get(0));
+	                focusQuarterYear = th.getYearTerm(th.getCurrentTerm());
 	            }catch(Exception e){
 	                LOG.warn("Could not find current term, using next term",e);
 	                try{
-	                    focusQuarterYear = th.getYearTerm(th.getPlanningTerms().get(0));
+	                    focusQuarterYear = th.getYearTerm(KSCollectionUtils.getRequiredZeroElement(th.getPlanningTerms()));
 	                }catch(Exception e2){
 	                    try{
 	                        LOG.warn("Could not find future planned term, using last term", e2);
                             StudentCourseRecordInfo studentInfo = studentCourseRecordInfos.get(studentCourseRecordInfos.size() - 1);
-                            String termId = KsapFrameworkServiceLocator.getTermHelper().findTermIdByNameAndContainingDates(studentInfo.getCourseBeginDate(), studentInfo.getCourseEndDate(), studentInfo.getTermName());
+                            String termId = studentInfo.getTermId();
                             focusQuarterYear = th.getYearTerm(termId);
 	                    }catch(Exception e3){
 	                        LOG.error("Could not find last term, using first term");
@@ -98,7 +99,7 @@ public class PlannedTermsHelperBase {
 
 		if (studentCourseRecordInfos.size() > 0) {
 			for (StudentCourseRecordInfo studentInfo : studentCourseRecordInfos) {
-				String termId = KsapFrameworkServiceLocator.getTermHelper().findTermIdByNameAndContainingDates(studentInfo.getCourseBeginDate(), studentInfo.getCourseEndDate(), studentInfo.getTermName());
+				String termId = studentInfo.getTermId();
 				PlannedTerm pt = termsList.get(termId);
 				if (pt == null) {
 					Term t = KsapFrameworkServiceLocator.getTermHelper().getTerm(termId);

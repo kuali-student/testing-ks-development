@@ -17,6 +17,8 @@ import org.kuali.student.ap.plannerreview.LearningPlanReviewStrategy;
 import org.kuali.student.ap.schedulebuilder.ScheduleBuildStrategy;
 import org.kuali.student.ap.schedulebuilder.ShoppingCartStrategy;
 import org.kuali.student.enrollment.academicrecord.service.AcademicRecordService;
+import org.kuali.student.enrollment.courseofferingset.service.CourseOfferingSetService;
+import org.kuali.student.enrollment.courseregistration.service.CourseRegistrationService;
 import org.kuali.student.r2.core.acal.service.AcademicCalendarService;
 import org.kuali.student.enrollment.courseoffering.service.CourseOfferingService;
 import org.kuali.student.enrollment.lui.service.LuiService;
@@ -75,7 +77,7 @@ public final class KsapFrameworkServiceLocator {
 	 * @return The ks-core remote ATP service.
 	 */
 	public static AtpService getAtpService() {
-		return getInstance().ksCoreAtpService;
+		return getInstance().atpService;
 	}
 
 	/**
@@ -84,7 +86,7 @@ public final class KsapFrameworkServiceLocator {
 	 * @return The ks-core remote type service.
 	 */
 	public static TypeService getTypeService() {
-		return getInstance().ksCoreTypeService;
+		return getInstance().typeService;
 	}
 
 	/**
@@ -93,7 +95,7 @@ public final class KsapFrameworkServiceLocator {
 	 * @return The ks-core remote message service.
 	 */
 	public static MessageService getMessageService() {
-		return getInstance().ksCoreMessageService;
+		return getInstance().messageService;
 	}
 
 	/**
@@ -102,7 +104,7 @@ public final class KsapFrameworkServiceLocator {
 	 * @return The ks-core remote organization service.
 	 */
 	public static OrganizationService getOrganizationService() {
-		return getInstance().ksCoreOrganizationService;
+		return getInstance().organizationService;
 	}
 
 	/**
@@ -111,7 +113,7 @@ public final class KsapFrameworkServiceLocator {
 	 * @return The ks-core remote enumeration service.
 	 */
 	public static EnumerationManagementService getEnumerationManagementService() {
-		return getInstance().ksCoreEnumerationManagementService;
+		return getInstance().enumerationManagementService;
 	}
 
 	/**
@@ -120,7 +122,7 @@ public final class KsapFrameworkServiceLocator {
 	 * @return The ks-core remote comment service.
 	 */
 	public static CommentService getCommentService() {
-		return getInstance().ksCoreCommentService;
+		return getInstance().commentService;
 	}
 
 	/**
@@ -129,7 +131,7 @@ public final class KsapFrameworkServiceLocator {
 	 * @return The ks-enroll remote LUI service.
 	 */
 	public static LuiService getLuiService() {
-		return getInstance().ksEnrollLuiService;
+		return getInstance().luiService;
 	}
 
 	/**
@@ -138,8 +140,12 @@ public final class KsapFrameworkServiceLocator {
 	 * @return The ks-enroll remote course offering service.
 	 */
 	public static CourseOfferingService getCourseOfferingService() {
-		return getInstance().ksEnrollCourseOfferingService;
+		return getInstance().courseOfferingService;
 	}
+    
+    public static CourseOfferingSetService getCourseOfferingSetService() {
+        return getInstance().courseOfferingSetService;
+    }
 
 	/**
 	 * Get the ks-enroll remote academic calendar service.
@@ -147,7 +153,7 @@ public final class KsapFrameworkServiceLocator {
 	 * @return The ks-enroll remote message service.
 	 */
 	public static AcademicCalendarService getAcademicCalendarService() {
-		return getInstance().ksEnrollAcalService;
+		return getInstance().academicCalendarService;
 	}
 
 	/**
@@ -156,7 +162,7 @@ public final class KsapFrameworkServiceLocator {
 	 * @return The ks-enroll remote message service.
 	 */
 	public static AcademicRecordService getAcademicRecordService() {
-		return getInstance().ksEnrollAcademicRecordService;
+		return getInstance().academicRecordService;
 	}
 
 	/**
@@ -165,7 +171,7 @@ public final class KsapFrameworkServiceLocator {
 	 * @return The ks-lum remote course service.
 	 */
 	public static CourseService getCourseService() {
-		return getInstance().ksLumCourseService;
+		return getInstance().courseService;
 	}
 
 	/**
@@ -174,7 +180,7 @@ public final class KsapFrameworkServiceLocator {
 	 * @return The ks-lum remote program service.
 	 */
 	public static ProgramService getProgramService() {
-		return getInstance().ksLumProgramService;
+		return getInstance().programService;
 	}
 
 	/**
@@ -183,7 +189,7 @@ public final class KsapFrameworkServiceLocator {
 	 * @return The ks-lum remote clu service.
 	 */
 	public static CluService getCluService() {
-		return getInstance().ksLumCluService;
+		return getInstance().cluService;
 	}
 
 	/**
@@ -192,10 +198,19 @@ public final class KsapFrameworkServiceLocator {
 	 * @return The ks-lum remote lrc service.
 	 */
 	public static LRCService getLrcService() {
-		return getInstance().ksLumLrcService;
+		return getInstance().lrcService;
 	}
 
-	/**
+    /**
+     * Get the KS course registration service
+     *
+     * @return the KS course registration service
+     */
+    public CourseRegistrationService getCourseRegistrationService() {
+        return courseRegistrationService;
+    }
+
+    /**
 	 * Get the KSAP context provider.
 	 * 
 	 * @return The KSAP context provider.
@@ -325,60 +340,69 @@ public final class KsapFrameworkServiceLocator {
         return getInstance().learningPlanReviewStrategy;
     }
 
-    public void setKsCoreAtpService(AtpService ksCoreAtpService) {
-        getInstance().ksCoreAtpService = ksCoreAtpService;
+    public void setAtpService(AtpService atpService) {
+        getInstance().atpService = atpService;
     }
 
-    public void setKsCoreTypeService(TypeService ksCoreTypeService) {
-        getInstance().ksCoreTypeService = ksCoreTypeService;
+    public void setTypeService(TypeService typeService) {
+        getInstance().typeService = typeService;
     }
 
-    public void setKsCoreMessageService(MessageService ksCoreMessageService) {
-        getInstance().ksCoreMessageService = ksCoreMessageService;
+    public void setMessageService(MessageService messageService) {
+        getInstance().messageService = messageService;
     }
 
-    public void setKsCoreOrganizationService(OrganizationService ksCoreOrganizationService) {
-        getInstance().ksCoreOrganizationService = ksCoreOrganizationService;
+    public void setOrganizationService(OrganizationService organizationService) {
+        getInstance().organizationService = organizationService;
     }
 
-    public void setKsCoreEnumerationManagementService(EnumerationManagementService ksCoreEnumerationManagementService) {
-        getInstance().ksCoreEnumerationManagementService = ksCoreEnumerationManagementService;
+    public void setEnumerationManagementService(EnumerationManagementService enumerationManagementService) {
+        getInstance().enumerationManagementService = enumerationManagementService;
     }
 
-    public void setKsCoreCommentService(CommentService ksCoreCommentService) {
-        getInstance().ksCoreCommentService = ksCoreCommentService;
+    public void setCommentService(CommentService commentService) {
+        getInstance().commentService = commentService;
     }
 
-    public void setKsEnrollLuiService(LuiService ksEnrollLuiService) {
-        getInstance().ksEnrollLuiService = ksEnrollLuiService;
+    public void setLuiService(LuiService luiService) {
+        getInstance().luiService = luiService;
     }
 
-    public void setKsEnrollCourseOfferingService(CourseOfferingService ksEnrollCourseOfferingService) {
-        getInstance().ksEnrollCourseOfferingService = ksEnrollCourseOfferingService;
+    public void setCourseOfferingService(CourseOfferingService courseOfferingService) {
+        getInstance().courseOfferingService = courseOfferingService;
     }
 
-    public void setKsEnrollAcalService(AcademicCalendarService ksEnrollAcalService) {
-        getInstance().ksEnrollAcalService = ksEnrollAcalService;
+    public void setCourseOfferingSetService(CourseOfferingSetService courseOfferingSetService) {
+        getInstance().courseOfferingSetService = courseOfferingSetService;
     }
 
-    public void setKsEnrollAcademicRecordService(AcademicRecordService ksEnrollAcademicRecordService) {
-        getInstance().ksEnrollAcademicRecordService = ksEnrollAcademicRecordService;
+    public void setAcademicCalendarService(AcademicCalendarService academicCalendarService) {
+        getInstance().academicCalendarService = academicCalendarService;
     }
 
-    public void setKsLumCourseService(CourseService ksLumCourseService) {
-        getInstance().ksLumCourseService = ksLumCourseService;
+    public void setAcademicRecordService(AcademicRecordService academicRecordService) {
+        getInstance().academicRecordService = academicRecordService;
     }
 
-    public void setKsLumProgramService(ProgramService ksLumProgramService) {
-        getInstance().ksLumProgramService = ksLumProgramService;
+    public void setCourseService(CourseService courseService) {
+        getInstance().courseService = courseService;
     }
 
-    public void setKsLumCluService(CluService ksLumCluService) {
-        getInstance().ksLumCluService = ksLumCluService;
+    public void setProgramService(ProgramService programService) {
+        getInstance().programService = programService;
     }
 
-    public void setKsLumLrcService(LRCService ksLumLrcService) {
-        getInstance().ksLumLrcService = ksLumLrcService;
+    public void setCluService(CluService cluService) {
+        getInstance().cluService = cluService;
+    }
+
+    public void setLrcService(LRCService lrcService) {
+        getInstance().lrcService = lrcService;
+    }
+
+
+    public void setCourseRegistrationService(CourseRegistrationService courseRegistrationService) {
+        this.courseRegistrationService = courseRegistrationService;
     }
 
     public void setKsapContext(KsapContext ksapContext) {
@@ -439,36 +463,40 @@ public final class KsapFrameworkServiceLocator {
 
     public void setScheduleBuildStrategy(ScheduleBuildStrategy scheduleBuildStrategy) {
         getInstance().scheduleBuildStrategy = scheduleBuildStrategy;
-    }
+    }    
 
 	@EJB
-	private transient AtpService ksCoreAtpService;
+	private transient AtpService atpService;
 	@EJB
-	private transient TypeService ksCoreTypeService;
+	private transient TypeService typeService;
 	@EJB
-	private transient MessageService ksCoreMessageService;
+	private transient MessageService messageService;
 	@EJB
-	private transient OrganizationService ksCoreOrganizationService;
+	private transient OrganizationService organizationService;
 	@EJB
-	private transient EnumerationManagementService ksCoreEnumerationManagementService;
+	private transient EnumerationManagementService enumerationManagementService;
 	@EJB
-	private transient CommentService ksCoreCommentService;
+	private transient CommentService commentService;
 	@EJB
-	private transient LuiService ksEnrollLuiService;
+	private transient LuiService luiService;
 	@EJB
-	private transient CourseOfferingService ksEnrollCourseOfferingService;
+    private transient CourseOfferingService courseOfferingService;
+    @EJB
+    private transient CourseOfferingSetService courseOfferingSetService;
 	@EJB
-	private transient AcademicCalendarService ksEnrollAcalService;
+	private transient AcademicCalendarService academicCalendarService;
 	@EJB
-	private transient AcademicRecordService ksEnrollAcademicRecordService;
+	private transient AcademicRecordService academicRecordService;
 	@EJB
-	private transient CourseService ksLumCourseService;
+	private transient CourseService courseService;
 	@EJB
-	private transient ProgramService ksLumProgramService;
+	private transient ProgramService programService;
 	@EJB
-	private transient CluService ksLumCluService;
+	private transient CluService cluService;
 	@EJB
-	private transient LRCService ksLumLrcService;
+	private transient LRCService lrcService;
+    @EJB
+    private transient CourseRegistrationService courseRegistrationService;
 	@EJB
 	private transient KsapContext ksapContext;
 	@EJB

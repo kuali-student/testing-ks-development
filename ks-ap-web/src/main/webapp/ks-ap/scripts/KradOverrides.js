@@ -1,10 +1,4 @@
 /**
- * Fix under KSAP-
- * Placed for retrieve component since refresh image doesnt seem to get set.
- */
-var refreshImage = jQuery("<img src='/student/ks-ap/images/ajaxLoader.gif' alt='" + getMessage(kradVariables.MESSAGE_LOADING) + "' /> ");
-
-/**
  * Fix under KSAP-265
  * Override of krad.actions.js.  Allowing alternate form name to be set on retrieve.
  */
@@ -519,5 +513,67 @@ KradResponse.prototype = {
     // displays the response contents in a lightbox
     displayLightBoxHandler: function (content, dataAttr) {
         showLightboxContent(content);
+    }
+}
+
+/**
+ * Creates the tooltip widget for an component
+ *
+ * @param id - id for the component to apply the tooltip to
+ * @param options - options for the tooltip
+ */
+function createTooltip(id, text, options, onMouseHoverFlag, onFocusFlag) {
+    var elementInfo = getHoverElement(id);
+    var element = elementInfo.element;
+
+    options['innerHtml'] = text;
+    options['manageMouseEvents'] = false;
+    if (onFocusFlag) {
+        // Add onfocus trigger
+        jQuery("#" + id).focus(function () {
+//            if (!jQuery("#" + id).IsBubblePopupOpen()) {
+            // TODO : use data attribute to check if control
+            if (!isControlWithMessages(id)) {
+                jQuery("#" + id).SetBubblePopupOptions(options, true);
+                jQuery("#" + id).SetBubblePopupInnerHtml(options.innerHTML, true);
+                jQuery("#" + id).ShowBubblePopup();
+            }
+//            }
+        });
+        jQuery("#" + id).blur(function () {
+            jQuery("#" + id).HideBubblePopup();
+        });
+    }else if (onMouseHoverFlag) {
+        // Add mouse hover trigger
+        jQuery("#" + id).hover(function () {
+            if (!jQuery("#" + id).IsBubblePopupOpen()) {
+                if (!isControlWithMessages(id)) {
+                    jQuery("#" + id).SetBubblePopupOptions(options, true);
+                    jQuery("#" + id).SetBubblePopupInnerHtml(options.innerHTML, true);
+                    jQuery("#" + id).ShowBubblePopup();
+                }
+            }
+        }, function (event) {
+            if (!onFocusFlag || !jQuery("#" + id).is(":focus")) {
+                var result = mouseInTooltipCheck(event, id, element, this, elementInfo.type);
+                if (result) {
+                    mouseLeaveHideTooltip(id, jQuery("#" + id), element, elementInfo.type);
+                }
+            }
+        });
+    }else{
+        // Add mouse hover trigger
+        jQuery("#" + id).click(function () {
+            if (!jQuery("#" + id).IsBubblePopupOpen()) {
+                hideBubblePopups();
+                if (!isControlWithMessages(id)) {
+                    jQuery("#" + id).SetBubblePopupOptions(options, true);
+                    jQuery("#" + id).SetBubblePopupInnerHtml(options.innerHTML, true);
+                    jQuery("#" + id).ShowBubblePopup();
+                }
+            }else{
+                hideBubblePopups();
+            }
+        });
     }
 }

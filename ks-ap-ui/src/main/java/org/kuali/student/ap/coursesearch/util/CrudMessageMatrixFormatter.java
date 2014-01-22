@@ -30,6 +30,9 @@ public class CrudMessageMatrixFormatter extends PropertyEditorSupport {
 
 	private transient CourseOfferingService courseOfferingService;
 
+    //We may be able to split this out so we have the URL separate from the markup of the anchor tag
+    private final String plannerScreenUrl = "<a href=\"planner?methodToCall=start&viewId=Planner-FormView&focusAtpId=";
+
 	protected CourseOfferingService getCourseOfferingService() {
 		if (this.courseOfferingService == null) {
 			// TODO: Use constants for namespace.
@@ -52,10 +55,8 @@ public class CrudMessageMatrixFormatter extends PropertyEditorSupport {
 	@Override
 	public String getAsText() {
 
-		Term currentTerm = KsapFrameworkServiceLocator.getTermHelper()
-				.getCurrentTerms().get(0);
-
 		CourseDetails courseDetails = (CourseDetails) super.getValue();
+        //@TODO: Convert to StringBuilder instead of StringBuffer
 		StringBuffer sb = new StringBuffer();
 		boolean currentTermRegistered = false;
 
@@ -98,23 +99,38 @@ public class CrudMessageMatrixFormatter extends PropertyEditorSupport {
 							.isAdviser()) {
 						String user = KsapFrameworkServiceLocator
 								.getUserSessionHelper().getStudentName();
+                        /*
+                         * @TODO: Convert this tag manipulation handling
+                         * This is simply creating an orphan DD element, with no containing DL
+                         * Moreover the ends up getting rendered inside of a SPAN element;
+                         * It is bad form, and will not validate, when you put block-level elements, such as
+                         * A UL/OL/DL, inside of an inline element like a span.
+                         *
+                         * Additional recommendations:
+                         *
+                         * If we are to use a list, would be to use a UL since we are only dealing with a list of items.
+                         * DL is for a list of key/value pairs, which is not what we have in this case.
+                         *
+                         * Instead of the string appending, a formatted string would be much easier to manage.
+                         * For an example, look at ScheduledTermsPropertyEditor.java
+                         *  */
 						sb = sb.append("<dd>")
 								.append(user + " withdrew from this course in ")
-								.append("<a href=plan?methodToCall=start&viewId=PlannedCourses-FormView&focusAtpId=")
+								.append(plannerScreenUrl)
 								.append(withdrawnTerm).append(">")
 								.append(term.getName()).append("</a>");
 					} else {
 						sb = sb.append("<dd>")
 								.append("You withdrew from this course in ")
-								.append("<a href=plan?methodToCall=start&viewId=PlannedCourses-FormView&focusAtpId=")
-								.append(withdrawnTerm).append(">")
+								.append(plannerScreenUrl)
+								.append(withdrawnTerm).append("\">")
 								.append(term.getName()).append("</a>");
 					}
 				}
 				if (counter > 0) {
 					sb = sb.append(",")
-							.append("<a href=plan?methodToCall=start&viewId=PlannedCourses-FormView&focusAtpId=")
-							.append(withdrawnTerm).append(">")
+							.append(plannerScreenUrl)
+							.append(withdrawnTerm).append("\">")
 							.append(term.getName()).append("</a>");
 				}
 				counter++;
@@ -122,12 +138,17 @@ public class CrudMessageMatrixFormatter extends PropertyEditorSupport {
 
 			int counter2 = 0;
 			int counter3 = 0;
+            /*
+            * @TODO: look at the efficiency of how we are looping here
+             *
+             * As it stands, we potentially have an O(n^2) going on here
+            * */
 			for (String nonWithdrawnTerm : nonWithDrawnCourseTerms) {
 				Term term = KsapFrameworkServiceLocator.getTermHelper()
 						.getTerm(nonWithdrawnTerm);
 				List<String> sections = getSections(courseDetails,
 						nonWithdrawnTerm);
-				if (term.getStartDate().after(currentTerm.getStartDate())) {
+				if (!KsapFrameworkServiceLocator.getTermHelper().isCompleted(term.getId())) {
 					if (counter2 == 0) {
 						String message = "You are enrolled in ";
 						if (KsapFrameworkServiceLocator.getUserSessionHelper()
@@ -152,15 +173,15 @@ public class CrudMessageMatrixFormatter extends PropertyEditorSupport {
 								.append(message)
 								.append(sec)
 								.append(" for ")
-								.append("<a href=plan?methodToCall=start&viewId=PlannedCourses-FormView&focusAtpId=")
-								.append(nonWithdrawnTerm).append(">")
+								.append(plannerScreenUrl)
+								.append(nonWithdrawnTerm).append("\">")
 								.append(term.getName()).append("</a>");
 						currentTermRegistered = true;
 					}
 					if (counter2 > 0) {
 						sb = sb.append(",")
-								.append("<a href=plan?methodToCall=start&viewId=PlannedCourses-FormView&focusAtpId=")
-								.append(nonWithdrawnTerm).append(">")
+								.append(plannerScreenUrl)
+								.append(nonWithdrawnTerm).append("\">")
 								.append(term.getName()).append("</a>");
 						currentTermRegistered = true;
 					}
@@ -176,15 +197,15 @@ public class CrudMessageMatrixFormatter extends PropertyEditorSupport {
 						}
 						sb = sb.append("<dd>")
 								.append(message)
-								.append("<a href=plan?methodToCall=start&viewId=PlannedCourses-FormView&focusAtpId=")
-								.append(nonWithdrawnTerm).append(">")
+								.append(plannerScreenUrl)
+								.append(nonWithdrawnTerm).append("\">")
 								.append(term.getName()).append("</a>");
 
 					}
 					if (counter3 > 0) {
 						sb = sb.append(", ")
-								.append("<a href=plan?methodToCall=start&viewId=PlannedCourses-FormView&focusAtpId=")
-								.append(nonWithdrawnTerm).append(">")
+								.append(plannerScreenUrl)
+								.append(nonWithdrawnTerm).append("\">")
 								.append(term.getName()).append("</a>");
 					}
 					counter3++;
@@ -261,7 +282,7 @@ public class CrudMessageMatrixFormatter extends PropertyEditorSupport {
 							Term term = KsapFrameworkServiceLocator
 									.getTermHelper().getTerm(t);
 							sb = startsSub
-									.append("<a href=\"plan?methodToCall=start&viewId=PlannedCourses-FormView&focusAtpId=")
+									.append(plannerScreenUrl)
 									.append(t).append("\">")
 									.append(term.getName()).append(" plan")
 									.append("</a>").append(", ");
@@ -278,7 +299,7 @@ public class CrudMessageMatrixFormatter extends PropertyEditorSupport {
 						if (!currentTermRegistered) {
 							sb = sb.append("<dd>")
 									.append("Added to ")
-									.append("<a href=\"plan?methodToCall=start&viewId=PlannedCourses-FormView&focusAtpId=")
+									.append(plannerScreenUrl)
 									.append(term.getId()).append("\">")
 									.append(term.getName()).append(" plan")
 									.append("</a> ").append(" on ").append(key)
@@ -286,7 +307,7 @@ public class CrudMessageMatrixFormatter extends PropertyEditorSupport {
 						} else {
 							sb = sb.append("<dd>")
 									.append("This course was also added to ")
-									.append("<a href=\"plan?methodToCall=start&viewId=PlannedCourses-FormView&focusAtpId=")
+									.append(plannerScreenUrl)
 									.append(term.getId()).append("\">")
 									.append(term.getName()).append(" plan")
 									.append("</a> ").append(" on ").append(key)
@@ -301,8 +322,7 @@ public class CrudMessageMatrixFormatter extends PropertyEditorSupport {
 						for (String t : terms) {
 							Term term = KsapFrameworkServiceLocator
 									.getTermHelper().getTerm(t);
-							sb = sb.append(
-									"<a href=\"plan?methodToCall=start&viewId=PlannedCourses-FormView&focusAtpId=")
+							sb = sb.append(plannerScreenUrl)
 									.append(t).append("\">")
 									.append(term.getName()).append(" plan")
 									.append("</a> ").append(",");
@@ -317,7 +337,7 @@ public class CrudMessageMatrixFormatter extends PropertyEditorSupport {
 						Term term = KsapFrameworkServiceLocator.getTermHelper()
 								.getTerm(planItemsMap.get(key));
 						sb = sb.append(" and ")
-								.append("<a href=\"plan?methodToCall=start&viewId=PlannedCourses-FormView&focusAtpId=")
+								.append(plannerScreenUrl)
 								.append(term.getId()).append("\">")
 								.append(term.getName()).append(" plan")
 								.append("</a> ").append(" on ").append(key);
@@ -350,7 +370,7 @@ public class CrudMessageMatrixFormatter extends PropertyEditorSupport {
 
 	/**
 	 * returns the section links string for given courseId and term in the form
-	 * ("<a href="http://localhost:8080/student/myplan/inquiry?methodToCall=
+	 * ("<a href="http://localhost:8080/kr-krad/inquiry?methodToCall=
 	 * start&viewId=CourseDetails-InquiryView&courseId=60325fa8-7307-454a-be73-3
 	 * cc1c642122d#kuali-uw-atp-2013-1-19889"> Section (SLN) </a>")
 	 * 
@@ -379,7 +399,7 @@ public class CrudMessageMatrixFormatter extends PropertyEditorSupport {
 					.format("<a href=\"%s\">%s</a>",
 							ConfigContext.getCurrentContextConfig()
 									.getProperty("appserver.url")
-									+ "/ap/inquiry?methodToCall=start&viewId=CourseDetails-InquiryView&courseId="
+									+ "/kr-krad/inquiry?methodToCall=start&viewId=CourseDetails-InquiryView&courseId="
 									+ courseDetails.getCourseSummaryDetails()
 											.getCourseId()
 									+ "#"

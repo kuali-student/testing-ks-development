@@ -29,25 +29,27 @@
         <property name="shoppingCartHelper" ref="shoppingCartHelper"/>
         <property name="planHelper" ref="planHelper"/>
         <property name="courseSearchStrategy" ref="courseSearchStrategy"/>
-        <property name="ksEnrollAcalService" ref="ksEnrollAcalService"/>
-        <property name="ksEnrollAcademicRecordService" ref="ksEnrollAcademicRecordService"/>
-        <property name="ksEnrollCourseOfferingService" ref="ksEnrollCourseOfferingService"/>
-        <property name="ksEnrollLuiService" ref="ksEnrollLuiService"/>
-        <property name="ksCoreCommentService" ref="ksCoreCommentService"/>
-        <property name="ksCoreEnumerationManagementService" ref="enumServiceClient"/>
-        <property name="ksLumCourseService" ref="ksLumCourseService"/>
-        <property name="ksLumProgramService" ref="ksLumProgramService"/>
-        <property name="ksLumCluService" ref="ksLumCluService"/>
-        <property name="ksLumLrcService" ref="ksLumLrcService"/>
-        <property name="ksCoreOrganizationService" ref="orgClient"/>
-        <property name="ksCoreMessageService" ref="ksCoreMessageService"/>
-        <property name="ksCoreTypeService" ref="typeClient"/>
-        <property name="ksCoreAtpService" ref="atpServiceClient"/>
+        <property name="academicCalendarService" ref="ksEnrollAcalService"/>
+        <property name="academicRecordService" ref="academicRecordServiceWithMockAssembler"/>
+        <property name="courseOfferingService" ref="ksEnrollCourseOfferingService"/>
+        <property name="courseOfferingSetService" ref="ksEnrollCourseOfferingSetService"/>
+        <property name="luiService" ref="ksEnrollLuiService"/>
+        <property name="commentService" ref="ksCoreCommentService"/>
+        <property name="enumerationManagementService" ref="enumServiceClient"/>
+        <property name="courseService" ref="ksLumCourseService"/>
+        <property name="programService" ref="ksLumProgramService"/>
+        <property name="cluService" ref="ksLumCluService"/>
+        <property name="lrcService" ref="ksLumLrcService"/>
+        <property name="organizationService" ref="orgClient"/>
+        <property name="messageService" ref="ksCoreMessageService"/>
+        <property name="typeService" ref="typeClient"/>
+        <property name="atpService" ref="atpServiceClient"/>
         <property name="academicPlanService" ref="academicPlanService"/>
         <property name="enrollmentStatusHelper" ref="enrollStatusHelper"/>
         <property name="learningPlanReviewStrategy" ref="learningPlanReviewStrategy"/>
         <property name="scheduleBuildStrategy" ref="scheduleBuildStrategy"/>
         <property name="shoppingCartStrategy" ref="shoppingCartStrategy"/>
+        <property name="courseRegistrationService" ref="courseRegistrationServiceMock"/>
     </bean>
     <bean id="ksLumLrcService" class="org.kuali.rice.ksb.messaging.KSBClientProxyFactoryBean">
         <property name="serviceEndpointInterface"
@@ -105,17 +107,58 @@
         <property name="serviceQName"
                   value="{http://student.kuali.org/wsdl/courseOffering}CourseOfferingService" />
     </bean>
-    <bean id="ksEnrollAcademicRecordService" class="org.kuali.rice.ksb.messaging.KSBClientProxyFactoryBean">
+    <bean id="ksEnrollCourseOfferingSetService" class="org.kuali.rice.ksb.messaging.KSBClientProxyFactoryBean">
         <property name="serviceEndpointInterface"
-                  value="org.kuali.student.enrollment.academicrecord.service.AcademicRecordService" />
+                  value="org.kuali.student.enrollment.courseofferingset.service.CourseOfferingSetService" />
         <property name="serviceQName"
-                  value="{http://student.kuali.org/wsdl/academicrecord}AcademicRecordService" />
+                  value="{http://student.kuali.org/wsdl/courseOfferingSet}CourseOfferingSetService" />
+    </bean>
+    <!--<bean id="ksEnrollAcademicRecordService" class="org.kuali.rice.ksb.messaging.KSBClientProxyFactoryBean">-->
+        <!--<property name="serviceEndpointInterface"-->
+                  <!--value="org.kuali.student.enrollment.academicrecord.service.AcademicRecordService" />-->
+        <!--<property name="serviceQName"-->
+                  <!--value="{http://student.kuali.org/wsdl/academicrecord}AcademicRecordService" />-->
+    <!--</bean>-->
+
+    <bean id="courseRecordAssemblerMock" class="org.kuali.student.enrollment.class2.academicrecord.service.assembler.StudentCourseRecordAssemblerMockAllGradeA" >
+        <property name="luiService" ref="LuiService" />
+        <property name="atpService" ref="AtpService" />
+        <property name="gradingService" ref="gradingService" />
+        <property name="lrcService" ref="lrcServiceCache" />
+    </bean>
+    <bean id="academicRecordServiceWithMockAssembler" class="org.kuali.student.enrollment.class2.academicrecord.service.impl.AcademicRecordServiceImpl">
+        <property name="courseRegService" ref="courseRegistrationServiceMock" />
+        <property name="atpService" ref="AtpService" />
+        <property name="gradingService" ref="gradingService" />
+        <property name="lrcService" ref="lrcServiceCache" />
+        <property name="courseRecordAssembler" ref="courseRecordAssemblerMock" />
+    </bean>
+
+    <bean id="courseRegistrationServiceMock"
+          class="org.kuali.student.enrollment.class2.courseregistration.service.decorators.CourseRegistrationServiceValidationDecorator">
+        <property name="validator" ref="validator" />
+        <property name="nextDecorator" ref="courseRegistrationMockImpl" />
+    </bean>
+
+    <bean id="courseRegistrationMockImpl" class="org.kuali.student.ap.courseregistration.impl.CourseRegistrationServiceMockImpl2">
+        <!-- setup fake registration records until better reference data is available -->
+        <property name="fakeRegistrations">
+            <list>
+                <value type="java.lang.String[]">admin,kuali.atp.2012Spring,BSCI441</value>
+                <value type="java.lang.String[]">admin,kuali.atp.2012Fall,ENGL201</value>
+                <value type="java.lang.String[]">admin,kuali.atp.2012Fall,HIST137</value>
+                <value type="java.lang.String[]">admin,kuali.atp.2012Fall,PHYS404</value>
+                <value type="java.lang.String[]">janeDoe,kuali.atp.2011Fall,ENGL101</value>
+            </list>
+        </property>
+        <property name="courseOfferingService" ref="CourseOfferingService" />
     </bean>
 
     <bean id="ksapContext" class="org.kuali.student.ap.framework.context.support.DefaultKsapContext" />
 
     <bean id="ksapTextHelper" class="org.kuali.student.ap.framework.context.support.DefaultTextHelper">
-        <property name="messageGroup" value="myplan" />
+        <property name="messageGroup" value="ksap" />
+        <property name="baseName" value="org.kuali.student.ap.bundles.POCResourceBundleUI"/>
     </bean>
 
     <bean id="ksapTermHelper" class="org.kuali.student.ap.framework.context.support.DefaultTermHelper" />
