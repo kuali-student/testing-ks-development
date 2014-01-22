@@ -18,19 +18,6 @@ import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.config.property.ConfigContext;
 import org.kuali.rice.core.api.criteria.Predicate;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
-import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
-import org.kuali.student.ap.framework.context.CourseSearchConstants;
-import org.kuali.student.ap.framework.course.CourseSearchForm;
-import org.kuali.student.ap.framework.course.CourseSearchItem;
-import org.kuali.student.ap.framework.course.CourseSearchStrategy;
-import org.kuali.student.ap.framework.course.Credit;
-import org.kuali.student.common.util.KSCollectionUtils;
-import org.kuali.student.enrollment.courseoffering.dto.CourseOfferingInfo;
-import org.kuali.student.enrollment.courseofferingset.dto.SocInfo;
-import org.kuali.student.r2.common.util.constants.CourseOfferingSetServiceConstants;
-import org.kuali.student.r2.common.util.constants.LuiServiceConstants;
-import org.kuali.student.r2.core.acal.infc.Term;
-import org.kuali.student.enrollment.courseoffering.service.CourseOfferingService;
 import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
 import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
 import org.kuali.student.ap.academicplan.infc.LearningPlan;
@@ -45,12 +32,25 @@ import org.kuali.student.ap.coursesearch.util.CreditsFacet;
 import org.kuali.student.ap.coursesearch.util.CurriculumFacet;
 import org.kuali.student.ap.coursesearch.util.GenEduReqFacet;
 import org.kuali.student.ap.coursesearch.util.TermsFacet;
+import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
+import org.kuali.student.ap.framework.context.CourseSearchConstants;
+import org.kuali.student.ap.framework.course.CourseSearchForm;
+import org.kuali.student.ap.framework.course.CourseSearchItem;
+import org.kuali.student.ap.framework.course.CourseSearchStrategy;
+import org.kuali.student.ap.framework.course.Credit;
+import org.kuali.student.common.collection.KSCollectionUtils;
+import org.kuali.student.enrollment.courseoffering.dto.CourseOfferingInfo;
+import org.kuali.student.enrollment.courseoffering.service.CourseOfferingService;
+import org.kuali.student.enrollment.courseofferingset.dto.SocInfo;
 import org.kuali.student.r2.common.dto.ContextInfo;
 import org.kuali.student.r2.common.exceptions.DoesNotExistException;
 import org.kuali.student.r2.common.exceptions.InvalidParameterException;
 import org.kuali.student.r2.common.exceptions.MissingParameterException;
 import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
+import org.kuali.student.r2.common.util.constants.CourseOfferingSetServiceConstants;
+import org.kuali.student.r2.common.util.constants.LuiServiceConstants;
+import org.kuali.student.r2.core.acal.infc.Term;
 import org.kuali.student.r2.core.atp.dto.AtpInfo;
 import org.kuali.student.r2.core.enumerationmanagement.dto.EnumeratedValueInfo;
 import org.kuali.student.r2.core.search.dto.SearchParamInfo;
@@ -904,7 +904,7 @@ public class CourseSearchStrategyImpl implements CourseSearchStrategy {
 	}
 
 	public void addDivisionSearches(List<String> divisions, List<String> codes,
-			List<String> levels, List<SearchRequestInfo> requests) {
+			List<String> levels, List<String> incompleteCodes, List<SearchRequestInfo> requests) {
 		for (String division : divisions) {
 			boolean needDivisionQuery = true;
 
@@ -929,6 +929,15 @@ public class CourseSearchStrategyImpl implements CourseSearchStrategy {
 				request.addParam("level", level);
 				requests.add(request);
 			}
+
+            for (String incompleteCode : incompleteCodes) {
+                needDivisionQuery = false;
+
+                SearchRequestInfo request = new SearchRequestInfo(
+                        "ksap.lu.search.courseCode");
+                request.addParam("code", incompleteCode);
+                requests.add(request);
+            }
 
 			if (needDivisionQuery) {
 				SearchRequestInfo request = new SearchRequestInfo(
@@ -968,6 +977,9 @@ public class CourseSearchStrategyImpl implements CourseSearchStrategy {
 				+ System.currentTimeMillis());
 		String query = form.getSearchQuery().toUpperCase();
 
+        // Unchanging query for full text search
+        String pureQuery = query;
+
 		List<String> levels = QueryTokenizer.extractCourseLevels(query);
 		for (String level : levels) {
 			query = query.replace(level, "");
@@ -983,20 +995,19 @@ public class CourseSearchStrategyImpl implements CourseSearchStrategy {
 		extractDivisions(divisionMap, query, divisions, true);
 
         List<String> incompleteCodes = QueryTokenizer.extractIncompleteCourseCodes(query,divisions);
-        levels.addAll(incompleteCodes);
 
 		ArrayList<SearchRequestInfo> requests = new ArrayList<SearchRequestInfo>();
 
 		LOG.info("Start of method addDivisionSearches of CourseSearchStrategy:"
 				+ System.currentTimeMillis());
 		// Order is important, more exact search results appear at top of list
-		addDivisionSearches(divisions, codes, levels, requests);
+		addDivisionSearches(divisions, codes, levels, incompleteCodes, requests);
 		LOG.info("End of method addDivisionSearches of CourseSearchStrategy:"
 				+ System.currentTimeMillis());
 
 		LOG.info("Start of method addFullTextSearches of CourseSearchStrategy:"
 				+ System.currentTimeMillis());
-		addFullTextSearches(query, requests);
+		addFullTextSearches(pureQuery, requests);
 		LOG.info("End of method addFullTextSearches of CourseSearchStrategy:"
 				+ System.currentTimeMillis());
 
