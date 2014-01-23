@@ -1,7 +1,6 @@
 package org.kuali.student.enrollment.registration.client.service;
 
 
-import org.apache.cxf.transport.http.HttpServletRequestSnapshot;
 import org.kuali.student.enrollment.registration.client.service.dto.ActivityOfferingSearchResult;
 import org.kuali.student.enrollment.registration.client.service.dto.ActivityTypeSearchResult;
 import org.kuali.student.enrollment.registration.client.service.dto.CourseAndPrimaryAOSearchResult;
@@ -10,18 +9,13 @@ import org.kuali.student.enrollment.registration.client.service.dto.InstructorSe
 import org.kuali.student.enrollment.registration.client.service.dto.RegGroupSearchResult;
 import org.kuali.student.enrollment.registration.client.service.dto.StudentScheduleCourseResult;
 import org.kuali.student.enrollment.registration.client.service.dto.TermSearchResult;
-import org.springframework.http.HttpRequest;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
@@ -69,14 +63,13 @@ public interface ScheduleOfClassesService {
      * @param termCode optional; required if termId not provided
      * @param courseCode required
      * @return Returns a list of course offerings
-     * @throws Exception
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     @Path("/courseofferings")
-    public List<CourseSearchResult> searchForCourseOfferings(@QueryParam("termId") String termId,
-                                                             @QueryParam("termCode") String termCode,
-                                                             @QueryParam("courseCode") String courseCode) throws Exception;
+    public Response restfulSearchForCourseOfferings( @QueryParam("termId") String termId,
+                                                     @QueryParam("termCode") String termCode,
+                                                     @QueryParam("courseCode") String courseCode );
     /**
      * Java Helper method.
      *
@@ -85,7 +78,7 @@ public interface ScheduleOfClassesService {
      * @return Returns a list of course offerings
      * @throws Exception
      */
-    public List<CourseSearchResult> searchForCourseOfferingsByTermIdAndCourse(String termId, String courseCode) throws Exception;
+    public List<CourseSearchResult> searchForCourseOfferingsByTermIdAndCourse( String termId, String courseCode ) throws Exception;
 
     /**
      * Java Helper method.
@@ -95,23 +88,24 @@ public interface ScheduleOfClassesService {
      * @return Returns a list of course offerings
      * @throws Exception
      */
-    public List<CourseSearchResult> searchForCourseOfferingsByTermCodeAndCourse(String termCode, String courseCode) throws Exception;
+    public List<CourseSearchResult> searchForCourseOfferingsByTermCodeAndCourse( String termCode, String courseCode ) throws Exception;
 
     /**
      * In order to support the UI we have been asked to provide a course offering search that will return course offering information as well as
      * a list of primary activity offerings. There is a default order of activity offering types. Ex: lecture, lab, discussion.
      * In that case the search will return the course offering information and a list of lectures.
      *
-     * @param termCode required
+     * @param termCode optional; required if both courseOfferingId & termId are not provided
+     * @param termId optional; if provided, overrides termCode
      * @param courseCode required
      * @return Returns a list of objects that each contain a course offering and a list of primary activity offerings
-     * @throws Exception
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     @Path("/courseofferings/primaryactivities")
-    public List<CourseAndPrimaryAOSearchResult> searchForCourseOfferingsAndPrimaryAosByTermAndCourse(@QueryParam("termCode") String termCode,
-                                                                                                     @QueryParam("courseCode") String courseCode) throws Exception;
+    public Response restfulSearchForCourseOfferingsAndPrimaryAosByTermAndCourse( @QueryParam("termId") String termId,
+                                                                                 @QueryParam("termCode") String termCode,
+                                                                                 @QueryParam("courseCode") String courseCode );
 
 
 /** REGISTRATION GROUPS **/
@@ -130,16 +124,15 @@ public interface ScheduleOfClassesService {
      * @param courseCode optional; required if courseOfferingId not provided
      * @param regGroupName optional; if provided, will return a single entity
      * @return Returns a list of registration groups
-     * @throws Exception
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     @Path("/reggroups")
-    public List<RegGroupSearchResult> searchForRegistrationGroups(@QueryParam("courseOfferingId") String courseOfferingId,
-                                                                  @QueryParam("termId") String termId,
-                                                                  @QueryParam("termCode") String termCode,
-                                                                  @QueryParam("courseCode") String courseCode,
-                                                                  @QueryParam("regGroupName") String regGroupName) throws Exception;
+    public Response restfulSearchForRegistrationGroups( @QueryParam("courseOfferingId") String courseOfferingId,
+                                                        @QueryParam("termId") String termId,
+                                                        @QueryParam("termCode") String termCode,
+                                                        @QueryParam("courseCode") String courseCode,
+                                                        @QueryParam("regGroupName") String regGroupName );
 
     /**
      * Java Helper method.
@@ -167,15 +160,14 @@ public interface ScheduleOfClassesService {
      * @param termCode optional; required if both courseOfferingId & termId are not provided
      * @param courseCode optional; required if courseOfferingId not provided
      * @return Returns a list of activity offerings
-     * @throws Exception
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     @Path("/activityofferings")
-    public List<ActivityOfferingSearchResult> searchForActivityOfferings(@QueryParam("courseOfferingId") String courseOfferingId,
-                                                                         @QueryParam("termId") String termId,
-                                                                         @QueryParam("termCode") String termCode,
-                                                                         @QueryParam("courseCode") String courseCode) throws Exception;
+    public Response restfulSearchForActivityOfferings( @QueryParam("courseOfferingId") String courseOfferingId,
+                                                       @QueryParam("termId") String termId,
+                                                       @QueryParam("termCode") String termCode,
+                                                       @QueryParam("courseCode") String courseCode );
 
 
 /** ACTIVITY TYPES **/
@@ -190,14 +182,14 @@ public interface ScheduleOfClassesService {
      * @param termCode optional; required if courseOfferingId not provided
      * @param courseCode optional; required if courseOfferingId not provided
      * @return Returns a list of activity types
-     * @throws Exception
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     @Path("/activitytypes")
-    public List<ActivityTypeSearchResult> searchForActivityTypes(@QueryParam("courseOfferingId") String courseOfferingId,
-                                                                 @QueryParam("termCode") String termCode,
-                                                                 @QueryParam("courseCode") String courseCode) throws Exception;
+    public Response restfulSearchForActivityTypes( @QueryParam("courseOfferingId") String courseOfferingId,
+                                                   @QueryParam("termId") String termId,
+                                                   @QueryParam("termCode") String termCode,
+                                                   @QueryParam("courseCode") String courseCode );
 
 
 /** INSTRUCTORS **/
@@ -216,16 +208,15 @@ public interface ScheduleOfClassesService {
      * @param termCode optional; required if neither courseOfferingId, activityOfferingId, or termId are provided
      * @param courseCode optional; required if neither courseOfferingId nor activityOfferingId are provided
      * @return Returns a list of instructors
-     * @throws Exception
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     @Path("/instructors")
-    public List<InstructorSearchResult> searchForInstructors(@QueryParam("courseOfferingId") String courseOfferingId,
-                                                             @QueryParam("activityOfferingId") String activityOfferingId,
-                                                             @QueryParam("termId") String termId,
-                                                             @QueryParam("termCode") String termCode,
-                                                             @QueryParam("courseCode") String courseCode) throws Exception;
+    public Response restfulSearchForInstructors( @QueryParam("courseOfferingId") String courseOfferingId,
+                                                 @QueryParam("activityOfferingId") String activityOfferingId,
+                                                 @QueryParam("termId") String termId,
+                                                 @QueryParam("termCode") String termCode,
+                                                 @QueryParam("courseCode") String courseCode );
 
 
 /** TERMS **/
@@ -236,13 +227,12 @@ public interface ScheduleOfClassesService {
      * @param termCode optional; if provided, overrides isActiveTerms
      * @param isActiveTerms optional
      * @return Returns a list of terms
-     * @throws Exception
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     @Path("/terms")
-    public List<TermSearchResult> searchForTerms( @QueryParam("termCode") String termCode,
-                                                  @QueryParam("active") boolean isActiveTerms ) throws Exception;
+    public Response restfulSearchForTerms( @QueryParam("termCode") String termCode,
+                                           @QueryParam("active") boolean isActiveTerms );
 
     /**
      * Java Helper method.
@@ -252,14 +242,4 @@ public interface ScheduleOfClassesService {
      * @throws Exception
      */
     public String getTermIdByTermCode( String termCode ) throws Exception;
-
-
-/** STUDENT REGISTRATION INFO **/
-
-    @GET
-    @Produces({MediaType.APPLICATION_JSON})
-    @Path("/personschedule")
-    public List<StudentScheduleCourseResult> searchForScheduleByPersonAndTerm(@QueryParam("person") String personId,
-                                                                              @QueryParam("termCode") String termCode) throws Exception;
-
 }
