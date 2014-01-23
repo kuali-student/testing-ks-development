@@ -487,7 +487,7 @@ public class LearningObjectiveServiceImpl implements LearningObjectiveService {
 	 * @see org.kuali.student.lum.lo.service.LearningObjectiveService#updateLoCategory(java.lang.String, org.kuali.student.lum.lo.dto.LoCategoryInfo)
 	 */
 	@Override
-	@Transactional(readOnly=false,noRollbackFor={DoesNotExistException.class},rollbackFor={Throwable.class})
+	//@Transactional(readOnly=false,noRollbackFor={DoesNotExistException.class},rollbackFor={Throwable.class})
 	public LoCategoryInfo updateLoCategory(String loCategoryId,
 			LoCategoryInfo loCategoryInfo,ContextInfo contextInfo) throws DataValidationErrorException,
 			DoesNotExistException, InvalidParameterException,
@@ -529,7 +529,7 @@ public class LearningObjectiveServiceImpl implements LearningObjectiveService {
     		if (null != loInfos) {
 				// remove associations of this LoCategory from active LO's
     			for (LoInfo info : loInfos) {
-    				if (info.getStateKey().equals("active"))  {
+    				if ("active".equals(info.getStateKey()))  {
 	    				try {
 							removeLoCategoryFromLo(loCategoryId, info.getId(),contextInfo);
 						} catch (UnsupportedActionException uaee) {
@@ -886,7 +886,7 @@ public class LearningObjectiveServiceImpl implements LearningObjectiveService {
     }
 
     @Override
-	@Transactional(readOnly=false,noRollbackFor={DoesNotExistException.class},rollbackFor={Throwable.class})
+	//@Transactional(readOnly=false,noRollbackFor={DoesNotExistException.class},rollbackFor={Throwable.class})
 	public LoCategoryInfo createLoCategory (String loCategoryTypeKey,  LoCategoryInfo loCategoryInfo,  ContextInfo contextInfo)
             throws DataValidationErrorException, DoesNotExistException, InvalidParameterException, MissingParameterException,
             OperationFailedException, PermissionDeniedException, ReadOnlyException {

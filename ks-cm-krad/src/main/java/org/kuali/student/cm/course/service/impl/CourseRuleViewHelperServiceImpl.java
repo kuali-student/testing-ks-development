@@ -16,6 +16,14 @@
 package org.kuali.student.cm.course.service.impl;
 
 import org.kuali.rice.core.api.util.tree.Tree;
+import org.kuali.rice.krad.uif.UifConstants;
+import org.kuali.rice.krad.uif.component.Component;
+import org.kuali.rice.krad.uif.container.CollectionGroup;
+import org.kuali.rice.krad.uif.container.Container;
+import org.kuali.rice.krad.uif.util.ComponentFactory;
+import org.kuali.rice.krad.uif.util.ComponentUtils;
+import org.kuali.rice.krad.uif.view.View;
+import org.kuali.rice.krad.web.form.MaintenanceDocumentForm;
 import org.kuali.rice.krms.api.repository.proposition.PropositionType;
 import org.kuali.rice.krms.api.repository.term.TermDefinition;
 import org.kuali.rice.krms.api.repository.type.KrmsTypeDefinition;
@@ -23,43 +31,38 @@ import org.kuali.rice.krms.builder.ComponentBuilder;
 import org.kuali.rice.krms.dto.PropositionEditor;
 import org.kuali.rice.krms.dto.PropositionParameterEditor;
 import org.kuali.rice.krms.dto.RuleEditor;
+import org.kuali.rice.krms.dto.RuleManagementWrapper;
+import org.kuali.rice.krms.dto.TemplateInfo;
 import org.kuali.rice.krms.dto.TermEditor;
 import org.kuali.rice.krms.dto.TermParameterEditor;
 import org.kuali.rice.krms.tree.RuleCompareTreeBuilder;
 import org.kuali.rice.krms.tree.node.CompareTreeNode;
+import org.kuali.rice.krms.util.KRMSConstants;
 import org.kuali.rice.krms.util.PropositionTreeUtil;
+import org.kuali.student.cm.course.service.CourseInfoMaintainable;
 import org.kuali.student.core.krms.tree.KSRuleCompareTreeBuilder;
 import org.kuali.student.lum.lu.ui.krms.dto.LUPropositionEditor;
 import org.kuali.student.lum.lu.ui.krms.service.impl.LURuleViewHelperServiceImpl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
+ *  This class was created to override {@link LURuleViewHelperServiceImpl} for Curriculum Management KRMS (Course Requisites) purposes. 
  *
- * @author Kuali Student Team
+ * @author OpenCollab/rSmart KRAD CM Conversion Alliance!
  */
 public class CourseRuleViewHelperServiceImpl extends LURuleViewHelperServiceImpl {
 
     private KSRuleCompareTreeBuilder compareTreeBuilder;
 
-    /**
-     *
-     * @return
-     */
     @Override
     public Class<? extends PropositionEditor> getPropositionEditorClass() {
         return LUPropositionEditor.class;
     }
 
-    /**
-     * Builds compare tree for the compare CO and CLU lightbox links.
-     *
-     * @param original
-     * @param compare
-     * @return
-     * @throws Exception
-     */
     @Override
     public Tree<CompareTreeNode, String> buildCompareTree(RuleEditor original, RuleEditor compare) {
 
@@ -77,7 +80,8 @@ public class CourseRuleViewHelperServiceImpl extends LURuleViewHelperServiceImpl
      *
      * @param propositionEditor
      */
-    protected void initPropositionEditor(PropositionEditor propositionEditor) {
+    @Override
+    public void initPropositionEditor(PropositionEditor propositionEditor) {
         if (PropositionType.SIMPLE.getCode().equalsIgnoreCase(propositionEditor.getPropositionTypeCode())) {
 
             if (propositionEditor.getType() == null) {
@@ -94,7 +98,6 @@ public class CourseRuleViewHelperServiceImpl extends LURuleViewHelperServiceImpl
             for (PropositionEditor child : propositionEditor.getCompoundEditors()) {
                 initPropositionEditor(child);
             }
-
         }
     }
 
@@ -105,7 +108,8 @@ public class CourseRuleViewHelperServiceImpl extends LURuleViewHelperServiceImpl
      * @param proposition
      * @return
      */
-    protected Map<String, String> getTermParameters(PropositionEditor proposition) {
+    @Override
+    public Map<String, String> getTermParameters(PropositionEditor proposition) {
 
         Map<String, String> termParameters = new HashMap<String, String>();
         if (proposition.getTerm() == null) {
@@ -125,7 +129,81 @@ public class CourseRuleViewHelperServiceImpl extends LURuleViewHelperServiceImpl
 
         return termParameters;
     }
+    
+    @Override
+    public void addCustomContainerComponents(View view, Object model, Container container) {
+        if (KRMSConstants.KRMS_PROPOSITION_DETAILSECTION_ID.equals(container.getId())) {
+            customizePropositionEditSection(view, model, container);
+        }
+    }
+    
+    private void customizePropositionEditSection(View view, Object model, Container container) {
+        //Retrieve the current editing proposition if exists.
+        MaintenanceDocumentForm maintenanceDocumentForm = (MaintenanceDocumentForm) model;
+        CourseInfoMaintainable courseInfoMaintainable = (CourseInfoMaintainable)maintenanceDocumentForm.getDocument().getNewMaintainableObject();
 
+        RuleEditor ruleEditor = courseInfoMaintainable.getCourseRuleManagementWrapper().getRuleEditor();
+        PropositionEditor propEditor = PropositionTreeUtil.getProposition(ruleEditor);
+
+        List<Component> components = new ArrayList<Component>();
+        if (propEditor != null) {
+            //Retrieve the name of the xml component to display for the proposition type.
+            TemplateInfo template = this.getTemplateForType(propEditor.getType());
+
+            if (template != null && template.getComponentId() != null) {
+                Component component = ComponentFactory.getNewComponentInstance(template.getComponentId());
+                view.assignComponentIds(component);
+                if(container.getId().equals(maintenanceDocumentForm.getUpdateComponentId())){
+                    String nodePath = view.getDefaultBindingObjectPath() + "." + propEditor.getBindingPath();
+                    ComponentUtils.pushObjectToContext(component, UifConstants.ContextVariableNames.NODE_PATH, nodePath);
+                    ComponentUtils.prefixBindingPathNested(component, propEditor.getBindingPath());
+                }
+
+                //Add Proposition Type FieldGroup to Tree Node
+                components.add(component);
+            }
+
+            if (template != null && template.getConstantComponentId() != null) {
+                Component component = ComponentFactory.getNewComponentInstance(template.getConstantComponentId());
+                view.assignComponentIds(component);
+
+                //Add Proposition Type FieldGroup to Tree Node
+                components.add(component);
+            }
+        }
+
+        //Do not display if there are no components.
+        if (components.size() == 0) {
+            container.getHeader().setRender(false);
+        }
+
+        container.setItems(components);
+    }
+    
+    
+    @Override
+    public boolean performAddLineValidation(View view, CollectionGroup collectionGroup, Object model, Object addLine) {
+        return super.performAddLineValidation(view, collectionGroup, model, addLine);
+    }
+
+    @Override
+    public void processAfterAddLine(View view, CollectionGroup collectionGroup, Object model, Object addLine,
+            boolean isValidLine) {
+        super.processAfterAddLine(view, collectionGroup, model, addLine, isValidLine);
+    }
+    
+    @Override
+    protected RuleEditor getRuleEditor(Object model) {
+        if (model instanceof MaintenanceDocumentForm) {
+            MaintenanceDocumentForm maintenanceDocumentForm = (MaintenanceDocumentForm) model;
+            CourseInfoMaintainable courseInfoMaintainable = (CourseInfoMaintainable)maintenanceDocumentForm.getDocument().getNewMaintainableObject();
+            RuleManagementWrapper ruleWrapper = courseInfoMaintainable.getCourseRuleManagementWrapper();
+            return ruleWrapper.getRuleEditor();
+        }
+        return null;
+    }
+
+    @Override
     protected RuleCompareTreeBuilder getCompareTreeBuilder() {
         if (compareTreeBuilder == null) {
             compareTreeBuilder = new KSRuleCompareTreeBuilder();

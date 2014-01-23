@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.kuali.rice.core.api.util.KeyValue;
 import org.kuali.rice.krad.maintenance.Maintainable;
+import org.kuali.rice.krms.dto.AgendaEditor;
 import org.kuali.student.cm.course.form.CluInstructorInfoWrapper;
 import org.kuali.student.cm.course.form.CollaboratorWrapper;
 import org.kuali.student.cm.course.form.CourseJointInfoWrapper;
@@ -28,16 +29,19 @@ import org.kuali.student.cm.course.form.LoDisplayInfoWrapper;
 import org.kuali.student.cm.course.form.LoDisplayWrapperModel;
 import org.kuali.student.cm.course.form.OrganizationInfoWrapper;
 import org.kuali.student.cm.course.form.ResultValuesGroupInfoWrapper;
+import org.kuali.student.cm.course.form.ReviewInfo;
 import org.kuali.student.cm.course.form.SubjectCodeWrapper;
+import org.kuali.student.cm.course.form.SupportingDocumentInfoWrapper;
 import org.kuali.student.r2.core.comment.dto.CommentInfo;
 import org.kuali.student.r2.core.comment.dto.DecisionInfo;
+import org.kuali.student.r2.core.document.dto.DocumentInfo;
 import org.kuali.student.r2.core.proposal.dto.ProposalInfo;
 import org.kuali.student.r2.lum.course.dto.CourseInfo;
 
 /**
  * {@link CourseInfo} Maintainable interface
  *
- *
+ * @author OpenCollab/rSmart KRAD CM Conversion Alliance!
  */
 public interface CourseInfoMaintainable extends Maintainable {
 
@@ -59,6 +63,8 @@ public interface CourseInfoMaintainable extends Maintainable {
 	List<CourseJointInfoWrapper> searchForJointOfferingCourses(String courseNumber);
 	
 	List<LoCategoryInfoWrapper> searchForLoCategories(String categoryName);
+
+    List<AgendaEditor> getAgendasForRef(String discriminatorType, String refObjectId);
 
     ProposalInfo getProposal();
 
@@ -254,6 +260,22 @@ public interface CourseInfoMaintainable extends Maintainable {
     List<OrganizationInfoWrapper> getAdministeringOrganizations();
 
     /**
+     * This overridden method ...
+     *
+     */
+    List<SupportingDocumentInfoWrapper> getDocumentsToAdd();
+
+    /**
+     * This overridden method ...
+     *
+     */
+    void setDocumentsToAdd(final List<SupportingDocumentInfoWrapper> documentToAdd);
+
+    void setSupportingDocuments(final List<DocumentInfo> supportingDocuments);
+
+    List<DocumentInfo> getSupportingDocuments();
+
+    /**
      * Sets the list of Administering Organizations
      * 
      * @param administeringOrganizations List of {@link OrganizationInfoWrapper}
@@ -263,6 +285,8 @@ public interface CourseInfoMaintainable extends Maintainable {
     CourseInfo getCourse();
     
     void setCourse(final CourseInfo course);
+    
+    ReviewInfo getReviewInfo();
     
     String getUnitsContentOwnerToAdd();
 
@@ -292,5 +316,12 @@ public interface CourseInfoMaintainable extends Maintainable {
      */
     LoDisplayWrapperModel getLoDisplayWrapperModel();
     
+    /**
+     * 
+     * Retrieve the {@link CourseRuleManagementWrapper} instance that is specifically used for KRMS (Course Requisites) purposes.
+     * 
+     * @return {@link CourseRuleManagementWrapper}
+     */
     CourseRuleManagementWrapper getCourseRuleManagementWrapper();
+
 }
