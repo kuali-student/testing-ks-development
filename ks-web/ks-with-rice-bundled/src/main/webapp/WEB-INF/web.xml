@@ -64,9 +64,7 @@
 
     <filter>
 		<filter-name>UserLoginFilter</filter-name>
-        <!-- enable KS Kitchen Sink pages to bypass login.jsp: -->
-        <filter-class>org.kuali.student.common.kitchensink.KitchenSinkUserLoginFilter</filter-class>
-        <!--<filter-class>org.kuali.rice.krad.web.filter.UserLoginFilter</filter-class>-->
+        <filter-class>org.kuali.rice.krad.web.filter.UserLoginFilter</filter-class>
     </filter>
 
     <filter>
@@ -290,6 +288,17 @@
         <servlet-name>ks-krad</servlet-name>
     </filter-mapping>
 
+	<!--  FTL test -->
+    <servlet>
+        <servlet-name>cr-performance-test</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>cr-performance-test</servlet-name>
+        <url-pattern>/cr-performance-test/*</url-pattern>
+    </servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>remoting</servlet-name>
 		<url-pattern>/remoting/*</url-pattern>
