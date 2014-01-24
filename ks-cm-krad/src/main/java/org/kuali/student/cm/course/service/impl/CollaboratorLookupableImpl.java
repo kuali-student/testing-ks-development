@@ -35,6 +35,7 @@ import org.kuali.student.r2.core.search.dto.SearchResultCellInfo;
 import org.kuali.student.r2.core.search.dto.SearchResultInfo;
 import org.kuali.student.r2.core.search.dto.SearchResultRowInfo;
 import org.kuali.student.r2.core.search.service.SearchService;
+import org.kuali.student.r2.lum.util.constants.CourseServiceConstants;
 
 /**
 *
@@ -82,7 +83,9 @@ public class CollaboratorLookupableImpl extends LookupableImpl {
         	for (SearchResultRowInfo result : searchResult.getRows()) {
                 List<SearchResultCellInfo> cells = result.getCells();
                 CollaboratorWrapper collaboratorDisplay = new CollaboratorWrapper();
+                //implement a test to remove searched username from list
                 for (SearchResultCellInfo cell : cells) {
+                    
                     if (QuickViewByGivenName.GIVEN_NAME_RESULT.equals(cell.getKey())) {
                     	collaboratorDisplay.setGivenName(cell.getValue());
                     } else if (QuickViewByGivenName.PERSON_ID_RESULT.equals(cell.getKey())) {
@@ -95,7 +98,9 @@ public class CollaboratorLookupableImpl extends LookupableImpl {
                     	collaboratorDisplay.setDisplayName(cell.getValue());
                     }
                 }
-                collaboratorDisplays.add(collaboratorDisplay);
+                if(!ContextUtils.getContextInfo().getPrincipalId().equals(collaboratorDisplay.getPersonID())){
+                    collaboratorDisplays.add(collaboratorDisplay);    
+                }
         	}
 		} catch (Exception e) {
 		    FormattedLogger.error("An error occurred retrieving the Collaborators: " + e);
@@ -106,7 +111,7 @@ public class CollaboratorLookupableImpl extends LookupableImpl {
 	
 	private SearchService getSearchService() {
 		if (searchService == null) {
-			searchService = GlobalResourceLoader.getService(new QName(LookupableConstants.NAMESPACE_PERSONSEACH, LookupableConstants.PERSONSEACH_SERVICE_NAME_LOCAL_PART));
+			searchService = GlobalResourceLoader.getService(new QName(CourseServiceConstants.NAMESPACE_PERSONSEACH, CourseServiceConstants.PERSONSEACH_SERVICE_NAME_LOCAL_PART));
 		}
 		return searchService;
 	}

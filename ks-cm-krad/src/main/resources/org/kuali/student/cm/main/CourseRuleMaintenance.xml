@@ -1,4 +1,4 @@
-<?xml version="1.0" entcoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright 2007-2013 The Kuali Foundation
 
@@ -20,142 +20,13 @@ limitations under the License.
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-    <!-- <bean id="CourseRuleWrapperMaintenanceDocument" parent="uifMaintenanceDocumentEntry">
-        <property name="dataObjectClass" value="org.kuali.student.lum.lu.ui.krms.dto.LURuleManagementWrapper"/>
-        <property name="maintainableClass" value="org.kuali.student.enrollment.class1.krms.service.impl.CORuleEditorMaintainableImpl"/>
-        <property name="documentTypeName" value="CORuleMaintenanceDocument"/>
-        <property name="businessRulesClass" value="org.kuali.rice.krms.util.RuleEditorBusRule" />
-        <property name="lockingKeys">
-            <list>
-                <value>refObjectId</value>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="CourseRuleManagementWrapper" parent="LURuleManagementWrapper">
-        <property name="dataObjectClass" value="org.kuali.student.lum.lu.ui.krms.dto.LURuleManagementWrapper"/>
-    </bean>
-
-    <bean id="KS-AgendaManagement-View" parent="KS-CourseOffering-MaintenanceViewWithTermContextBarPlaceholder">
-        <property name="viewName" value="COAgendaManagementView"/>
-        <property name="dataObjectClassName" value="org.kuali.student.lum.lu.ui.krms.dto.LURuleManagementWrapper"/>
-        <property name="viewHelperServiceClass"
-                  value="org.kuali.student.enrollment.class1.krms.service.impl.CORuleViewHelperServiceImpl"/>
-        <property name="headerText" value="@{#dp.cluDescription} : @{#dp.courseOfferingTitle}"/>
-        <property name="items">
-            <list>
-                <bean id="KS-AgendaMaintenance-Page" parent="KS-AgendaMaintenance-Page-parent"/>
-                <bean id="KS-RuleMaintenance-Page" parent="KS-RuleMaintenance-Page-Parent"/>
-            </list>
-        </property>
-        <property name="dialogs">
-            <list>
-                <bean id="compareCluAndCoRuleLightBox" parent="KRMS-CompareRule">
-                    <property name="headerText" value="Compare Catalog and Course Offering Rules"/>
-                </bean>
-                <bean id="courseRangeLookup" parent="KRMS-CourseRangeResult-Lookup"/>
-                <bean id="warningMessagedYesNo" parent="KRMS-WarningMessagedYesNo"/>
-            </list>
-        </property>
-        <property name="topGroup">
-            <bean id="KSCO-ContextBar" parent="KS-CourseOffering-ContextBar" p:style="display:block;">
-                <property name="onDocumentReadyScript" value="setSeasonalColor('KSCO-ContextBar', '@{#dp.contextBar.termDayOfYear}', '@{#ConfigProperties['application.url']}');"/>
-            </bean>
-        </property>
-        <property name="breadcrumbOptions.homewardPathBreadcrumbs">
-            <list>
-                <ref bean="KS-HomewardPathBreadcrumbs-Home"/>
-                <ref bean="KS-HomewardPathBreadcrumbs-Enrollment"/>
-                <bean parent="Uif-BreadcrumbItem">
-                    <property name="label" value="Course Offerings"/>
-                    <property name="url.viewId" value="courseOfferingManagementView"/>
-                    <property name="url.controllerMapping" value="courseOfferingManagement"/>
-                </bean>
-                <bean parent="Uif-BreadcrumbItem">
-                    <property name="label" value="@{#dp.cluSubjectCode}"/>
-                    <property name="url.viewId" value="courseOfferingManagementView"/>
-                    <property name="url.controllerMapping" value="courseOfferingManagement"/>
-                    <property name="url.requestParameters">
-                        <map key-type="java.lang.String" merge="true">
-                            <entry key="methodToCall" value="show"/>
-                            <entry key="dataObjectClassName" value="org.kuali.student.r2.lum.course.dto.CourseInfo"/>
-                            <entry key="hideReturnLink" value="true"/>
-                            <entry key="inputCode" value="@{#dp.cluSubjectCode}"/>
-                            <entry key="formKey" value="@{returnFormKey}"/>
-                            <entry key="pageId" value="manageCourseOfferingsPage"/>
-                            <entry key="viewName" value="@{#dp.cluSubjectCode}"/>
-                        </map>
-                    </property>
-                </bean>
-                <bean parent="Uif-BreadcrumbItem">
-                    <property name="label" value="@{#dp.cluDescription}"/>
-                    <property name="url.viewId" value="courseOfferingManagementView"/>
-                    <property name="url.controllerMapping" value="courseOfferingManagement"/>
-                    <property name="url.requestParameters">
-                        <map key-type="java.lang.String" merge="true">
-                            <entry key="methodToCall" value="show"/>
-                            <entry key="dataObjectClassName" value="org.kuali.student.r2.lum.course.dto.CourseInfo"/>
-                            <entry key="hideReturnLink" value="true"/>
-                            <entry key="inputCode" value="@{#dp.cluDescription}"/>
-                            <entry key="termCode" value="@{#dp.cluTermCode}"/>
-                            <entry key="pageId" value="manageTheCourseOfferingPage"/>
-                        </map>
-                    </property>
-                </bean>
-            </list>
-        </property>
-        <property name="breadcrumbOptions.breadcrumbOverrides">
-            <list>
-                <bean parent="Uif-BreadcrumbItem">
-                    <property name="label" value="Course Offering Requisites"/>
-                </bean>
-            </list>
-        </property>
-
-        <property name="authorizer">
-            <bean class="org.kuali.student.enrollment.class1.krms.view.KSKRMSViewAuthorizer"/>
-        </property>
-
-        <property name="singlePageView" value="false"/>
-        <property name="entryPageId" value="KSCO-AgendaMaintenance-Page"/>
-        <property name="additionalScriptFiles">
-            <list>
-                <value>themes/ksboot/scripts/ruleMaintenance.js</value>
-                <value>krms/scripts/requiredAlerts.js</value>
-                <value>krms/scripts/countdownInputs.js</value>
-            </list>
-        </property>
-        <property name="additionalCssFiles">
-            <list>
-                <value>themes/ksboot/stylesheets/krms.css</value>
-            </list>
-        </property>
-    </bean> -->
-
-    <!-- <bean name="KS-AgendaMaintenance-Page-parent" parent="KRMS-AgendaMaintenance-Page-Parent">
-        <property name="headerText" value="Course Offering Requisites"/>
-        <property name="items">
-            <list>
-                <bean parent="KRMS-AgendaMaintenance-DisclosureLinks"/>
-                <bean parent="KRMS-AgendaManage-Section" class="org.kuali.student.cm.course.service.util.CourseAgendaSection">
-                    <property name="rulePrototype">
-                        <ref bean="KS-AgendaManage-RulePrototype"/>
-                    </property>
-                </bean>
-            </list>
-        </property>
-        <property name="footer">
-            <ref bean="KS-DocumentPageFooter-SubmitCancel"/>
-        </property>
-    </bean> -->
-
     <bean id="KS-DocumentPageFooter-SubmitCancel"  parent="KS-DocumentPageFooter-SubmitCancel-parent"/>
     <bean id="KS-DocumentPageFooter-SubmitCancel-parent" parent="Uif-DocumentPageFooter" abstract="true">
         <property name="items">
             <list>
                 <bean parent="KS-Uif-PrimaryActionButton" p:ajaxSubmit="false" p:methodToCall="route" p:actionLabel="Submit" p:performClientSideValidation="true"
                       p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_ROUTE]}"/>
-                <bean parent="KS-Uif-NavigationActionLink" p:ajaxSubmit="false" p:methodToCall="cancel" p:actionLabel="Cancel"
+                <bean parent="Uif-NavigationActionLink" p:ajaxSubmit="false" p:methodToCall="cancel" p:actionLabel="Cancel"
                       p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_CANCEL]}"/>
             </list>
         </property>
@@ -174,7 +45,6 @@ limitations under the License.
     <property name="items">
         <list>
             <bean id="KS-RuleEdit-ActionLinks" parent="KS-RuleEdit-Links" p:align="right"/>
-            <bean id="KS-RuleView-ActionLinks" parent="KS-RuleView-Links" p:align="right"/>
             <bean parent="Uif-MessageField" p:messageText="@{#line.ruleTypeInfo.instruction}"/>
             <bean id="KS-ViewTree-Group" parent="Uif-VerticalBoxGroup"
                   p:cssClasses="viewModeNode">
@@ -200,8 +70,7 @@ limitations under the License.
     <bean id="KS-RuleAdd-Links" parent="KRMS-RuleAdd-Links">
         <property name="items">
             <list>
-                <bean parent="KS-RuleView-Links" p:render="@{#line.dummy and #line.parent != null}"/>
-                <bean parent="KS-Uif-NavigationActionLink" p:actionLabel="Add Rule" p:methodToCall="addRule" p:componentSecurity.performActionAuthz="true" p:actionEvent="addEditRequisite"
+                <bean parent="Uif-NavigationActionLink" p:actionLabel="Add Rule" p:methodToCall="addRule"
                       p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_ROUTE]}"/>
             </list>
         </property>
@@ -210,25 +79,8 @@ limitations under the License.
     <bean id="KS-RuleEdit-Links" parent="KRMS-RuleEdit-Links">
         <property name="items">
             <list>
-                <bean parent="KS-Uif-ActionLink" p:actionLabel="Compare to Catalog" p:methodToCall="compareRules" p:componentSecurity.performActionAuthz="true" p:actionEvent="compare">
-                    <property name="toolTip">
-                        <bean parent="Uif-Tooltip" p:tooltipContent="Compare Catalog and Course Offering rules"/>
-                    </property>
-                </bean>
-                <bean parent="KS-Uif-NavigationActionLink" p:actionLabel="Edit Rule" p:methodToCall="goToRuleView" p:componentSecurity.performActionAuthz="true" p:actionEvent="addEditRequisite"/>
-                <bean parent="KS-Uif-ActionLink" p:actionLabel="Delete Rule" p:methodToCall="deleteRule" p:componentSecurity.performActionAuthz="true" p:actionEvent="deleteRequisite"/>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="KS-RuleView-Links" parent="KRMS-RuleView-Links">
-        <property name="items">
-            <list>
-                <bean parent="KS-Uif-ActionLink" p:actionLabel="Compare to Catalog" p:methodToCall="compareRules" p:componentSecurity.performActionAuthz="true" p:actionEvent="compare">
-                    <property name="toolTip">
-                        <bean parent="Uif-Tooltip" p:tooltipContent="Compare Catalog and Course Offering rules"/>
-                    </property>
-                </bean>
+                <bean parent="Uif-NavigationActionLink" p:actionLabel="Edit Rule" p:methodToCall="goToRuleView"/>
+                <bean parent="KS-Uif-ActionLink" p:actionLabel="Delete Rule" p:methodToCall="deleteRule"/>
             </list>
         </property>
     </bean>
@@ -241,7 +93,7 @@ limitations under the License.
                     <bean parent="Uif-Message"/>
                 </property>
                 <property name="dataGroupPrototype">
-                    <ref bean="KSCO-ListItems-DataGroup"/>
+                    <ref bean="KS-ListItems-DataGroup"/>
                 </property>
             </bean>
         </property>
@@ -296,7 +148,7 @@ limitations under the License.
     <bean id="KS-ListItems-DataGroup" parent="KS-ListItems-DataGroup-parent">
         <property name="subCollections">
             <list merge="true">
-                <bean parent="KSAO-ListItems-DataGroup-parent">
+                <bean parent="KS-ListItems-DataGroup-parent">
                     <property name="propertyName" value="cluGroups"/>
                 </bean>
             </list>
@@ -343,30 +195,7 @@ limitations under the License.
     </bean>
 
     <bean name="KS-RuleMaintenance-Page-Parent" parent="KRMS-RuleMaintenance-Page-Parent">
-        <property name="headerText" value="@{#dp.ruleEditor.dummy == true ? 'Add' : 'Edit'} @{#dp.ruleEditor.ruleTypeInfo.description}"/>
-        <property name="breadcrumbOptions.breadcrumbOverrides">
-            <list>
-                <bean parent="Uif-BreadcrumbItem">
-                    <property name="label" value="Course Offering Requisites"/>
-                    <property name="url.controllerMapping" value="/courseOfferingRules"/>
-                    <property name="url.viewType" value="MAINTENANCE"/>
-                    <property name="url.methodToCall" value="maintenanceEdit"/>
-                    <property name="url.requestParameters">
-                        <map key-type="java.lang.String" merge="true">
-                            <entry key="dataObjectClassName"
-                                   value="org.kuali.student.enrollment.class1.krms.dto.CORuleManagementWrapper"/>
-                            <entry key="viewName" value="COAgendaManagementView"/>
-                            <entry key="overrideKeys" value="refObjectId"/>
-                            <entry key="refObjectId" value="@{#dp.refObjectId}"/>
-                        </map>
-                    </property>
-                </bean>
-                <bean parent="Uif-BreadcrumbItem">
-                    <property name="label"
-                              value="@{#dp.ruleEditor.dummy == true ? 'Add' : 'Edit'} @{#dp.ruleEditor.ruleTypeInfo.description}"/>
-                </bean>
-            </list>
-        </property>
+        <property name="headerText" value="@{#dp.courseRuleManagementWrapper.ruleEditor.dummy == true ? 'Add' : 'Edit'} @{#dp.courseRuleManagementWrapper.ruleEditor.ruleTypeInfo.description}"/>
         <property name="items">
             <list>
                 <ref bean="KS-Rules-ManageSection"/>
@@ -381,8 +210,7 @@ limitations under the License.
                             <property name="actionLabel" value="Update Rule"/>
                             <property name="methodToCall" value="updateRule"/>
                         </bean>
-                        <bean id="KS-CancelRule-Button" parent="KS-Uif-NavigationActionLink">
-                            <property name="actionLabel" value="Cancel"/>
+                        <bean id="KS-CancelRule-Button" parent="Uif-CancelAction">
                             <property name="methodToCall" value="cancelEditRule"/>
                         </bean>
                     </list>
@@ -403,19 +231,8 @@ limitations under the License.
     <bean id="KS-RuleHeader-BoxSection" parent="KRMS-RuleHeader-BoxSection">
         <property name="items">
             <list>
-                <ref bean="KRMS-RuleHeader-Section"/>
-                <bean id="KS-RulePreview-ActionLinks" parent="KS-RulePreview-Links" p:style="float: right"/>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="KS-RulePreview-Links" parent="KRMS-RulePreview-Links">
-        <property name="items">
-            <list>
-                <bean parent="KS-Uif-ActionLink" p:actionLabel="Compare to Catalog" p:methodToCall="compareRules" p:componentSecurity.performActionAuthz="true" p:actionEvent="compare">
-                    <property name="toolTip">
-                        <bean parent="Uif-Tooltip" p:tooltipContent="Compare Catalog and Course Offering rules"/>
-                    </property>
+                <bean parent="KRMS-RuleHeader-Section">
+                    <property name="instructionalText" value="@{#dp.courseRuleManagementWrapper.ruleEditor.ruleTypeInfo.instruction}"/>
                 </bean>
             </list>
         </property>
@@ -438,7 +255,7 @@ limitations under the License.
             <map>
                 <entry key="selected" value="0"/>
                 <entry key="select"
-                       value="function(event, ui) {ajaxCallOnTabSelect(event, ui, 'KRMS-RuleEditor-TreeGroup', 'KSCO-EditWithLogic-EditGroup', 'refreshLogicArea', 'KRMS-LogicArea-InputField');}"/>
+                       value="function(event, ui) {ajaxCallOnTabSelect(event, ui, 'KRMS-RuleEditor-TreeGroup', 'KS-EditWithLogic-EditGroup', 'refreshLogicArea', 'KRMS-LogicArea-InputField');}"/>
             </map>
         </property>
     </bean>
@@ -469,8 +286,8 @@ limitations under the License.
                 <bean parent="KS-Uif-HorizontalBoxGroup-ToolbarGroup">
                     <property name="items">
                         <list>
-                            <bean parent="KRMS-RuleEditorView-AddButton" p:componentSecurity.performActionAuthz="true" p:actionEvent="addEditGroupRule"/>
-                            <bean parent="KRMS-RuleEditorView-EditButton" p:componentSecurity.performActionAuthz="true" p:actionEvent="addEditGroupRule"/>
+                            <bean parent="KRMS-RuleEditorView-AddButton"/>
+                            <bean parent="KRMS-RuleEditorView-EditButton"/>
                         </list>
                     </property>
                 </bean>
@@ -478,9 +295,9 @@ limitations under the License.
                 <bean parent="KS-Uif-HorizontalBoxGroup-ToolbarGroup">
                     <property name="items">
                         <list>
-                            <bean parent="KRMS-RuleEditorView-GroupButton" p:componentSecurity.performActionAuthz="true" p:actionEvent="addEditGroupRule"/>
-                            <bean parent="KRMS-RuleEditorView-LeftButton" p:componentSecurity.performActionAuthz="true" p:actionEvent="moveRule"/>
-                            <bean parent="KRMS-RuleEditorView-RightButton" p:componentSecurity.performActionAuthz="true" p:actionEvent="moveRule"/>
+                            <bean parent="KRMS-RuleEditorView-GroupButton"/>
+                            <bean parent="KRMS-RuleEditorView-LeftButton"/>
+                            <bean parent="KRMS-RuleEditorView-RightButton"/>
                         </list>
                     </property>
                 </bean>
@@ -488,8 +305,8 @@ limitations under the License.
                 <bean parent="KS-Uif-HorizontalBoxGroup-ToolbarGroup">
                     <property name="items">
                         <list>
-                            <bean parent="KRMS-RuleEditorView-UpButton" p:componentSecurity.performActionAuthz="true" p:actionEvent="moveRule"/>
-                            <bean parent="KRMS-RuleEditorView-DownButton" p:componentSecurity.performActionAuthz="true" p:actionEvent="moveRule"/>
+                            <bean parent="KRMS-RuleEditorView-UpButton"/>
+                            <bean parent="KRMS-RuleEditorView-DownButton"/>
                         </list>
                     </property>
                 </bean>
@@ -497,10 +314,10 @@ limitations under the License.
                 <bean parent="KS-Uif-HorizontalBoxGroup-ToolbarGroup">
                     <property name="items">
                         <list>
-                            <bean parent="KRMS-RuleEditorView-CopyButton" p:componentSecurity.performActionAuthz="true" p:actionEvent="copyCutRule"/>
-                            <bean parent="KRMS-RuleEditorView-CutButton" p:componentSecurity.performActionAuthz="true" p:actionEvent="copyCutRule"/>
-                            <bean parent="KRMS-RuleEditorView-PasteButton" p:componentSecurity.performActionAuthz="true" p:actionEvent="copyCutRule"/>
-                            <bean parent="KRMS-RuleEditorView-DeleteButton" p:componentSecurity.performActionAuthz="true" p:actionEvent="deleteRule"/>
+                            <bean parent="KRMS-RuleEditorView-CopyButton"/>
+                            <bean parent="KRMS-RuleEditorView-CutButton"/>
+                            <bean parent="KRMS-RuleEditorView-PasteButton"/>
+                            <bean parent="KRMS-RuleEditorView-DeleteButton"/>
                         </list>
                     </property>
                 </bean>
@@ -512,7 +329,7 @@ limitations under the License.
     <bean id="KS-EditWithLogic-EditSection" parent="KRMS-EditWithLogic-EditSection-parent">
         <property name="items">
             <list>
-                <ref bean="KSCO-EditWithLogic-EditGroup"/>
+                <ref bean="KS-EditWithLogic-EditGroup"/>
             </list>
         </property>
     </bean>
@@ -561,6 +378,124 @@ limitations under the License.
             <list>
                 <ref bean="KRMS-PrototypeHeader-BoxGroup"/>
                 <ref bean="KS-ListItems-DataGroup"/>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="KRMS-PropositionEdit-DefineSection-parentBean" abstract="true" parent="KRMS-VerticalBoxSubSection">
+        <property name="headerText" value="Define Rule Statement"/>
+        <property name="items">
+            <list>
+
+                <!-- Hidden ID field -->
+                <bean parent="KRMS-PropKey-HiddenField"/>
+
+                <!--Add the type droplist-->
+                <bean id="KRMS-PropositionType-Dropdown" parent="Uif-InputField-LabelTop" p:propertyName="proposition.typeId"
+                      p:showLabel="true" p:label="Rule Statement Option" p:maxLength="40" p:required="true">
+                    <property name="control">
+                        <bean parent="Uif-DropdownControl" p:cssClasses="categorySelect"
+                              p:onChangeScript="ajaxCallPropositionTypeUpdate(jQuery(this), 'updatePropositionType', 'KRMS-PropositionEdit-DetailSection');" />
+                    </property>
+                    <property name="optionsFinder">
+                        <bean class="org.kuali.student.lum.lu.ui.course.keyvalues.KSCoursePropositionTypeValuesFinder"/>
+                    </property>
+                </bean>
+
+            </list>
+        </property>
+    </bean>
+    
+    <!-- Copied from AORuleMaintenance.xml in Enrollment-trunk -->
+    <bean id="KSAO-ListItems-DataGroup-parent" parent="KRMS-ListItems-DataGroup-parent" p:renderAddLine="false">
+        <property name="layoutManager">
+            <bean parent="Uif-StackedCollectionLayout-WithBoxItems" class="org.kuali.student.core.krms.HorizontalActionsStackedLayoutManager">
+                <property name="actionsInLineGroup" value="true"/>
+                <property name="lineGroupPrototype">
+                    <bean parent="Uif-CollectionHorizontalBoxItem">
+                        <property name="cssClasses">
+                            <list merge="true">
+                                <value>krms-stackedPreviewItem</value>
+                            </list>
+                        </property>
+                        <property name="renderFooter" value="true"/>
+                    </bean>
+                </property>
+                <property name="subCollectionFieldGroupPrototype">
+                    <bean parent="Uif-VerticalFieldGroup" p:fieldLabel.render="false"
+                          p:cssClasses="uif-subCollection"/>
+                </property>
+                <property name="cssClasses">
+                    <list merge="true">
+                        <value>krms-stackedCollectionLayout</value>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <property name="collectionObjectClass" value="org.kuali.student.lum.lu.ui.krms.dto.CluGroup" />
+        <property name="items">
+            <list>
+                <bean parent="Uif-MessageField" p:messageText="@{#line.title}" p:render="@{#line.showTitle}"/>
+            </list>
+        </property>
+        <property name="lineActions">
+            <list>
+                <bean parent="KS-Uif-ActionLink" p:actionScript="show(e);" p:render="@{#line.showTitle}"
+                      p:actionLabel="Show Courses">
+                    <property name="cssClasses">
+                        <list merge="true">
+                            <value>showActionLink</value>
+                        </list>
+                    </property>
+                    <property name="actionImage">
+                        <null/>
+                    </property>
+                </bean>
+                <bean parent="KS-Uif-ActionLink" p:actionScript="hide(e);" p:render="@{#line.showTitle}"
+                      p:actionLabel="Hide Courses">
+                    <property name="cssClasses">
+                        <list merge="true">
+                            <value>hideActionLink</value>
+                        </list>
+                    </property>
+                    <property name="actionImage">
+                        <null/>
+                    </property>
+                </bean>
+            </list>
+        </property>
+        <property name="subCollections">
+            <list>
+                <bean parent="KSAO-ListItems-SubGroup" p:render="@{!#line.showTitle}"/>
+                <bean parent="KSAO-ListItems-SubGroup" p:render="@{#line.showTitle}">
+                    <property name="cssClasses">
+                        <list merge="true">
+                            <value>subGroup</value>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="KSAO-ListItems-SubGroup" parent="Uif-TableCollectionGroup" p:style="width: 550px; padding: 0;" p:renderAddLine="false">
+        <property name="collectionObjectClass" value="org.kuali.student.lum.lu.ui.krms.dto.CluCore" />
+        <property name="propertyName" value="clus" />
+        <property name="collectionLookup">
+            <bean parent="Uif-CollectionQuickFinder" p:quickfinderAction.render="false" />
+        </property>
+        <property name="layoutManager">
+            <ref bean="KS-SimpleTableCollectionLayout"/>
+        </property>
+        <property name="renderLineActions" value="false"/>
+        <property name="lineActions">
+            <list></list>
+        </property>
+        <property name="items">
+            <list>
+                <bean parent="Uif-DataField" p:propertyName="code"/>
+                <bean parent="Uif-DataField" p:propertyName="shortName"/>
+                <bean parent="Uif-DataField" p:propertyName="credits"/>
             </list>
         </property>
     </bean>
