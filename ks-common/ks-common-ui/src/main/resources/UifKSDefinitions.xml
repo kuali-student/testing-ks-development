@@ -149,7 +149,7 @@
                         <bean parent="Uif-HorizontalBoxGroup">
                             <property name="items">
                                 <list>
-                                    <bean parent="Uif-PrimaryActionButton" p:methodToCall="search" p:actionLabel="Search"/>
+                                    <bean id="button_search" parent="Uif-PrimaryActionButton" p:methodToCall="search" p:actionLabel="Search"/>
                                     <bean parent="Uif-ActionLink" p:actionLabel="Cancel"
                                           p:render="@{#form.renderedInLightBox}"
                                           p:onClickScript="e.preventDefault();closeLightbox();return false;"
@@ -607,6 +607,54 @@
     <bean id="KS-Uif-SecondaryActionButton" abstract="true" parent="KS-Uif-SecondaryActionButton-parentBean"/>
     <bean id="KS-Uif-SecondaryActionButton-parentBean" parent="Uif-SecondaryActionButton"/>
 
+    <bean id="KS-Uif-View-NavigationActionLink" parent="Uif-KS-NavigationActionLink-parentBean" abstract="true">
+        <property name="actionImage">
+            <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-eye"/>
+        </property>
+        <property name="actionImagePlacement" value="IMAGE_ONLY"/>
+    </bean>
+
+    <bean id="KS-Uif-Edit-NavigationActionLink" parent="Uif-KS-NavigationActionLink-parentBean" abstract="true">
+        <property name="actionImage">
+            <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-pencil"/>
+        </property>
+        <property name="actionImagePlacement" value="IMAGE_ONLY"/>
+    </bean>
+
+    <bean id="KS-Uif-Copy-NavigationActionLink" parent="Uif-KS-NavigationActionLink-parentBean" abstract="true">
+        <property name="actionImage">
+            <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-docs"/>
+        </property>
+        <property name="actionImagePlacement" value="IMAGE_ONLY"/>
+    </bean>
+
+    <bean id="KS-Uif-Delete-NavigationActionLink" parent="Uif-KS-NavigationActionLink-parentBean" abstract="true">
+        <property name="actionImage">
+            <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-cancel"/>
+        </property>
+        <property name="actionImagePlacement" value="IMAGE_ONLY"/>
+    </bean>
+
+    <bean id="KS-Uif-Manage-NavigationActionLink" parent="Uif-KS-NavigationActionLink-parentBean" abstract="true">
+        <property name="actionImage">
+            <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-wrench"/>
+        </property>
+        <property name="actionImagePlacement" value="IMAGE_ONLY"/>
+    </bean>
+
+    <bean id="KS-Uif-Requisite-NavigationActionLink" parent="Uif-KS-NavigationActionLink-parentBean" abstract="true">
+        <property name="actionImage">
+            <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-clipboard"/>
+        </property>
+    </bean>
+
+    <bean id="KS-Uif-Delete-ActionLink" parent="KS-Uif-ActionLink">
+        <property name="actionImage">
+            <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-cancel"/>
+        </property>
+        <property name="actionImagePlacement" value="IMAGE_ONLY"/>
+    </bean>
+
     <!-- This is used to display the view and page files names in the HTML so devs can find them -->
     <bean id="KS-SourceFile-Comment-Group" parent="Uif-HorizontalBoxGroup">
         <property name="items">
@@ -836,6 +884,14 @@
           p:onMouseOutScript="deleteLineMouseOut(this, 'uif-collectionDeleteHighlight');"
           p:onClickScript="writeCurrentPageToSession(this);" p:dirtyOnAction="true"
           p:loadingMessageText="Deleting Line..." p:id="@{#collectionGroup.id}_del@{#lineSuffix}"/>
+
+
+
+    <bean id="KS-Uif-Inline-WarningMessageGroup" parent="Uif-VerticalBoxSection"
+          p:additionalCssClasses="uif-validationMessages,uif-groupValidationMessages,uif-pageValidationMessages-warning,ks-subSection">
+        <property name="style" value="display: inline-block;" />
+    </bean>
+
 
     <bean id="KS-OptimisticLock-Page" parent="KS-Uif-Page" p:disclosure.render="false">
         <property name="items">
