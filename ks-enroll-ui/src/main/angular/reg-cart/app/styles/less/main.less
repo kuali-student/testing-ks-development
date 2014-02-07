@@ -1,0 +1,171 @@
+@import 'variables.less';
+@import 'ksboot/ks-fonts.less';
+
+
+
+/* Space out content a bit */
+body {
+  //padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+/* Everything but the jumbotron gets side spacing for mobile first views */
+.header,
+.marketing,
+.footer {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* Custom page header */
+.header {
+  margin-bottom: 5px;
+  padding: 0.2em;
+  background-color: @black;
+  color: @white;
+
+}
+
+.kscr-header-container{
+    background-color: #B9B9B9;
+}
+.kscr-searchTerm{
+    padding-left: 0.5em;
+}
+
+.kscr-header-title{
+    padding-left: 2em;
+}
+
+.kscr-logo{
+     background-image:url('../images/logo_kuali_k_only.png');
+     background-repeat: no-repeat;
+     background-size: 2.2em auto;
+     padding: 0.5em;
+}
+
+.navigation{
+   float: right;
+    a{
+      font-size: 1.7em;
+      flex: auto;
+      color: #fff;
+
+    }
+    a:hover, a:focus{
+       color: #d3d3d3;
+       outline: none;
+       text-decoration:none;
+    }
+}
+
+/* Make the masthead heading the same height as the navigation */
+.header h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 40px;
+  padding-bottom: 19px;
+}
+
+/* Custom page footer */
+.footer {
+  padding-top: 19px;
+  color: #777;
+  border-top: 1px solid #e5e5e5;
+}
+
+/* Customize container */
+@media (min-width: 768px) {
+  .container {
+    max-width: 730px;
+  }
+}
+.container-narrow > hr {
+  margin: 30px 0;
+}
+
+/* Main marketing message and sign up button */
+.jumbotron {
+  text-align: center;
+  border-bottom: 1px solid #e5e5e5;
+}
+.jumbotron .btn {
+  font-size: 21px;
+  padding: 14px 24px;
+}
+
+/* Supporting marketing content */
+.marketing {
+  margin: 40px 0;
+}
+.marketing p + h4 {
+  margin-top: 28px;
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+  /* Remove the padding we set earlier */
+  .header,
+  .marketing,
+  .footer {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Remove the bottom border on the jumbotron for visual effect */
+  .jumbotron {
+    border-bottom: 0;
+  }
+}
+
+.kscr-cart-course {
+    background-color: #EEE;
+    margin: 10px;
+}
+
+.kscr-course-header {
+    background-color: #CCC;
+    padding: 5px;
+}
+
+.kscr-course-header .remove {
+    float: right;
+}
+
+.kscr-course-info {
+    border-bottom: 1px dotted #000;
+    padding: 5px;
+}
+
+.kscr-adding-header{
+    background-color: #EEE;
+    padding: 0.1em 0.1em 0.1em 0.5em;
+}
+
+.kscr-AdditionalOpions-buttons{
+   float: right;
+   padding-right: 1em;
+}
+
+#searchTerm{
+    padding: 0.6em 0.1em;
+}
+
+@font-face {
+    font-family: 'Glyphicons Halflings';
+    src: url("fonts/glyphicons-halflings-regular.eot");
+    src: url('fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../../fonts/glyphicons-halflings-regular.woff') format('woff'), url('../../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
+
+
+.glyphicon {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    -webkit-font-smoothing: antialiased;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -moz-osx-font-smoothing: grayscale;
+}

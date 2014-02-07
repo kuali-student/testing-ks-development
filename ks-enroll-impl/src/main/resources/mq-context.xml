@@ -1,0 +1,87 @@
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:amq="http://activemq.apache.org/schema/core"
+        xmlns:jms="http://www.springframework.org/schema/jms"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+  http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd
+  http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-2.5.xsd">
+
+    <!-- NOTE: these declarations must be maintained in ALPHABETICAL-order or they will break the build
+         http://stackoverflow.com/a/2785026
+    -->
+    <amq:broker useJmx="false" persistent="false">
+        <amq:plugins>
+            <amq:statisticsBrokerPlugin />
+        </amq:plugins>
+        <amq:transportConnectors>
+            <amq:transportConnector uri="tcp://localhost:0" />
+        </amq:transportConnectors>
+    </amq:broker>
+
+    <!-- Basic AMQ connection factory -->
+    <amq:connectionFactory id="amqConnectionFactory" brokerURL="vm://localhost" />
+
+    <!-- Wraps the AMQ connection factory in Spring's caching (ie: pooled) factory
+         From the AMQ "Spring Support"-page: "You can use the PooledConnectionFactory for efficient pooling... or you
+         can use the Spring JMS CachingConnectionFactory to achieve the same effect."
+         See "Consuming JMS from inside Spring" at http://activemq.apache.org/spring-support.html
+         Also see http://codedependents.com/2010/07/14/connectionfactories-and-caching-with-spring-and-activemq/
+
+         Note: there are pros/cons to using Spring's caching factory vs Apache's PooledConnectionFactory; but, until
+         we have more explicit reasons to favor one over the other, Spring's is less tightly-coupled to a specific
+         AMQP-implementation.
+         See http://stackoverflow.com/a/19594974
+    -->
+    <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <constructor-arg ref="amqConnectionFactory"/>
+        <property name="sessionCacheSize" value="1"/>
+    </bean>
+
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <constructor-arg ref="connectionFactory" />
+    </bean>
+
+    <jms:listener-container concurrency="1" >
+        <jms:listener id="regPerfListener" destination="org.kuali.student.enrollment.registration.performanceStatsQueue" ref="performanceStatsListener" />
+        <jms:listener id="regInitListener" destination="org.kuali.student.enrollment.registration.initilizationListenerQueue" ref="registrationInitilizationListener" />
+        <jms:listener id="regVerificationListener" destination="org.kuali.student.enrollment.registration.verificationQueue" ref="registrationVerificationListener" />
+        <jms:listener id="regSeatCheckListener" destination="org.kuali.student.enrollment.registration.seatCheckQueue" ref="registrationSeatCheckListener" />
+    </jms:listener-container>
+
+
+    <bean id="performanceStatsListener" class="org.kuali.student.enrollment.registration.engine.listener.SimplePerformanceListener">
+        <property name="jmsTemplate" ref="jmsTemplate"/>
+    </bean>
+
+    <bean id="registrationInitilizationListener" class="org.kuali.student.enrollment.registration.engine.listener.FirstNodeRegistrationListener">
+        <property name="jmsTemplate" ref="jmsTemplate"/>
+        <property name="destinations">
+            <list>
+                <value>org.kuali.student.enrollment.registration.verificationQueue</value>
+            </list>
+        </property>
+        <property name="registrationProcessService" ref="courseRegistratoinInitilizationService"/>
+    </bean>
+
+    <bean id="registrationVerificationListener" class="org.kuali.student.enrollment.registration.engine.listener.BaseRegistrationListener">
+        <property name="jmsTemplate" ref="jmsTemplate"/>
+        <property name="destinations">
+            <list>
+                <value>org.kuali.student.enrollment.registration.seatCheckQueue</value>
+            </list>
+        </property>
+        <property name="registrationProcessService" ref="courseRegistratoinVerificationService"/>
+    </bean>
+
+    <bean id="registrationSeatCheckListener" class="org.kuali.student.enrollment.registration.engine.listener.LastNodeRegistrationListener">
+        <property name="jmsTemplate" ref="jmsTemplate"/>
+        <property name="registrationProcessService" ref="courseRegistratoinSeatCheckService"/>
+    </bean>
+
+    <bean id="courseRegistratoinInitilizationService" class="org.kuali.student.enrollment.registration.engine.service.impl.CourseRegistrationInitilizationServiceImpl"/>
+    <bean id="courseRegistratoinVerificationService" class="org.kuali.student.enrollment.registration.engine.service.impl.CourseRegistrationVerificationServiceImpl"/>
+    <bean id="courseRegistratoinSeatCheckService" class="org.kuali.student.enrollment.registration.engine.service.impl.CourseRegistrationSeatCheckServiceImpl"/>
+
+
+</beans>
