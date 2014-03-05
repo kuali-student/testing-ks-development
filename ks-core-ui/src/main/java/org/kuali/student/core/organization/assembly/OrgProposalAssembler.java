@@ -16,7 +16,6 @@
 package org.kuali.student.core.organization.assembly;
 
 import org.apache.log4j.Logger;
-import org.kuali.student.common.conversion.util.R1R2ConverterUtil;
 import org.kuali.student.common.ui.client.mvc.DataModel;
 import org.kuali.student.common.ui.client.mvc.DataModelDefinition;
 import org.kuali.student.core.organization.assembly.data.server.OrgInfoData;
@@ -41,7 +40,7 @@ import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
 import org.kuali.student.r2.common.exceptions.ReadOnlyException;
 import org.kuali.student.r2.common.exceptions.VersionMismatchException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.core.organization.dto.OrgInfo;
 import org.kuali.student.r2.core.organization.dto.OrgOrgRelationInfo;
 import org.kuali.student.r2.core.organization.dto.OrgPositionRestrictionInfo;
@@ -56,7 +55,6 @@ import java.util.Map;
 import static org.kuali.student.r1.common.assembly.util.AssemblerUtils.addVersionIndicator;
 import static org.kuali.student.r1.common.assembly.util.AssemblerUtils.getVersionIndicator;
 import static org.kuali.student.r1.common.assembly.util.AssemblerUtils.setCreated;
-import static org.kuali.student.r1.common.assembly.util.AssemblerUtils.isDeleted;
 import static org.kuali.student.r1.common.assembly.util.AssemblerUtils.isModified;
 import static org.kuali.student.r1.common.assembly.util.AssemblerUtils.setUpdated;
 

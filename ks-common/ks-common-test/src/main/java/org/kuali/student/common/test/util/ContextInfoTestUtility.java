@@ -16,7 +16,7 @@ package org.kuali.student.common.test.util;
 
 import org.kuali.student.r2.common.dto.ContextInfo;
 import org.kuali.student.r2.common.dto.LocaleInfo;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 
 /**
  * This is a library of utility methods that can be used when working with the Context Info in unit tests.  

@@ -13,7 +13,6 @@ import org.kuali.student.r1.common.assembly.data.Metadata;
 import org.kuali.student.r1.common.assembly.util.IdTranslation;
 import org.kuali.student.r1.common.assembly.util.IdTranslator;
 import org.kuali.student.r2.common.dto.ContextInfo;
-import org.kuali.student.r2.common.util.ContextUtils;
 
 public class IdTranslatorFilter extends AbstractDataFilter {
     final static Logger LOG = Logger.getLogger(IdTranslatorFilter.class);

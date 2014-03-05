@@ -31,7 +31,6 @@ import org.kuali.student.r1.common.assembly.old.Assembler;
 import org.kuali.student.r1.common.assembly.old.data.SaveResult;
 import org.kuali.student.r1.common.rice.StudentIdentityConstants;
 import org.kuali.student.r1.common.rice.authorization.PermissionType;
-import org.kuali.student.r2.common.dto.ContextInfo;
 import org.kuali.student.common.ui.client.service.BaseDataOrchestrationRpcService;
 import org.kuali.student.common.ui.client.service.DataSaveResult;
 import org.kuali.student.common.ui.client.service.exceptions.OperationFailedException;
@@ -39,7 +38,6 @@ import org.kuali.student.common.ui.shared.IdAttributes;
 import org.kuali.student.common.util.security.SecurityUtils;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import org.kuali.student.r2.common.util.ContextUtils;
 
 /**
  * Generic implementation of data orchestration calls and workflow calls
