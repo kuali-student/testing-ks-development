@@ -135,12 +135,16 @@ public class TestProcessServiceMapImpl {
             fail("should have gotten a dependent objects exist exception");
         } catch (DependentObjectsExistException ex) {
             // expected
+            assertNotNull(ex.getMessage());
+            assertEquals("1 instructions are connected to this check", ex.getMessage());
         }
         try {
             processService.deleteProcess(process.getKey(), contextInfo);
             fail("should have gotten a dependent objects exist exception");
         } catch (DependentObjectsExistException ex) {
             // expected
+            assertNotNull(ex.getMessage());
+            assertEquals("1 instructions are connected to this process", ex.getMessage());
         }
 
         // delete category
@@ -152,6 +156,8 @@ public class TestProcessServiceMapImpl {
             fail("should not be able to get deleted category");
         } catch (DoesNotExistException e) {
             // expected
+            assertNotNull(e.getMessage());
+            assertEquals(category.getId(), e.getMessage());
         }
 
         // delete category
@@ -163,6 +169,8 @@ public class TestProcessServiceMapImpl {
             fail("should not be able to get deleted instruction");
         } catch (DoesNotExistException e) {
             // expected
+            assertNotNull(e.getMessage());
+            assertEquals(instruction.getId(), e.getMessage());
         }
 
 
@@ -175,6 +183,8 @@ public class TestProcessServiceMapImpl {
             fail("should not be able to get deleted process");
         } catch (DoesNotExistException e) {
             // expected
+            assertNotNull(e.getMessage());
+            assertEquals(process.getKey(), e.getMessage());
         }
 
 
@@ -187,6 +197,8 @@ public class TestProcessServiceMapImpl {
             fail("should not be able to get deleted check");
         } catch (DoesNotExistException e) {
             // expected
+            assertNotNull(e.getMessage());
+            assertEquals(check.getId(), e.getMessage());
         }
         
         // load data for additional testing
@@ -215,6 +227,8 @@ public class TestProcessServiceMapImpl {
             fail("should have thrown AlreadyExistsException");
         } catch (AlreadyExistsException ex) {
             // expected
+            assertNotNull(ex.getMessage());
+            assertEquals(category.getId(), ex.getMessage());
         }
 
         List<ProcessInfo> processes = processService.getProcessesForProcessCategory(category.getId(), contextInfo);
@@ -231,6 +245,8 @@ public class TestProcessServiceMapImpl {
             fail("should have gotten dependent object exists exception");
         } catch (DependentObjectsExistException ex) {
             // expected
+            assertNotNull(ex.getMessage());
+            assertEquals("1 process categories are connected to this process", ex.getMessage());
         }
 
         try {
@@ -238,6 +254,8 @@ public class TestProcessServiceMapImpl {
             fail("should have gotten dependent object exists exception");
         } catch (DependentObjectsExistException ex) {
             // expected
+            assertNotNull(ex.getMessage());
+            assertEquals("1 processes are connected to this category", ex.getMessage());
         }
 
         // remove process from category
@@ -246,10 +264,10 @@ public class TestProcessServiceMapImpl {
         assertTrue(status.getIsSuccess());
 
         processes = processService.getProcessesForProcessCategory(category.getId(), contextInfo);
-        assertEquals(0, processes.size());
+        assertTrue(processes.isEmpty());
 
         processCategories = processService.getProcessCategoriesForProcess(process.getKey(), contextInfo);
-        assertEquals(0, processCategories.size());
+        assertTrue(processCategories.isEmpty());
     }
 
     private ProcessInfo testCrudProcess()
@@ -609,7 +627,7 @@ public class TestProcessServiceMapImpl {
         }
         List<String> processCategoryIdsByType2 = processService.getProcessCategoryIdsByType(ProcessServiceConstants.PROCESS_CATEGORY_TYPE_KEY_CATEGORY +
                 "2", contextInfo);
-        assertEquals(0, processCategoryIdsByType2.size());
+        assertTrue(processCategoryIdsByType2.isEmpty());
 
         List<ProcessCategoryInfo> catInfosForProcess = processService.getProcessCategoriesForProcess(
                 ProcessServiceConstants.PROCESS_KEY_VIEW_GRADES_FOR_TERM, contextInfo);
@@ -626,13 +644,15 @@ public class TestProcessServiceMapImpl {
             fail("should have thrown a does not exist exception");
         } catch (DoesNotExistException e) {
             // should be here
+            assertNotNull(e.getMessage());
+            assertEquals(catInfosForProcess2.get(0).getId(), e.getMessage());
         }
 
         processService.removeProcessFromProcessCategory(ProcessServiceConstants.PROCESS_KEY_VIEW_GRADES_FOR_TERM,
                 ProcessServiceDataLoader.PROCESS_CATEGORY_ID_ACADEMIC_RECORD, contextInfo);
         catInfosForProcess = processService.getProcessCategoriesForProcess(
                 ProcessServiceConstants.PROCESS_KEY_VIEW_GRADES_FOR_TERM, contextInfo);
-        assertEquals(0, catInfosForProcess.size());
+        assertTrue(catInfosForProcess.isEmpty());
         processService.addProcessToProcessCategory(ProcessServiceConstants.PROCESS_KEY_VIEW_GRADES_FOR_TERM,
                 ProcessServiceDataLoader.PROCESS_CATEGORY_ID_ACADEMIC_RECORD, contextInfo);
         catInfosForProcess = processService.getProcessCategoriesForProcess(

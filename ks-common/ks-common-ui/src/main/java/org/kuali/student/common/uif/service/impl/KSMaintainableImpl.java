@@ -19,11 +19,14 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
 import org.kuali.rice.krad.maintenance.MaintainableImpl;
+import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.ObjectUtils;
 import org.kuali.student.common.uif.service.KSMaintainable;
+import org.kuali.student.r2.common.dto.AttributeInfo;
 import org.kuali.student.r2.common.dto.ContextInfo;
 import org.kuali.student.r2.common.exceptions.*;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.r2.common.messenger.util.MessengerConstants;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.core.class1.state.dto.StateInfo;
 import org.kuali.student.r2.core.class1.state.service.StateService;
 import org.kuali.student.r2.core.class1.type.dto.TypeInfo;
@@ -61,7 +64,12 @@ public class KSMaintainableImpl extends MaintainableImpl implements KSMaintainab
      * @return a new ContextInfo
      */
     public ContextInfo createContextInfo(){
-        return ContextUtils.createDefaultContextInfo();
+        ContextInfo contextInfo = ContextUtils.createDefaultContextInfo();
+        AttributeInfo attr = new AttributeInfo();
+        attr.setKey(MessengerConstants.USER_MESSAGE_PROCESS_ID);
+        attr.setValue(GlobalVariables.getUserSession().getKualiSessionId());
+        contextInfo.getAttributes().add(attr);
+        return contextInfo;
     }
 
     /**

@@ -27,7 +27,7 @@ import org.kuali.student.r1.common.assembly.transform.IdTranslatorFilter;
 import org.kuali.student.r2.common.exceptions.MissingParameterException;
 import org.kuali.student.r2.core.search.dto.*;
 import org.kuali.student.r2.core.search.service.SearchService;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;

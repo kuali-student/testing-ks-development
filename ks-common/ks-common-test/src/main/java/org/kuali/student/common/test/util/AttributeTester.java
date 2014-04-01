@@ -15,7 +15,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.student.r2.common.dto.AttributeInfo;
-import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +25,7 @@ import org.slf4j.LoggerFactory;
 public class AttributeTester {
 
     private static final Logger log = LoggerFactory.getLogger(AttributeTester.class);
-    
+
     public void add2ForCreate(List<AttributeInfo> expected) {
         AttributeInfo attr = new AttributeInfo();
         attr.setKey("attribute.key1");

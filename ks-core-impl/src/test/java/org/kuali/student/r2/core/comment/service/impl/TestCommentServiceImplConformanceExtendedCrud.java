@@ -34,6 +34,7 @@ import org.kuali.student.r2.core.comment.dto.CommentInfo;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 @Transactional
@@ -62,19 +63,15 @@ public abstract class TestCommentServiceImplConformanceExtendedCrud extends Test
     /*
         A method to set the fields for a Comment in a 'test create' section prior to calling the 'create' operation.
     */
-    public void testCrudComment_setDTOFieldsForTestCreate(CommentInfo expected) {
+    public void testCrudComment_setDTOFieldsForTestCreate(CommentInfo expected) throws ParseException {
         expected.setTypeKey("typeKey01");
         expected.setStateKey("stateKey01");
         expected.setCommentText(RichTextHelper.buildRichTextInfo("plain text updated", "formatted text!!!"));
         expected.setCommenterId("commenterId01");
         expected.setReferenceTypeKey("referenceTypeKey01");
         expected.setReferenceId("referenceId01");
-        try {
-            expected.setEffectiveDate(dateFormat.parse("20130611"));
-            expected.setExpirationDate(dateFormat.parse("21000101"));
-        } catch (ParseException e) {
-            throw new RuntimeException("Failed to parse date", e);
-        }
+        expected.setEffectiveDate(dateFormat.parse("20130611"));
+        expected.setExpirationDate(dateFormat.parse("21000101"));
     }
 
     /*
@@ -97,16 +94,12 @@ public abstract class TestCommentServiceImplConformanceExtendedCrud extends Test
     /*
         A method to set the fields for a Comment in a 'test update' section prior to calling the 'update' operation.
     */
-    public void testCrudComment_setDTOFieldsForTestUpdate(CommentInfo expected) {
+    public void testCrudComment_setDTOFieldsForTestUpdate(CommentInfo expected) throws ParseException {
         expected.setStateKey("stateKey_Updated");
         expected.setCommentText(RichTextHelper.buildRichTextInfo("plain text updated", "formatted text updated!!!"));
         expected.setCommenterId("commenterId_Updated");
-        try {
-            expected.setEffectiveDate(dateFormat.parse("20100611"));
-            expected.setExpirationDate(dateFormat.parse("21100101"));
-        } catch (ParseException e) {
-            throw new RuntimeException("Failed to parse date", e);
-        }
+        expected.setEffectiveDate(dateFormat.parse("20100611"));
+        expected.setExpirationDate(dateFormat.parse("21100101"));
     }
 
     /*
@@ -128,18 +121,14 @@ public abstract class TestCommentServiceImplConformanceExtendedCrud extends Test
         A method to set the fields for a Comment in the 'test read after update' section.
         This dto is another (second) dto object being created for other tests.
     */
-    public void testCrudComment_setDTOFieldsForTestReadAfterUpdate(CommentInfo expected) {
+    public void testCrudComment_setDTOFieldsForTestReadAfterUpdate(CommentInfo expected) throws ParseException {
         expected.setStateKey("stateKey_Updated2");
         expected.setCommentText(RichTextHelper.buildRichTextInfo("plain text updated2", "formatted text updated2!!!"));
         expected.setCommenterId("commenterId_Updated2");
         expected.setReferenceTypeKey("referenceTypeKey05");
         expected.setReferenceId("referenceId06");
-        try {
-            expected.setEffectiveDate(dateFormat.parse("20100610"));
-            expected.setExpirationDate(dateFormat.parse("21100111"));
-        } catch (ParseException e) {
-            throw new RuntimeException("Failed to parse date", e);
-        }
+        expected.setEffectiveDate(dateFormat.parse("20100610"));
+        expected.setExpirationDate(dateFormat.parse("21100111"));
     }
 
 
@@ -149,8 +138,7 @@ public abstract class TestCommentServiceImplConformanceExtendedCrud extends Test
 
     /* Method Name: getCommentsByReferenceAndType */
     @Test
-    public void test_getCommentsByReferenceAndType()
-            throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
+    public void test_getCommentsByReferenceAndType() throws Exception {
         loadData();
 
         List<CommentInfo> comments = testService.getCommentsByReferenceAndType("1", CommentDataLoader.REF_OBJECT_ONE_COMMENT_TYPE, contextInfo);
@@ -177,8 +165,7 @@ public abstract class TestCommentServiceImplConformanceExtendedCrud extends Test
 
     /* Method Name: deleteCommentsByReference */
     @Test
-    public void test_deleteCommentsByReference()
-            throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
+    public void test_deleteCommentsByReference() throws Exception {
         loadData();
 
         List<CommentInfo> comments = testService.getCommentsByReferenceAndType("5", CommentDataLoader.REF_OBJECT_TWO_COMMENT_TYPE, contextInfo);
@@ -187,7 +174,7 @@ public abstract class TestCommentServiceImplConformanceExtendedCrud extends Test
         testService.deleteCommentsByReference("5", CommentDataLoader.REF_OBJECT_TWO_COMMENT_TYPE, contextInfo);
 
         comments = testService.getCommentsByReferenceAndType("5", CommentDataLoader.REF_OBJECT_TWO_COMMENT_TYPE, contextInfo);
-        assertEquals(0, comments.size());
+        assertTrue(comments.isEmpty());
     }
 
     /* Method Name: validateComment */
@@ -196,12 +183,8 @@ public abstract class TestCommentServiceImplConformanceExtendedCrud extends Test
             throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
     }
 
-    private void loadData() throws OperationFailedException {
-        try {
-            dataLoader.beforeTest();
-        } catch (Exception e) {
-            throw new OperationFailedException("failed to load data", e);
-        }
+    private void loadData() throws Exception {
+        dataLoader.beforeTest();
     }
 }
 

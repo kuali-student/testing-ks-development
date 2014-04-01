@@ -31,6 +31,8 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -173,7 +175,8 @@ public class TestAcademicCalendarServiceImplWithMocks {
             this.acalService.getHolidayCalendar(orig.getId(), callContext);
             fail("should have thrown does not exist exception");
         } catch (DoesNotExistException ex) {
-            // expected
+            assertNotNull(ex.getMessage());
+            assertTrue(ex.getMessage().contains(orig.getId()));
         }
     }
 
@@ -251,7 +254,7 @@ public class TestAcademicCalendarServiceImplWithMocks {
         assertEquals(orig.getTypeKey(), info.getTypeKey());
         assertEquals(orig.getStateKey(), info.getStateKey());
         assertEquals(orig.getStartDate(), info.getStartDate());
-        assertEquals(null, info.getEndDate());
+        assertNull(info.getEndDate());
         assertEquals(orig.getIsAllDay(), info.getIsAllDay());
         assertEquals(orig.getIsDateRange(), info.getIsDateRange());
         assertEquals(orig.getIsInstructionalDay(), info.getIsInstructionalDay());
@@ -295,7 +298,8 @@ public class TestAcademicCalendarServiceImplWithMocks {
             this.acalService.getHoliday(orig.getId(), callContext);
             fail("should have thrown does not exist exception");
         } catch (DoesNotExistException ex) {
-            // expected
+            assertNotNull(ex.getMessage());
+            assertTrue(ex.getMessage().contains(orig.getId()));
         }
     }
 
@@ -455,7 +459,8 @@ public class TestAcademicCalendarServiceImplWithMocks {
             this.acalService.getAcademicCalendar(orig.getId(), callContext);
             fail("should have thrown does not exist exception");
         } catch (DoesNotExistException ex) {
-            // expected
+            assertNotNull(ex.getMessage());
+            assertTrue(ex.getMessage().contains(orig.getId()));
         }
         // clean up hcals
         this.acalService.deleteHolidayCalendar(hcal1.getId(), callContext);
@@ -533,7 +538,7 @@ public class TestAcademicCalendarServiceImplWithMocks {
         assertEquals(orig.getTypeKey(), info.getTypeKey());
         assertEquals(orig.getStateKey(), info.getStateKey());
         assertEquals(orig.getStartDate(), info.getStartDate());
-        assertEquals(null, info.getEndDate());
+        assertNull(info.getEndDate());
         assertEquals(orig.getIsAllDay(), info.getIsAllDay());
         assertEquals(orig.getIsDateRange(), info.getIsDateRange());
         new AttributeTester().check(orig.getAttributes(), info.getAttributes());
@@ -575,7 +580,8 @@ public class TestAcademicCalendarServiceImplWithMocks {
             this.acalService.getAcalEvent(orig.getId(), callContext);
             fail("should have thrown does not exist exception");
         } catch (DoesNotExistException ex) {
-            // expected
+            assertNotNull(ex.getMessage());
+            assertTrue(ex.getMessage().contains(orig.getId()));
         }
     }
 
@@ -705,7 +711,7 @@ public class TestAcademicCalendarServiceImplWithMocks {
         status = this.acalService.removeTermFromAcademicCalendar(acalInfo.getId(), info.getId(), callContext);
         assertEquals(Boolean.TRUE, status.getIsSuccess());
         terms = this.acalService.getTermsForAcademicCalendar(acalInfo.getId(), callContext);
-        assertEquals(0, terms.size());
+        assertTrue(terms.isEmpty());
 
         // test adding term to term
         TermInfo subTerm = new TermInfo();
@@ -740,9 +746,9 @@ public class TestAcademicCalendarServiceImplWithMocks {
         status = this.acalService.removeTermFromTerm(info.getId(), subTerm.getId(), callContext);
         assertEquals(Boolean.TRUE, status.getIsSuccess());
         terms = this.acalService.getIncludedTermsInTerm(info.getId(), callContext);
-        assertEquals(0, terms.size());
+        assertTrue(terms.isEmpty());
         terms = this.acalService.getContainingTerms(subTerm.getId(), callContext);
-        assertEquals(0, terms.size());
+        assertTrue(terms.isEmpty());
 
         // delete
         orig = info;
@@ -754,7 +760,8 @@ public class TestAcademicCalendarServiceImplWithMocks {
             this.acalService.getTerm(orig.getId(), callContext);
             fail("should have thrown does not exist exception");
         } catch (DoesNotExistException ex) {
-            // expected
+            assertNotNull(ex.getMessage());
+            assertTrue(ex.getMessage().contains(orig.getId()));
         }
     }
 
@@ -828,7 +835,7 @@ public class TestAcademicCalendarServiceImplWithMocks {
         assertEquals(orig.getTypeKey(), info.getTypeKey());
         assertEquals(orig.getStateKey(), info.getStateKey());
         assertEquals(orig.getStartDate(), info.getStartDate());
-        assertEquals(null, info.getEndDate());
+        assertNull(info.getEndDate());
         assertEquals(orig.getIsAllDay(), info.getIsAllDay());
         assertEquals(orig.getIsDateRange(), info.getIsDateRange());
         new AttributeTester().check(orig.getAttributes(), info.getAttributes());
@@ -870,7 +877,8 @@ public class TestAcademicCalendarServiceImplWithMocks {
             this.acalService.getKeyDate(orig.getId(), callContext);
             fail("should have thrown does not exist exception");
         } catch (DoesNotExistException ex) {
-            // expected
+            assertNotNull(ex.getMessage());
+            assertTrue(ex.getMessage().contains(orig.getId()));
         }
     }
 
@@ -886,10 +894,12 @@ public class TestAcademicCalendarServiceImplWithMocks {
         hcal.setAdminOrgId("testOrgId1");
 
         try{
-             hcal.setTypeKey("not configured hcal type");
-             acalService.createHolidayCalendar(hcal.getTypeKey(), hcal, callContext);
+            hcal.setTypeKey("not configured hcal type");
+            acalService.createHolidayCalendar(hcal.getTypeKey(), hcal, callContext);
+            fail("InvalidParameterException should have been thrown");
         }catch(InvalidParameterException ex){
-            System.out.println("expected exception: "  + ex.getMessage());
+            assertNotNull(ex.getMessage());
+            assertEquals("HolidayCalendar type " + hcal.getTypeKey() + " not right", ex.getMessage());
         }
 
         hcal.setTypeKey(AtpServiceConstants.ATP_HOLIDAY_CALENDAR_TYPE_KEY);
@@ -913,8 +923,10 @@ public class TestAcademicCalendarServiceImplWithMocks {
         try{
             holiday.setTypeKey("not configured holiday type");
             acalService.createHoliday(info.getId(), holiday.getTypeKey(), holiday, callContext);
+            fail("InvalidParameterException should have been thrown");
         }catch(InvalidParameterException ex){
-            System.out.println("expected exception: "  + ex.getMessage());
+            assertNotNull(ex.getMessage());
+            assertEquals("Holiday type not found: '" + holiday.getTypeKey() + "'", ex.getMessage());
         }
 
         holiday.setTypeKey(AtpServiceConstants.MILESTONE_INDEPENDENCE_DAY_OBSERVED_TYPE_KEY);
@@ -935,12 +947,8 @@ public class TestAcademicCalendarServiceImplWithMocks {
         acal.setEndDate(new Date(new Date().getTime() + 100000));
         acal.setAdminOrgId("testOrgId1");
 
-        try{
-            acal.setTypeKey("not configured acal type");
-            acalService.createAcademicCalendar(acal.getTypeKey(), acal, callContext);
-        }catch(InvalidParameterException ex){
-            System.out.println("expected exception: "  + ex.getMessage());
-        }
+        acal.setTypeKey("not configured acal type");
+        acalService.createAcademicCalendar(acal.getTypeKey(), acal, callContext);
 
         acal.setTypeKey(AtpServiceConstants.ATP_ACADEMIC_CALENDAR_TYPE_KEY);
         AcademicCalendarInfo acalInfo = acalService.createAcademicCalendar(acal.getTypeKey(), acal, callContext);
@@ -961,8 +969,10 @@ public class TestAcademicCalendarServiceImplWithMocks {
         try{
             event.setTypeKey("not configured acalevent type");
             acalService.createAcalEvent(acalInfo.getId(), event.getTypeKey(), event, callContext);
+            fail("InvalidParameterException should have been thrown");
         }catch(InvalidParameterException ex){
-            System.out.println("expected exception: "  + ex.getMessage());
+            assertNotNull(ex.getMessage());
+            assertEquals("AcalEvent type not found: '" + event.getTypeKey() + "'", ex.getMessage());
         }
 
         event.setTypeKey(AtpServiceConstants.MILESTONE_HOMECOMING_TYPE_KEY);
@@ -999,8 +1009,10 @@ public class TestAcademicCalendarServiceImplWithMocks {
         try{
             term.setTypeKey("not configured term type");
             acalService.createTerm(term.getTypeKey(), term, callContext);
+            fail("InvalidParameterException should have been thrown");
         }catch(InvalidParameterException ex){
-            System.out.println("expected exception: "  + ex.getMessage());
+            assertNotNull(ex.getMessage());
+            assertEquals("Term type not found: '" + term.getTypeKey() + "'", ex.getMessage());
         }
 
         term.setTypeKey(AtpServiceConstants.ATP_FALL_TYPE_KEY);
@@ -1022,8 +1034,10 @@ public class TestAcademicCalendarServiceImplWithMocks {
         try{
             kd.setTypeKey("not configured keydate type");
             acalService.createKeyDate(termInfo.getId(), kd.getTypeKey(), kd, callContext);
+            fail("InvalidParameterException should have been thrown");
         }catch(InvalidParameterException ex){
-            System.out.println("expected exception: "  + ex.getMessage());
+            assertNotNull(ex.getMessage());
+            assertEquals("Keydate type not found: '" + kd.getTypeKey() + "'", ex.getMessage());
         }
 
         kd.setTypeKey(AtpServiceConstants.MILESTONE_GRADES_DUE_TYPE_KEY);

@@ -159,15 +159,14 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			new MetaTester().checkAfterUpdate(expected.getMeta(), actual.getMeta());
 			
 			// Test that VersionMissmatchException's are being detected
-			boolean exception = false;
 			try {
-   			testService.updateSchedule ( original.getId(), original, contextInfo);
+       			testService.updateSchedule ( original.getId(), original, contextInfo);
+                fail("VersionMismatchException should have been thrown");
 			}
-			catch (VersionMismatchException e) { 
-   			exception = true;			}
-			
-			Assert.assertTrue("VersionMissmatchException was not detected!", exception);
-			
+			catch (VersionMismatchException e) {
+                assertNotNull(e.getMessage());
+            }
+
 			// -------------------------------------
 			// test read after update
 			// -------------------------------------
@@ -206,7 +205,7 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			List<ScheduleInfo> records = testService.getSchedulesByIds ( scheduleIds, contextInfo);
 			
 			assertEquals(scheduleIds.size(), records.size());
-			assertEquals(0, scheduleIds.size());
+            assertTrue(scheduleIds.isEmpty());
 			
 			// -------------------------------------
 			// test bulk get
@@ -225,7 +224,7 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 							fail(record.getId());
 					}
 			}
-			assertEquals(0, scheduleIds.size());
+            assertTrue(scheduleIds.isEmpty());
 			
 			// -------------------------------------
 			// test get by type
@@ -258,7 +257,8 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			}
 			catch (DoesNotExistException dnee)
 			{
-					// expected
+                assertNotNull(dnee.getMessage());
+                assertEquals(actual.getId(), dnee.getMessage());
 			}
 			
 	}
@@ -371,15 +371,14 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			new MetaTester().checkAfterUpdate(expected.getMeta(), actual.getMeta());
 			
 			// Test that VersionMissmatchException's are being detected
-			boolean exception = false;
 			try {
-   			testService.updateScheduleBatch ( original.getId(), original, contextInfo);
+   			    testService.updateScheduleBatch ( original.getId(), original, contextInfo);
+                fail("VersionMismatchException should have been thrown");
 			}
-			catch (VersionMismatchException e) { 
-   			exception = true;			}
-			
-			Assert.assertTrue("VersionMissmatchException was not detected!", exception);
-			
+			catch (VersionMismatchException e) {
+                assertNotNull(e.getMessage());
+            }
+
 			// -------------------------------------
 			// test read after update
 			// -------------------------------------
@@ -418,7 +417,7 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			List<ScheduleBatchInfo> records = null; // TODO INSERT CODE TO GET DTO BY IDS
 			
 			assertEquals(scheduleBatchIds.size(), records.size());
-			assertEquals(0, scheduleBatchIds.size());
+        assertTrue(scheduleBatchIds.isEmpty());
 			
 			// -------------------------------------
 			// test bulk get
@@ -437,7 +436,7 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 							fail(record.getId());
 					}
 			}
-			assertEquals(0, scheduleBatchIds.size());
+        assertTrue(scheduleBatchIds.isEmpty());
 			
 			// -------------------------------------
 			// test get by type
@@ -470,7 +469,8 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			}
 			catch (DoesNotExistException dnee)
 			{
-					// expected
+                assertNotNull(dnee.getMessage());
+                assertEquals(actual.getId(), dnee.getMessage());
 			}
 			
 	}
@@ -582,13 +582,12 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			new MetaTester().checkAfterUpdate(expected.getMeta(), actual.getMeta());
 			
 			// Test that VersionMissmatchException's are being detected
-			boolean exception = false;
 			try {
-   			testService.updateScheduleRequest ( original.getId(), original, contextInfo);
-			} catch (VersionMismatchException e) { 
-   			exception = true;			}
-			
-			Assert.assertTrue("VersionMissmatchException was not detected!", exception);
+   			    testService.updateScheduleRequest ( original.getId(), original, contextInfo);
+                fail("VersionMismatchException should have been thrown");
+            } catch (VersionMismatchException e) {
+                assertNotNull(e.getMessage());
+            }
 			
 			// -------------------------------------
 			// test read after update
@@ -628,7 +627,7 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			List<ScheduleRequestInfo> records = testService.getScheduleRequestsByIds ( scheduleRequestIds, contextInfo);
 			
 			assertEquals(scheduleRequestIds.size(), records.size());
-			assertEquals(0, scheduleRequestIds.size());
+        assertTrue(scheduleRequestIds.isEmpty());
 			
 			// -------------------------------------
 			// test bulk get
@@ -647,7 +646,7 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 							fail(record.getId());
 					}
 			}
-			assertEquals(0, scheduleRequestIds.size());
+        assertTrue(scheduleRequestIds.isEmpty());
 			
 			// -------------------------------------
 			// test get by type
@@ -680,7 +679,8 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			}
 			catch (DoesNotExistException dnee)
 			{
-					// expected
+                assertNotNull(dnee.getMessage());
+                assertEquals(actual.getId(), dnee.getMessage());
 			}
 			
 	}
@@ -795,14 +795,13 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			new MetaTester().checkAfterUpdate(expected.getMeta(), actual.getMeta());
 			
 			// Test that VersionMismatchException's are being detected
-			boolean exception = false;
 			try {
-   			testService.updateTimeSlot ( original.getId(), original, contextInfo);
-			} catch (VersionMismatchException e) { 
-   			exception = true;			}
-			
-			Assert.assertTrue("VersionMismatchException was not detected!", exception);
-			
+       			testService.updateTimeSlot ( original.getId(), original, contextInfo);
+                fail("VersionMismatchException should have been thrown");
+			} catch (VersionMismatchException e) {
+                assertNotNull(e.getMessage());
+            }
+
 			// -------------------------------------
 			// test read after update
 			// -------------------------------------
@@ -841,7 +840,7 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			List<TimeSlotInfo> records = testService.getTimeSlotsByIds ( timeSlotIds, contextInfo);
 			
 			assertEquals(timeSlotIds.size(), records.size());
-			assertEquals(0, timeSlotIds.size());
+        assertTrue(timeSlotIds.isEmpty());
 			
 			// -------------------------------------
 			// test bulk get
@@ -860,7 +859,7 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 							fail(record.getId());
 					}
 			}
-			assertEquals(0, timeSlotIds.size());
+        assertTrue(timeSlotIds.isEmpty());
 			
 			// -------------------------------------
 			// test get by type
@@ -893,7 +892,8 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			}
 			catch (DoesNotExistException dnee)
 			{
-					// expected
+                assertNotNull(dnee.getMessage());
+                assertEquals(actual.getId(), dnee.getMessage());
 			}
 			
 	}
@@ -1006,14 +1006,14 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			new MetaTester().checkAfterUpdate(expected.getMeta(), actual.getMeta());
 			
 			// Test that VersionMissmatchException's are being detected
-			boolean exception = false;
 			try {
-   			testService.updateScheduleTransaction ( original.getId(), original, contextInfo);
-			} catch (VersionMismatchException e) { 
-   			exception = true;			}
-			
-			Assert.assertTrue("VersionMissmatchException was not detected!", exception);
-			
+       			testService.updateScheduleTransaction ( original.getId(), original, contextInfo);
+                fail("VersionMismatchException should have been thrown");
+			} catch (VersionMismatchException e) {
+                assertNotNull(e.getMessage());
+                assertEquals(original.getId(), e.getMessage());
+            }
+
 			// -------------------------------------
 			// test read after update
 			// -------------------------------------
@@ -1052,7 +1052,7 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			List<ScheduleTransactionInfo> records = testService.getScheduleTransactionsByIds ( scheduleTransactionIds, contextInfo);
 			
 			assertEquals(scheduleTransactionIds.size(), records.size());
-			assertEquals(0, scheduleTransactionIds.size());
+        assertTrue(scheduleTransactionIds.isEmpty());
 			
 			// -------------------------------------
 			// test bulk get
@@ -1071,7 +1071,7 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 							fail(record.getId());
 					}
 			}
-			assertEquals(0, scheduleTransactionIds.size());
+        assertTrue(scheduleTransactionIds.isEmpty());
 			
 			// -------------------------------------
 			// test get by type
@@ -1104,7 +1104,8 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			}
 			catch (DoesNotExistException dnee)
 			{
-					// expected
+                assertNotNull(dnee.getMessage());
+                assertEquals(actual.getId(), dnee.getMessage());
 			}
 			
 	}
@@ -1216,16 +1217,14 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			new MetaTester().checkAfterUpdate(expected.getMeta(), actual.getMeta());
 			
 			// Test that VersionMissmatchException's are being detected
-			boolean exception = false;
             try {
                 testService.updateScheduleRequestSet(original.getId(), original,
                         contextInfo);
+                fail("VersionMismatchException should have been thrown");
             } catch (VersionMismatchException e) {
-                exception = true;
+                assertNotNull(e.getMessage());
             }
-			
-			Assert.assertTrue("VersionMissmatchException was not detected!", exception);
-			
+
 			// -------------------------------------
 			// test read after update
 			// -------------------------------------
@@ -1264,7 +1263,7 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			List<ScheduleRequestSetInfo> records = testService.getScheduleRequestSetsByIds ( scheduleRequestSetIds, contextInfo);
 			
 			assertEquals(scheduleRequestSetIds.size(), records.size());
-			assertEquals(0, scheduleRequestSetIds.size());
+        assertTrue(scheduleRequestSetIds.isEmpty());
 			
 			// -------------------------------------
 			// test bulk get
@@ -1283,7 +1282,7 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 							fail(record.getId());
 					}
 			}
-			assertEquals(0, scheduleRequestSetIds.size());
+        assertTrue(scheduleRequestSetIds.isEmpty());
 			
 			// -------------------------------------
 			// test get by type
@@ -1316,7 +1315,8 @@ public abstract class TestSchedulingServiceImplConformanceBaseCrud {
 			}
 			catch (DoesNotExistException dnee)
 			{
-					// expected
+                assertNotNull(dnee.getMessage());
+                assertEquals(actual.getId(), dnee.getMessage());
 			}
 			
 	}

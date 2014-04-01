@@ -726,7 +726,7 @@ cursor:auto;
 
 /************************************** APPLICATION HEADER **************************************/
 .ks-uif-viewHeader-container {
-  background-image:url('../images/header/bg_header.png');
+  background-color: #000;
   height: 49px;
 }
 
@@ -1984,7 +1984,7 @@ table.dataTable tr.even td.sorting_1 {
 }
 
 .ks-enableMouseOver{
-  z-index: 100;
+  z-index: 1;
 }
 
 /*
@@ -1994,4 +1994,23 @@ table.dataTable tr.even td.sorting_1 {
   width: 50%;
   float: left;
   margin-bottom: 10px;
+}
+
+/*
+  Positioning the meta-data on top of the dataTable causes the table showing on the right on some browsers.
+  Float left to show on the left.
+*/
+.dataTable{
+  float: left;
+}
+
+
+/*
+  classes for toggling items
+*/
+.on {
+}
+
+.off {
+  display: none;
 }

@@ -18,18 +18,16 @@ package org.kuali.student.r1.common.assembly.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.kuali.student.r1.common.assembly.data.AssemblyException;
 import org.kuali.student.r1.common.assembly.data.LookupMetadata;
 import org.kuali.student.r1.common.assembly.data.LookupParamMetadata;
 import org.kuali.student.r1.common.assembly.data.Metadata.WriteAccess;
 import org.kuali.student.r2.common.dto.ContextInfo;
-import org.kuali.student.r2.common.exceptions.MissingParameterException;
-import org.kuali.student.r2.common.exceptions.OperationFailedException;
-import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
 import org.kuali.student.r2.core.search.dto.*;
 import org.kuali.student.r2.core.search.service.SearchService;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Builds and issues SearchRequests parameterized with the information from LookupMetadata and the provided ID
@@ -43,7 +41,7 @@ public class IdTranslator {
 	private List<SearchParamInfo> additionalParams = new ArrayList<SearchParamInfo>();
     private SearchService searchDispatcher;
     
-    final Logger LOG = Logger.getLogger(IdTranslator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IdTranslator.class);
 
     public IdTranslator(SearchService searchDispatcher) throws AssemblyException {
     	this.searchDispatcher = searchDispatcher;
@@ -80,7 +78,7 @@ public class IdTranslator {
     		sr.setParams(searchParams); 		
     	}	
     	else {
-    		LOG.warn("Unable to build search request for " + lookupMetadata.getSearchTypeId() + " translation for id " + searchId);
+    		LOG.warn("Unable to build search request for {} translation for id {}", lookupMetadata.getSearchTypeId(), searchId);
     		
     	}
 

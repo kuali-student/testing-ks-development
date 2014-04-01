@@ -14,7 +14,7 @@ import org.kuali.student.r1.common.assembly.transform.MetadataFilter;
 import org.kuali.student.core.rice.authorization.CollaboratorHelper;
 import org.kuali.student.r1.core.workflow.dto.CollaboratorInfo;
 import org.kuali.student.r1.core.workflow.dto.WorkflowPersonInfo;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.core.proposal.dto.ProposalInfo;
 import org.kuali.student.r2.core.proposal.service.ProposalService;
 

@@ -22,7 +22,9 @@
 
     <bean id="KSTheme" abstract="true" parent="KSTheme-parentBean"/>
     <bean id="KSTheme-parentBean" parent="Uif-BaseTheme">
-        <property name="cssFiles">
+        <property name="usesThemeBuilder" value="false"/>
+        <property name="minCssFile" value="themes/ksboot/stylesheets/ksboot.@{#ConfigProperties['project.version']}.min.css"/>
+        <property name="minCssSourceFiles">
             <list merge="true">
                 <value>plugins/tooltip/ks.jquery.bubblepopup.css</value>
                 <value>themes/ksboot/stylesheets/enroll.css</value>
@@ -31,13 +33,17 @@
         </property>
         <!--TODO: KSENROLL-9721: Need to create a confirmation dialog in browser as opposed to make a server side round trip-->
         <!--We need to remove <value>themes/ksboot/scripts/krad.request.js</value> from the cript files after the rice fix-->
-        <property name="scriptFiles">
+        <property name="minScriptFile" value="themes/ksboot/scripts/ksboot.@{#ConfigProperties['project.version']}.min.js"/>
+        <property name="minScriptSourceFiles">
             <list merge="true">
-                <value>themes/bootstrap/scripts/bootstrap.js</value>
+                <value>themes/ksboot/scripts/bootstrap.js</value>
                 <value>themes/ksboot/scripts/enroll.js</value>
                 <value>krad/scripts/ks.krad.override.js</value>
                 <value>themes/ksboot/scripts/krad.request.js</value>
                 <value>krad/scripts/ks.krad.widget.js</value>
+                <value>themes/ksboot/scripts/amq_jquery_adapter.js</value>
+                <value>themes/ksboot/scripts/amq.js</value>
+                <value>themes/ksboot/scripts/behaviour.js</value>
             </list>
         </property>
     </bean>
@@ -58,6 +64,10 @@
         </property>
     </bean>
 
+    <bean id="KS-Uif-FormView-ApplicationHeader" parent="Uif-GlobalApplicationHeader-parentBean"
+          p:template="/ks-common/WEB-INF/ftl/ksApplicationHeader.ftl" p:render="true"
+          p:templateName="ks_applicationHeader"/>
+
     <bean id="KS-Uif-FormView" abstract="true" parent="Uif-FormView"
           class="org.kuali.student.common.uif.view.KSUifFormView">
         <property name="theme">
@@ -68,9 +78,7 @@
         <property name="stickyApplicationHeader" value="false"/>
         <property name="stickyHeader" value="true"/>
         <property name="applicationHeader">
-            <bean parent="Uif-GlobalApplicationHeader-parentBean"
-                  p:template="/ks-common/WEB-INF/ftl/ksApplicationHeader.ftl" p:render="true"
-                  p:templateName="ks_applicationHeader"/>
+            <bean parent="KS-Uif-FormView-ApplicationHeader"/>
         </property>
         <property name="dialogs">
             <list>
@@ -195,9 +203,7 @@
         <property name="stickyApplicationHeader" value="false"/>
         <property name="stickyHeader" value="true"/>
         <property name="applicationHeader">
-            <bean parent="Uif-GlobalApplicationHeader-parentBean"
-                  p:template="/ks-common/WEB-INF/ftl/ksApplicationHeader.ftl" p:render="true"
-                  p:templateName="ks_applicationHeader"/>
+            <bean parent="KS-Uif-FormView-ApplicationHeader"/>
         </property>
         <property name="header.cssClasses">
             <list merge="true">
@@ -500,44 +506,44 @@
     <bean id="Unified-Right-Header-Group-Action-Copy" parent="KS-Uif-ActionLink" p:actionLabel="Copy"
           p:actionImagePlacement="LEFT">
         <property name="actionImage">
-            <bean parent="Uif-Image" p:altText="Copy" p:title="Copy" p:style="ks-fontello-icon-docs"/>
+            <bean parent="Uif-Image" p:altText="Copy" p:title="Copy" p:source="" p:cssClasses="ks-fontello-icon-docs"/>
         </property>
     </bean>
     <bean id="Unified-Right-Header-Group-Action-Comment" parent="KS-Uif-ActionLink" p:actionLabel="Comment"
           p:actionImagePlacement="LEFT">
         <property name="actionImage">
-            <bean parent="Uif-Image" p:altText="Comment" p:title="Comment" p:style="ks-fontello-icon-comment"/>
+            <bean parent="Uif-Image" p:altText="Comment" p:title="Comment" p:source="" p:cssClasses="ks-fontello-icon-comment"/>
         </property>
     </bean>
     <bean id="Unified-Right-Header-Group-Action-Print" parent="KS-Uif-ActionLink" p:actionLabel="Print"
           p:actionImagePlacement="LEFT">
         <property name="actionImage">
-            <bean parent="Uif-Image" p:altText="Print" p:title="Print" p:style="ks-fontello-icon-print"/>
+            <bean parent="Uif-Image" p:altText="Print" p:title="Print" p:source="" p:cssClasses="ks-fontello-icon-print"/>
         </property>
     </bean>
     <bean id="Unified-Right-Header-Group-Action-Delete" parent="KS-Uif-ActionLink" p:actionLabel="Delete"
           p:actionImagePlacement="LEFT">
         <property name="actionImage">
-            <bean parent="Uif-Image" p:altText="Delete" p:title="Delete" p:style="ks-fontello-icon-cancel"/>
+            <bean parent="Uif-Image" p:altText="Delete" p:title="Delete" p:source="" p:cssClasses="ks-fontello-icon-cancel"/>
         </property>
     </bean>
     <bean id="Unified-Right-Header-Group-Action-Edit" parent="KS-Uif-ActionLink" p:actionLabel="Edit"
           p:actionImagePlacement="LEFT">
         <property name="actionImage">
-            <bean parent="Uif-Image" p:altText="Edit" p:title="Edit" p:style="ks-fontello-icon-pencil"/>
+            <bean parent="Uif-Image" p:altText="Edit" p:title="Edit" p:source="" p:cssClasses="ks-fontello-icon-pencil"/>
         </property>
     </bean>
     <bean id="Unified-Right-Header-Group-Action-Manage" parent="KS-Uif-ActionLink" p:actionLabel="Manage"
           p:actionImagePlacement="LEFT">
         <property name="actionImage">
-            <bean parent="Uif-Image" p:altText="Manage" p:title="Manage" p:style="ks-fontello-icon-wrench"/>
+            <bean parent="Uif-Image" p:altText="Manage" p:title="Manage" p:source="" p:cssClasses="ks-fontello-icon-wrench"/>
         </property>
     </bean>
     <bean id="Unified-Right-Header-Group-Action-MakeOfficial" parent="KS-Uif-ActionLink" p:actionLabel="Make Official"
           p:actionImagePlacement="LEFT">
         <property name="actionImage">
             <bean parent="Uif-Image" p:altText="Make Official" p:title="Make Official"
-                  p:style="ks-fontello-icon-check"/>
+                  p:source="" p:cssClasses="ks-fontello-icon-check"/>
         </property>
     </bean>
 
@@ -595,48 +601,48 @@
 
     <bean id="KS-Uif-View-NavigationActionLink" parent="Uif-KS-NavigationActionLink-parentBean" abstract="true" p:title="View">
         <property name="actionImage">
-            <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-eye"/>
+            <bean parent="Uif-Image" p:source="" p:cssClasses="ks-fontello-icon-eye"/>
         </property>
         <property name="actionImagePlacement" value="IMAGE_ONLY"/>
     </bean>
 
     <bean id="KS-Uif-Edit-NavigationActionLink" parent="Uif-KS-NavigationActionLink-parentBean" abstract="true" p:title="Edit">
         <property name="actionImage">
-            <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-pencil"/>
+            <bean parent="Uif-Image" p:source="" p:cssClasses="ks-fontello-icon-pencil"/>
         </property>
         <property name="actionImagePlacement" value="IMAGE_ONLY"/>
     </bean>
 
     <bean id="KS-Uif-Copy-NavigationActionLink" parent="Uif-KS-NavigationActionLink-parentBean" abstract="true" p:title="Copy">
         <property name="actionImage">
-            <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-docs"/>
+            <bean parent="Uif-Image" p:source="" p:cssClasses="ks-fontello-icon-docs" />
         </property>
         <property name="actionImagePlacement" value="IMAGE_ONLY"/>
     </bean>
 
     <bean id="KS-Uif-Delete-NavigationActionLink" parent="Uif-KS-NavigationActionLink-parentBean" abstract="true" p:title="Delete">
         <property name="actionImage">
-            <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-cancel"/>
+            <bean parent="Uif-Image" p:source="" p:cssClasses="ks-fontello-icon-cancel"/>
         </property>
         <property name="actionImagePlacement" value="IMAGE_ONLY"/>
     </bean>
 
     <bean id="KS-Uif-Manage-NavigationActionLink" parent="Uif-KS-NavigationActionLink-parentBean" abstract="true" p:title="Manage">
         <property name="actionImage">
-            <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-wrench"/>
+            <bean parent="Uif-Image" p:source="" p:cssClasses="ks-fontello-icon-wrench"/>
         </property>
         <property name="actionImagePlacement" value="IMAGE_ONLY"/>
     </bean>
 
     <bean id="KS-Uif-Requisite-NavigationActionLink" parent="Uif-KS-NavigationActionLink-parentBean" abstract="true">
         <property name="actionImage">
-            <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-clipboard"/>
+            <bean parent="Uif-Image" p:source="" p:cssClasses="ks-fontello-icon-clipboard"/>
         </property>
     </bean>
 
     <bean id="KS-Uif-Delete-ActionLink" parent="KS-Uif-ActionLink" p:title="Delete">
         <property name="actionImage">
-            <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-cancel"/>
+            <bean parent="Uif-Image" p:source="" p:cssClasses="ks-fontello-icon-cancel"/>
         </property>
         <property name="actionImagePlacement" value="IMAGE_ONLY"/>
     </bean>
@@ -721,7 +727,7 @@
         <property name="actionImagePlacement" value="LEFT"/>
         <property name="methodToCall" value="addBlankLine"/>
         <property name="actionEvent" value="addBlankLine"/>
-        <property name="additionalCssClasses" value="ks-fontello-icon-plus"/>
+        <property name="additionalCssClasses" value="ks-fontello-icon-plus-1"/>
     </bean>
 
     <!-- TODO: KSENROLL-8478 temporarily overriding KRAD's Inquiry as it was messing up the hover over. should be resolved in Rice 2.3.1 -->

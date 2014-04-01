@@ -494,14 +494,14 @@ function rgbToHex(r, g, b) {
  This function changes the UifImage components to bootsrtap links
  It only converts images that have their styles starting with the word icon
 
- It was originally using the src attribute but according to Cody this might cause a problem
- with KRAD. I think if using the src attribute is not causing any problem for the KRAD we should
- go back to using the src attribute.
+ I am now using class since the style is not rendered in IE.
  */
 function addBootstrapImageToLink() {
-    jQuery("img[style^=ks-fontello-icon-]").each(function () {
-        /*Style is used instead of src to prevent errors in krad*/
-        var src = jQuery(this).attr('style');
+    jQuery("img[class*=ks-fontello-icon-]").each(function () {
+        /*Style is not rendered in IE in krad. Use class*/
+        var src = jQuery.grep(this.className.split(" "), function(v, i){
+            return v.indexOf('ks-fontello-icon-') === 0;
+        }).join();
         var parent = jQuery(this).parent();
         if (jQuery(parent).is("span")) {
             parent.addClass(src);
@@ -842,7 +842,7 @@ function fixActionLinkJumpToIds(actionLinksId, jumpToElementId) {
  Capture click events on rows in datatables
  */
 jQuery(document).on("click", ".dataTable tbody tr", function (e) {
-    if (jQuery(e.target).is(":checkbox") || jQuery(e.target).is("a")) {
+    if (jQuery(e.target).is(":checkbox") || jQuery(e.target).is("a") || jQuery(e.target).is("i")) {
 
         // stop the bubbling to prevent firing the row's click event
         e.stopPropagation();
@@ -876,10 +876,12 @@ jQuery(function () {
 /*
     Apply changes to the DOM as elements are inserted.
  */
-jQuery(document).on('DOMNodeInserted', function(e) {
+jQuery(document).on('DOMNodeInserted', function (e) {
     var element = e.target;
-    if(jQuery(element).is('div.uif-page')){
+    if (jQuery(element).is('div.uif-page')) {
         handleEventforDisabledElements();
+        addBootstrapImageToLink();
+    } else if (jQuery(element).is('div.uif-tableCollectionSection')) {
         addBootstrapImageToLink();
     }
 });
@@ -902,13 +904,17 @@ function handleEventforDisabledElements() {
         if (jQuery(div).length == 0) {
             div = jQuery('<div id="' + divId + '" class="tree-bar-button-container uif-boxLayoutHorizontalItem" />');
             jQuery(this).after(div);
-            jQuery('[data-for=' + id + ']').each(function(){
+            jQuery('[data-for=' + id + ']').each(function () {
                 var dataValue = jQuery(this).val();
                 dataValue = dataValue.replace(id, divId);
-                    eval(dataValue);
+                if (jQuery.browser.msie) {
+                    eval("new " + dataValue + ";");
+                } else {
+                eval(dataValue);
+                }
             });
         }
-        jQuery(div).css({"position": "absolute", "top": jQuery(this).offset(top) + "px", "left": jQuery(this).offset().left + "px"});
+        jQuery(div).css({"position": "absolute", "top": jQuery(this).offset(top) + "px", "left": jQuery(this).offset().left + "px", "background": "transparent"});
         jQuery(div).height(jQuery(this).height());
         jQuery(div).width(jQuery(this).width());
         if (jQuery(this).is(':disabled')) {
@@ -923,6 +929,91 @@ function handleEventforDisabledElements() {
     });
 }
 
-function createWatermark(id, watermark) {
-    jQuery("#" + id).watermark(watermark, {className: 'ks-watermark'});
+function toggleRow(event){
+    var row = jQuery(event.target).closest('tr');
+    jQuery(row).find('.toggleable-element').each(function(){
+        if(jQuery(this).hasClass("on")) {
+            jQuery(this).switchClass("on", "off");
+        } else {
+            jQuery(this).switchClass("off", "on");
+        };
+    });
+}
+
+function getSelectedCollectionPathAndIndex(row){
+    var found = false;
+    var selectedCollectionPathAndIndex = {
+        selectedCollectionPath : "",
+        selectedLineIndex : -1
+    };
+
+    jQuery(row).find('.toggleable-element.on').each(function(){
+        jQuery(this).find('input').each(function(){
+            var name = jQuery(this).attr("name");
+            if(name != undefined){console.log(name);
+                var splitedName = name.split(".");
+                var clusterName = splitedName[0];
+                var wrapperName = splitedName[1].split('[')[0];
+                selectedCollectionPathAndIndex['selectedCollectionPath'] = clusterName + "." + wrapperName;
+                var index = splitedName[1].match(/\[(\d+)\]/)[1];
+                selectedCollectionPathAndIndex['selectedLineIndex'] = index;
+                found = true;
+                return false;
+            }
+        });
+        if(found) return false;
+    });
+    return selectedCollectionPathAndIndex;
+}
+
+function saveRSI(event, baseUrl){
+    var row = jQuery(event.target).closest('tr');
+    var index = jQuery(row).parent().index() - 1;
+
+    var selectedCollectionPathAndIndex = getSelectedCollectionPathAndIndex(row);
+
+    var formData = jQuery('#kualiForm').serialize() + '&' + jQuery.param(selectedCollectionPathAndIndex);
+
+    jQuery.ajax({
+        dataType:"json",
+        url:baseUrl + "/kr-krad/courseOfferingManagement?methodToCall=saveExamOfferingRSIJSON",
+        type:"POST",
+        data:formData,
+        success:function (data, textStatus, jqXHR) {
+            updateTable(event, data);
+        }
+    });
+}
+
+function updateTable(event, data){
+    var row = jQuery(event.target).closest('tr');
+    jQuery(row).find('.toggleable-element.off').each(function(){
+        var id = jQuery(this).attr("id");
+        if(id != undefined){
+            id = id.split("_id")[0];
+            var span = jQuery(this).find('span.uif-readOnlyContent');
+            var value = data[id];
+            jQuery(span).text(value);
+        }
+    });
+    toggleRow(event);
+}
+
+/**
+ * auto finish the time field with the format hh:mm am
+ */
+function timeFieldOnBlur(event){
+    var timeField = jQuery(event.target);
+    if (timeField.val() == ''){
+        return;
+    }
+
+    // Parse hours and minutes and am/pm
+    var timeMap = parseTimeString(timeField.val());
+    if (!timeMap) {
+        return;
+    }
+    var formattedTimeFieldVal = formatTime(timeMap);
+    timeField.val(formattedTimeFieldVal);
+    validateFieldValue(timeField);
 }

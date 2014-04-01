@@ -1,21 +1,7 @@
 package org.kuali.student.r2.core.room.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.annotation.Resource;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kuali.student.r2.common.dto.AttributeInfo;
@@ -30,28 +16,29 @@ import org.kuali.student.r2.core.room.dto.BuildingInfo;
 import org.kuali.student.r2.core.room.dto.RoomInfo;
 import org.kuali.student.r2.core.room.dto.RoomResponsibleOrgInfo;
 import org.kuali.student.r2.core.room.service.RoomService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Gordon
- * Date: 11/8/12
- * Time: 3:28 PM
- * To change this template use File | Settings | File Templates.
- */
+import javax.annotation.Resource;
+import javax.persistence.PersistenceException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:room-test-context.xml"})
 @TransactionConfiguration(transactionManager = "JtaTxManager", defaultRollback = true)
 @Transactional
 public class TestRoomServiceImpl {
-    
-    private static final Logger log = LoggerFactory.getLogger(TestRoomServiceImpl.class);
     
     @Resource
     private RoomService roomService;
@@ -70,12 +57,10 @@ public class TestRoomServiceImpl {
         t2.setCurrentDate( null );
     }
 
-    @Ignore
     private BuildingInfo createBuildingInfo() {
         return createBuildingInfo("ARM", "1", "Armory", "org.kuali.building.state.Active", "org.kuali.building.type.Miscellaneous", "plain description", "formatted description");
     }
 
-    @Ignore
     private BuildingInfo createBuildingInfo(String buildingCode, String campusKey, String name, String stateKey, String typeKey, String plain, String formatted) {
         BuildingInfo buildingInfo = new BuildingInfo();
 
@@ -89,7 +74,6 @@ public class TestRoomServiceImpl {
         return buildingInfo;
     }
 
-    @Ignore
     private RoomInfo createRoomInfo(BuildingInfo building, String floor, String roomCode, String name, String state, String type, String descPlain, String descFormatted) {
         RoomInfo room = new RoomInfo();
 
@@ -104,7 +88,6 @@ public class TestRoomServiceImpl {
         return room;
     }
 
-    @Ignore
     private RoomResponsibleOrgInfo createRoomResponsibleOrgInfo(String roomId, String orgId, String state, String type, Date effDate, Date expDate) {
         RoomResponsibleOrgInfo roomResponsibleOrgInfo = new RoomResponsibleOrgInfo();
 
@@ -118,7 +101,6 @@ public class TestRoomServiceImpl {
         return roomResponsibleOrgInfo;
     }
 
-    @Ignore
     private BuildingInfo addAttributeInfo(BuildingInfo buildingInfo, String name, String value) {
         if (buildingInfo.getAttributes() == null) {
             buildingInfo.setAttributes(new ArrayList<AttributeInfo>(1));
@@ -129,28 +111,6 @@ public class TestRoomServiceImpl {
         return buildingInfo;
     }
 
-    @Ignore
-    private RoomInfo addAttributeInfo(RoomInfo room, String name, String value) {
-        if (room.getAttributes() == null) {
-            room.setAttributes( new ArrayList<AttributeInfo>(1));
-        }
-
-        room.getAttributes().add(new AttributeInfo(name, value));
-
-        return room;
-    }
-
-    @Ignore RoomResponsibleOrgInfo addAttributeInfo(RoomResponsibleOrgInfo info, String name, String value) {
-        if (info.getAttributes() == null) {
-            info.setAttributes( new ArrayList<AttributeInfo>(1));
-        }
-
-        info.getAttributes().add(new AttributeInfo(name, value));
-
-        return info;
-    }
-
-    @Ignore
     public boolean equals(BuildingInfo b1, BuildingInfo b2) {
         assertEquals(b1.getBuildingCode(), b2.getBuildingCode());
         assertEquals(b1.getCampusKey(), b2.getCampusKey());
@@ -177,7 +137,7 @@ public class TestRoomServiceImpl {
     }
 
     @Test
-    public void testCreateBuilding() {
+    public void testCreateBuilding() throws Exception {
         BuildingInfo buildingInfo = createBuildingInfo();
 
         //test 1, exception if no ContextInfo
@@ -185,9 +145,8 @@ public class TestRoomServiceImpl {
             roomService.createBuilding(buildingInfo.getTypeKey(), buildingInfo, null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test invalid values in ContextInfo
@@ -195,9 +154,8 @@ public class TestRoomServiceImpl {
             roomService.createBuilding(buildingInfo.getTypeKey(), buildingInfo, t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test invalid value in contextInfo
@@ -205,9 +163,8 @@ public class TestRoomServiceImpl {
             roomService.createBuilding(buildingInfo.getTypeKey(), buildingInfo, t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
 
@@ -216,128 +173,91 @@ public class TestRoomServiceImpl {
             roomService.createBuilding(buildingInfo.getTypeKey(), null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("Object is missing!", e.getMessage());
         }
 
         //ok if no TypeKey specified
-        try {
-            roomService.createBuilding(null, buildingInfo, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        roomService.createBuilding(null, buildingInfo, contextInfo);
 
         //ok if blank TypeKey specified
-        try {
-            roomService.createBuilding("", buildingInfo, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        roomService.createBuilding("", buildingInfo, contextInfo);
 
         //typical usage
-        try {
-            roomService.createBuilding(buildingInfo.getTypeKey(), buildingInfo, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        roomService.createBuilding(buildingInfo.getTypeKey(), buildingInfo, contextInfo);
 
         //ok if new type key specified
-        try {
-            BuildingInfo buildingInfo1 = roomService.createBuilding("org.kuali.building.type.Extracurricular", buildingInfo, contextInfo);
-            assertEquals(buildingInfo.getName(), buildingInfo1.getName() );
-            assertFalse(buildingInfo1.getTypeKey().equals(buildingInfo.getTypeKey()));
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        BuildingInfo buildingInfo1 = roomService.createBuilding("org.kuali.building.type.Extracurricular", buildingInfo, contextInfo);
+        assertEquals(buildingInfo.getName(), buildingInfo1.getName() );
+        assertFalse(buildingInfo1.getTypeKey().equals(buildingInfo.getTypeKey()));
     }
 
     @Test
-    public void testGetBuilding() {
+    public void testGetBuilding() throws Exception {
         contextInfo.setCurrentDate( new Date() );
         contextInfo.setPrincipalId("createBuilding");
         BuildingInfo buildingInfo = createBuildingInfo();
-        try {
-            buildingInfo = roomService.createBuilding("", buildingInfo, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        buildingInfo = roomService.createBuilding("", buildingInfo, contextInfo);
 
         try {
             roomService.getBuilding(buildingInfo.getId(), null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         try {
             roomService.getBuilding(buildingInfo.getId(), t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         try {
             roomService.getBuilding(buildingInfo.getId(), t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         try {
             roomService.getBuilding(null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("id key is missing!", e.getMessage());
         }
 
         try {
             roomService.getBuilding("", contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("id key is missing!", e.getMessage());
         }
 
-        BuildingInfo getBuildingInfo = null;
+        BuildingInfo getBuildingInfo;
 
-        try {
-            getBuildingInfo = roomService.getBuilding(buildingInfo.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        getBuildingInfo = roomService.getBuilding(buildingInfo.getId(), contextInfo);
 
         assertTrue(equals(buildingInfo, getBuildingInfo));
     }
 
     @Test
-    public void testUpdateBuilding() {
-        contextInfo.setCurrentDate( new Date() );
+    public void testUpdateBuilding() throws Exception {
+        final long currentTime = System.currentTimeMillis();
+        contextInfo.setCurrentDate(new Date(currentTime));
         contextInfo.setPrincipalId( "createBuilding" );
-        BuildingInfo buildingInfo = null;
-        try {
-            buildingInfo = roomService.createBuilding("", createBuildingInfo(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        BuildingInfo buildingInfo;
+        buildingInfo = roomService.createBuilding("", createBuildingInfo(), contextInfo);
 
         assertEquals("0", buildingInfo.getMeta().getVersionInd());
         
-        BuildingInfo originalBuildingInfo = null;
-        try {
-            originalBuildingInfo = roomService.getBuilding(buildingInfo.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        BuildingInfo originalBuildingInfo;
+        originalBuildingInfo = roomService.getBuilding(buildingInfo.getId(), contextInfo);
 
         assertEquals("0", buildingInfo.getMeta().getVersionInd());
         
@@ -346,9 +266,8 @@ public class TestRoomServiceImpl {
             roomService.updateBuilding(buildingInfo.getId(), buildingInfo, null);
             fail("Expected exception not thrown"); //shouldn't get here
         } catch(MissingParameterException e) {
-            //exception we're expecting
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test no principal id
@@ -356,9 +275,8 @@ public class TestRoomServiceImpl {
             roomService.updateBuilding(buildingInfo.getTypeKey(), buildingInfo, t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test no current date
@@ -366,9 +284,8 @@ public class TestRoomServiceImpl {
             roomService.updateBuilding(buildingInfo.getTypeKey(), buildingInfo, t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //exception if no BuildingInfo
@@ -376,9 +293,8 @@ public class TestRoomServiceImpl {
             roomService.updateBuilding(null, null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("Object is missing!", e.getMessage());
         }
 
         //test 5, an actual update
@@ -390,21 +306,12 @@ public class TestRoomServiceImpl {
         buildingInfo.setTypeKey("org.kuali.building.type.Recreational");
 
         contextInfo.setPrincipalId("testUpdateBuilding");
-        //sleep for 1 sec to allow Time to change
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
-        contextInfo.setCurrentDate(new Date());
+        contextInfo.setCurrentDate(new Date(currentTime + 1000L));
 
 
-        BuildingInfo newBuildingInfo = null;
-        try {
-            newBuildingInfo = roomService.updateBuilding(buildingInfo.getId(), buildingInfo, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
-        
+        BuildingInfo newBuildingInfo;
+        newBuildingInfo = roomService.updateBuilding(buildingInfo.getId(), buildingInfo, contextInfo);
+
         assertEquals("1", newBuildingInfo.getMeta().getVersionInd());
         
         assertEquals(originalBuildingInfo.getId(), newBuildingInfo.getId());
@@ -425,66 +332,36 @@ public class TestRoomServiceImpl {
         assertFalse(originalBuildingInfo.getTypeKey().equals(buildingInfo.getTypeKey()));
 
         //ok if no Id specified
-        //sleep for 1 sec to allow Time to change
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
-        contextInfo.setCurrentDate(new Date());
-        BuildingInfo newNewBuildingInfo = null;
-        try {
-            newNewBuildingInfo = roomService.updateBuilding(newBuildingInfo.getId(), newBuildingInfo, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
-        
+        contextInfo.setCurrentDate(new Date(currentTime + 2000L));
+        BuildingInfo newNewBuildingInfo;
+        newNewBuildingInfo = roomService.updateBuilding(newBuildingInfo.getId(), newBuildingInfo, contextInfo);
+
         assertEquals("2", newNewBuildingInfo.getMeta().getVersionInd());
         
         assertFalse(newNewBuildingInfo.getMeta().getUpdateTime().equals(newBuildingInfo.getMeta().getUpdateTime()));
 
         //test ok if Id is blank
-        //sleep for 1 sec to allow Time to change
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
-        contextInfo.setCurrentDate(new Date());
-        BuildingInfo newNewNewBuildingInfo = null;
-        try {
-            newNewNewBuildingInfo = roomService.updateBuilding(newNewBuildingInfo.getId(), newNewBuildingInfo, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        contextInfo.setCurrentDate(new Date(currentTime + 3000L));
+        BuildingInfo newNewNewBuildingInfo;
+        newNewNewBuildingInfo = roomService.updateBuilding(newNewBuildingInfo.getId(), newNewBuildingInfo, contextInfo);
         assertFalse(newNewNewBuildingInfo.getMeta().getUpdateTime().equals(newNewBuildingInfo.getMeta().getUpdateTime()));
     }
 
     @Test
-    public void testGetBuildingIdsbyCampus() {
+    public void testGetBuildingIdsbyCampus() throws Exception {
         BuildingInfo b1 = createBuildingInfo("ARM", "1", "Armory", "active", "recreation", "the armory", "the armory");
         BuildingInfo b2 = createBuildingInfo("MIT", "2", "Armory", "active", "administration", "Mitchell", "Mitchell");
 
-        try {
-            b1 = roomService.createBuilding(null, b1, contextInfo);
-            b1 = roomService.getBuilding(b1.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
-
-        try {
-            b2 = roomService.createBuilding(null, b2, contextInfo);
-            b2 = roomService.getBuilding(b2.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        roomService.createBuilding(null, b1, contextInfo);
+        roomService.createBuilding(null, b2, contextInfo);
 
         //test null contextInfo
         try {
             roomService.getBuildingIdsByCampus("1", null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test invalid principalId
@@ -492,9 +369,8 @@ public class TestRoomServiceImpl {
             roomService.getBuildingIdsByCampus("1", t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test invalid currentDate
@@ -502,9 +378,8 @@ public class TestRoomServiceImpl {
             roomService.getBuildingIdsByCampus("1", t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test null campusKey
@@ -512,9 +387,8 @@ public class TestRoomServiceImpl {
             roomService.getBuildingIdsByCampus(null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we are expecting
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("campusKey key is missing!", e.getMessage());
         }
 
         //test blank campusKey
@@ -522,49 +396,30 @@ public class TestRoomServiceImpl {
             roomService.getBuildingIdsByCampus("", contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we are expecting
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("campusKey key is missing!", e.getMessage());
         }
 
 
         //test no results
-        try {
-            List<String> ids = roomService.getBuildingIdsByCampus("3", contextInfo);
-            assertEquals(0, ids.size());
-        } catch (DoesNotExistException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        List<String> ids = roomService.getBuildingIdsByCampus("3", contextInfo);
+        assertTrue(ids.isEmpty());
 
         //test normal search
-        try {
-            List<String> ids = roomService.getBuildingIdsByCampus("1", contextInfo);
-            assertEquals(ids.size(), 1);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        ids = roomService.getBuildingIdsByCampus("1", contextInfo);
+        assertEquals(1, ids.size());
     }
 
     @Test
-    public void testGetBuildingsByIds() {
+    public void testGetBuildingsByIds() throws Exception {
         BuildingInfo b1 = createBuildingInfo("ARM", "1", "Armory", "active", "recreation", "the armory", "the armory");
         BuildingInfo b2 = createBuildingInfo("MIT", "1", "Armory", "active", "administration", "Mitchell", "Mitchell");
 
-        try {
-            b1 = roomService.createBuilding(null, b1, contextInfo);
-            b1 = roomService.getBuilding(b1.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        b1 = roomService.createBuilding(null, b1, contextInfo);
+        b1 = roomService.getBuilding(b1.getId(), contextInfo);
 
-        try {
-            b2 = roomService.createBuilding(null, b2, contextInfo);
-            b2 = roomService.getBuilding(b2.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        b2 = roomService.createBuilding(null, b2, contextInfo);
+        b2 = roomService.getBuilding(b2.getId(), contextInfo);
 
         List<String> ids = new ArrayList<String>(2);
         //test null contextInfo
@@ -572,9 +427,8 @@ public class TestRoomServiceImpl {
             roomService.getBuildingsByIds(ids, null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test invalid principalId
@@ -582,9 +436,8 @@ public class TestRoomServiceImpl {
             roomService.getBuildingsByIds(ids, t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test invalid date
@@ -592,9 +445,8 @@ public class TestRoomServiceImpl {
             roomService.getBuildingsByIds(ids, t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test null list
@@ -602,68 +454,54 @@ public class TestRoomServiceImpl {
             roomService.getBuildingsByIds(null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("id list is null!", e.getMessage());
         }
 
         //test empty list
         try {
             roomService.getBuildingsByIds(ids, contextInfo);
+            fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("id list is null!", e.getMessage());
         }
 
         //normal search
         ids.add(b1.getId());
         ids.add(b2.getId());
-        try {
-            List<BuildingInfo> buildingInfos = roomService.getBuildingsByIds(ids, contextInfo);
-            assertEquals(buildingInfos.size(), 2);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        List<BuildingInfo> buildingInfos = roomService.getBuildingsByIds(ids, contextInfo);
+        assertEquals(buildingInfos.size(), 2);
 
         //test exception when not all ids are found
         ids.add("3");
         try {
             roomService.getBuildingsByIds(ids, contextInfo);
+            fail("Expected exception not thrown");
         } catch (DoesNotExistException e) {
-            //this is the exception we are expecting
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("Missing data for : 3", e.getMessage());
         }
     }
 
     @Test
-    public void testGetBuildingsByBuildingCode() {
+    public void testGetBuildingsByBuildingCode() throws Exception {
         BuildingInfo b1 = createBuildingInfo("ARM", "1", "Armory", "active", "recreation", "the armory", "the armory");
         BuildingInfo b2 = createBuildingInfo("MIT", "1", "Armory", "active", "administration", "Mitchell", "Mitchell");
 
-        try {
-            b1 = roomService.createBuilding(null, b1, contextInfo);
-            b1 = roomService.getBuilding(b1.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        b1 = roomService.createBuilding(null, b1, contextInfo);
+        b1 = roomService.getBuilding(b1.getId(), contextInfo);
 
-        try {
-            b2 = roomService.createBuilding(null, b2, contextInfo);
-            b2 = roomService.getBuilding(b2.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        b2 = roomService.createBuilding(null, b2, contextInfo);
+        b2 = roomService.getBuilding(b2.getId(), contextInfo);
 
         //test null contextInfo
         try {
             roomService.getBuildingsByBuildingCode(b1.getBuildingCode(), null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test invalid principalId
@@ -671,9 +509,8 @@ public class TestRoomServiceImpl {
             roomService.getBuildingsByBuildingCode(b1.getBuildingCode(), t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test invalid date
@@ -681,9 +518,8 @@ public class TestRoomServiceImpl {
             roomService.getBuildingsByBuildingCode(b1.getBuildingCode(), t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test null code
@@ -691,65 +527,43 @@ public class TestRoomServiceImpl {
             roomService.getBuildingsByBuildingCode(null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("buildingCode key is missing!", e.getMessage());
         }
 
         //test blank code
         try {
             roomService.getBuildingsByBuildingCode("", contextInfo);
+            fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("buildingCode key is missing!", e.getMessage());
         }
 
         //test when not found
-        try {
-            roomService.getBuildingsByBuildingCode("ADM", contextInfo);
-        } catch (DoesNotExistException e) {
-            //this is the exception we are expecting
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        List<BuildingInfo> list = roomService.getBuildingsByBuildingCode("ADM", contextInfo);
+        assertTrue(list.isEmpty());
 
         //test normal search
-        try {
-            List<BuildingInfo> list = roomService.getBuildingsByBuildingCode(b2.getBuildingCode(), contextInfo);
-            assertEquals(1, list.size());
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        list = roomService.getBuildingsByBuildingCode(b2.getBuildingCode(), contextInfo);
+        assertEquals(1, list.size());
     }
 
     @Test
-    public void testDeleteBuilding() {
+    public void testDeleteBuilding() throws Exception {
         BuildingInfo b1 = createBuildingInfo("ARM", "1", "Armory", "active", "recreation", "the armory", "the armory");
         BuildingInfo b2 = createBuildingInfo("MIT", "1", "Armory", "active", "administration", "Mitchell", "Mitchell");
 
-        try {
-            b1 = roomService.createBuilding(null, b1, contextInfo);
-            b1 = roomService.getBuilding(b1.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
-
-        try {
-            b2 = roomService.createBuilding(null, b2, contextInfo);
-            b2 = roomService.getBuilding(b2.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        b1 = roomService.createBuilding(null, b1, contextInfo);
+        roomService.createBuilding(null, b2, contextInfo);
 
         //test null contextInfo
         try {
             roomService.deleteBuilding(b1.getId(), null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test invalid principalId
@@ -757,9 +571,8 @@ public class TestRoomServiceImpl {
             roomService.deleteBuilding(b1.getId(), t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e){
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test invalid currentDate
@@ -767,9 +580,8 @@ public class TestRoomServiceImpl {
             roomService.deleteBuilding(b1.getId(), t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test null key
@@ -777,9 +589,8 @@ public class TestRoomServiceImpl {
             roomService.deleteBuilding(null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("id key is missing!", e.getMessage());
         }
 
         //test blank key
@@ -787,50 +598,33 @@ public class TestRoomServiceImpl {
             roomService.deleteBuilding("", contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("id key is missing!", e.getMessage());
         }
 
         //normal delete
-        try {
-            StatusInfo statusInfo = roomService.deleteBuilding(b1.getId(), contextInfo);
-            assertTrue(statusInfo.getIsSuccess());
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        StatusInfo statusInfo = roomService.deleteBuilding(b1.getId(), contextInfo);
+        assertTrue(statusInfo.getIsSuccess());
 
         //double-check record was deleted
-        try {
-            List<String> ids = roomService.getBuildingIdsByCampus("1", contextInfo);
-            assertEquals(1, ids.size());
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        List<String> ids = roomService.getBuildingIdsByCampus("1", contextInfo);
+        assertEquals(1, ids.size());
     }
 
     @Test
-    public void testBuildingAttributes() {
+    public void testBuildingAttributes() throws Exception {
         contextInfo.setPrincipalId("testBuildingAttributes");
         contextInfo.setCurrentDate( new Date() );
 
         //create a building
-        BuildingInfo b1 = null;
-        try {
-            b1 = roomService.createBuilding("", createBuildingInfo("ADM", "umuc", "Administration Building", "active", "administration", "the administration building", "the administration building"), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        BuildingInfo b1;
+        b1 = roomService.createBuilding("", createBuildingInfo("ADM", "umuc", "Administration Building", "active", "administration", "the administration building", "the administration building"), contextInfo);
 
         //give it attributes and update
         b1 = addAttributeInfo(b1, "key1", "value1");
         b1 = addAttributeInfo(b1, "key2", "value2");
-        BuildingInfo b2 = null;
-        try {
-            b2 = roomService.updateBuilding(b1.getId(), b1, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        BuildingInfo b2;
+        b2 = roomService.updateBuilding(b1.getId(), b1, contextInfo);
         List<AttributeInfo> a2 = b2.getAttributes();
         assertEquals(a2.size(), 2);
         HashMap<String, String> m2 = new HashMap<String, String>(2);
@@ -843,19 +637,15 @@ public class TestRoomServiceImpl {
         //remove attributes and update
         b2.setAttributes(new ArrayList<AttributeInfo>());
         b2 = addAttributeInfo(b2, "key3", "value3");
-        BuildingInfo b3 = null;
-        try {
-            b3 = roomService.updateBuilding(b2.getId(), b2, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        BuildingInfo b3;
+        b3 = roomService.updateBuilding(b2.getId(), b2, contextInfo);
         assertEquals(b3.getAttributes().size(), 1);
         assertEquals(b3.getAttributes().get(0).getKey(), "key3");
         assertEquals(b3.getAttributes().get(0).getValue(), "value3");
     }
 
     @Test
-    public void testCreateRoom() {
+    public void testCreateRoom() throws Exception {
         contextInfo.setPrincipalId("testCreateRoom");
         contextInfo.setCurrentDate( new Date() );
 
@@ -866,12 +656,8 @@ public class TestRoomServiceImpl {
         String state = "org.kuali.room.state.Active";
         String plain = "classroom for lectures";
         String formatted = "classroom for lectures";
-        BuildingInfo b = null;
-        try {
-            b = roomService.createBuilding("", createBuildingInfo("ADM", "umuc", "Administration Building", "active", "administration", "the administration building", "the administration building"), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        BuildingInfo b;
+        b = roomService.createBuilding("", createBuildingInfo("ADM", "umuc", "Administration Building", "active", "administration", "the administration building", "the administration building"), contextInfo);
 
         RoomInfo r = createRoomInfo(b, floor, roomCode, name, state, typeKey, plain, formatted);
 
@@ -880,9 +666,8 @@ public class TestRoomServiceImpl {
             roomService.createRoom(b.getId(), r.getTypeKey(), r, null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test invalid principalId
@@ -890,9 +675,8 @@ public class TestRoomServiceImpl {
             roomService.createRoom(b.getId(), r.getTypeKey(), r, t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test invalid date
@@ -900,9 +684,8 @@ public class TestRoomServiceImpl {
             roomService.createRoom(b.getId(), r.getTypeKey(), r, t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test null roomInfo
@@ -910,18 +693,13 @@ public class TestRoomServiceImpl {
             roomService.createRoom(b.getId(), r.getTypeKey(), null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("Object is missing!", e.getMessage());
         }
 
         //test null typeKey
-        RoomInfo r2 = null;
-        try {
-            r2 = roomService.createRoom(b.getId(), null, r, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        RoomInfo r2;
+        r2 = roomService.createRoom(b.getId(), null, r, contextInfo);
         assertEquals(r2.getBuildingId(), r.getBuildingId());
         assertEquals(r2.getTypeKey(), r.getTypeKey());
         assertEquals(r2.getFloor(), r.getFloor());
@@ -930,80 +708,46 @@ public class TestRoomServiceImpl {
         assertEquals(r2.getDescr().getFormatted(), r.getDescr().getFormatted());
 
         //test blank typeKey
-        r2 = null;
-        try {
-            r2 = roomService.createRoom(b.getId(), "", r, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        r2 = roomService.createRoom(b.getId(), "", r, contextInfo);
         assertEquals(r2.getTypeKey(), r.getTypeKey());
 
         //test new typeKey
-        r2 = null;
         String newTypeKey = r.getTypeKey() + "_new";
-        try {
-            r2 = roomService.createRoom(b.getId(), newTypeKey, r, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        r2 = roomService.createRoom(b.getId(), newTypeKey, r, contextInfo);
         assertEquals(r2.getTypeKey(), newTypeKey);
 
         //test null buildingId
-        r2 = null;
-        try {
-            r2 = roomService.createRoom(null, r.getTypeKey(), r, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        r2 = roomService.createRoom(null, r.getTypeKey(), r, contextInfo);
         assertEquals(r2.getBuildingId(), r.getBuildingId());
 
         //test blank buildingId
-        r2 = null;
-        try {
-            r2 = roomService.createRoom("", r.getTypeKey(), r, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        r2 = roomService.createRoom("", r.getTypeKey(), r, contextInfo);
         assertEquals(r2.getBuildingId(), r.getBuildingId());
 
         //test new buildingId
-        r2 = null;
         String newBuildingId = b.getId() + "_new";
-        try {
-            r2 = roomService.createRoom(newBuildingId, r.getTypeKey(), r, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        r2 = roomService.createRoom(newBuildingId, r.getTypeKey(), r, contextInfo);
         assertEquals(r2.getBuildingId(), newBuildingId);
     }
 
     @Test
-    public void testGetRoom() {
+    public void testGetRoom() throws Exception {
         contextInfo.setPrincipalId("testGetRoom");
         contextInfo.setCurrentDate( new Date() );
 
-        BuildingInfo b = null;
-        try {
-            b = roomService.createBuilding("", createBuildingInfo("ADM", "umuc", "Administration Building", "active", "administration", "the administration building", "the administration building"), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        BuildingInfo b;
+        b = roomService.createBuilding("", createBuildingInfo("ADM", "umuc", "Administration Building", "active", "administration", "the administration building", "the administration building"), contextInfo);
 
         RoomInfo room = createRoomInfo(b, "1", "1234", "classroom 1", "org.kuali.room.state.Active", "org.kuali.room.type.Lecture", "classroom for lectures", "classroom for lectures");
-        try {
-            room = roomService.createRoom(b.getId(), "", room, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        room = roomService.createRoom(b.getId(), "", room, contextInfo);
 
         //test null ContextInfo
         try {
             roomService.getRoom(room.getId(), null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test invalid principalId
@@ -1011,9 +755,8 @@ public class TestRoomServiceImpl {
             roomService.getRoom(room.getId(), t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test invalid date
@@ -1021,9 +764,8 @@ public class TestRoomServiceImpl {
             roomService.getRoom(room.getId(), t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test null roomId
@@ -1031,9 +773,8 @@ public class TestRoomServiceImpl {
             roomService.getRoom(null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("id key is missing!", e.getMessage());
         }
 
         //test blank roomId
@@ -1041,29 +782,22 @@ public class TestRoomServiceImpl {
             roomService.getRoom("", contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("id key is missing!", e.getMessage());
         }
 
         //test does not exist
         try {
             roomService.getRoom("DoesNotExist", contextInfo);
+            fail("Expected exception not thrown");
         } catch (DoesNotExistException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            t.printStackTrace();
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("Missing data for : 'DoesNotExist'", e.getMessage());
         }
 
         //normal use
-        RoomInfo r = null;
-        try {
-            r = roomService.getRoom(room.getId(), contextInfo);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            fail(t.toString());
-        }
+        RoomInfo r;
+        r = roomService.getRoom(room.getId(), contextInfo);
         assertNotNull(r);
         assertEquals(r.getId(), room.getId() );
         assertEquals(r.getBuildingId(), room.getBuildingId() );
@@ -1074,30 +808,19 @@ public class TestRoomServiceImpl {
     }
 
     @Test
-    public void testUpdateRoom() {
-        contextInfo.setCurrentDate( new Date() );
+    public void testUpdateRoom() throws Exception {
+        final long currentTime = System.currentTimeMillis();
+        contextInfo.setCurrentDate(new Date(currentTime));
         contextInfo.setPrincipalId( "testCreateRoom" );
 
-        BuildingInfo b = null;
-        try {
-            b = roomService.createBuilding("", createBuildingInfo(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        BuildingInfo b;
+        b = roomService.createBuilding("", createBuildingInfo(), contextInfo);
 
         RoomInfo r = createRoomInfo(b, "floor", "1234", "The Room", "Active", "Classroom", "plain", "formatted");
-        try {
-            r = roomService.createRoom(b.getId(), r.getTypeKey(), r, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        r = roomService.createRoom(b.getId(), r.getTypeKey(), r, contextInfo);
 
-        RoomInfo originalRoomInfo = null;
-        try {
-            originalRoomInfo = roomService.getRoom(r.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        RoomInfo originalRoomInfo;
+        originalRoomInfo = roomService.getRoom(r.getId(), contextInfo);
         assertNotNull(originalRoomInfo);
 
         //test missing ContextInfo
@@ -1105,9 +828,8 @@ public class TestRoomServiceImpl {
             roomService.updateRoom(r.getId(), r, null);
             fail("Expected exception not thrown"); //shouldn't get here
         } catch(MissingParameterException e) {
-            //exception we're expecting
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test no principal id
@@ -1115,9 +837,8 @@ public class TestRoomServiceImpl {
             roomService.updateRoom(r.getId(), r, t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test no current date
@@ -1125,9 +846,8 @@ public class TestRoomServiceImpl {
             roomService.updateRoom(r.getId(), r, t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test null RoomInfo
@@ -1135,18 +855,13 @@ public class TestRoomServiceImpl {
             roomService.updateRoom(r.getId(), null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("Object is missing!", e.getMessage());
         }
 
         //test normal update
         contextInfo.setPrincipalId("testUpdateRoom");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
-        contextInfo.setCurrentDate( new Date() );
+        contextInfo.setCurrentDate( new Date(currentTime + 1000L) );
         r.setBuildingId( r.getBuildingId() + "_new");
         r.setFloor( r.getFloor() + "_new");
         r.setRoomCode( r.getRoomCode() + "_new");
@@ -1154,12 +869,8 @@ public class TestRoomServiceImpl {
         r.setName( r.getName() + "_new");
         r.setTypeKey( r.getTypeKey() + "_new");
         r.setStateKey( r.getStateKey() + "_new");
-        RoomInfo r2 = null;
-        try {
-            r2 = roomService.updateRoom(r.getId(), r, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        RoomInfo r2;
+        r2 = roomService.updateRoom(r.getId(), r, contextInfo);
         assertNotNull(r2);
         assertEquals(r2.getId(), originalRoomInfo.getId());
         assertFalse(r2.getBuildingId().equals(originalRoomInfo.getBuildingId()));
@@ -1176,40 +887,33 @@ public class TestRoomServiceImpl {
         assertFalse(m1.getUpdateTime().equals(m2.getUpdateTime()));
 
         //test update with null roomId
-        
-        boolean shouldFail = false;
         try {
             roomService.updateRoom(null, r2, contextInfo);
-        } catch (Throwable t) {
-            shouldFail = true;
-        }
-        
-        assertTrue("update with a null id suceeded", shouldFail);
-        
-        //test update with blank roomId
-        shouldFail = false;
-        try {
-            roomService.updateRoom("", r2, contextInfo);
-        } catch (Throwable t) {
-            shouldFail = true;
+            fail("Expected exception not thrown");
+        } catch (IllegalArgumentException iae) {
+            assertNotNull(iae.getMessage());
+            assertEquals("id to load is required for loading", iae.getMessage());
         }
 
-        assertTrue("update with a blank id suceeded", shouldFail);
+        //test update with blank roomId
+        try {
+            roomService.updateRoom("", r2, contextInfo);
+            fail("Expected exception not thrown");
+        } catch (PersistenceException pe) {
+            assertNotNull(pe.getMessage());
+            assertTrue(pe.getMessage().contains("could not load an entity"));
+        }
     }
 
     @Test
-    public void testSearchAndDeleteRoom() {
+    public void testSearchAndDeleteRoom() throws Exception {
         contextInfo.setPrincipalId("testSearchAndDeleteRoom");
         contextInfo.setCurrentDate( new Date() );
         //create some buildings
         BuildingInfo b1 = createBuildingInfo("ARM", "1", "Armory", "active", "recreation", "the armory", "the armory");
         BuildingInfo b2 = createBuildingInfo("MIT", "1", "Armory", "active", "administration", "Mitchell", "Mitchell");
-        try {
-            b1 = roomService.createBuilding(null, b1, contextInfo);
-            b2 = roomService.createBuilding(null, b2, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        b1 = roomService.createBuilding(null, b1, contextInfo);
+        b2 = roomService.createBuilding(null, b2, contextInfo);
 
         //create some rooms
         RoomInfo r1 = createRoomInfo(b1, "1", "100", "War Room", "org.kuali.room.state.Active", "org.kuali.room.type.Classroom", "the war room", "the war room");
@@ -1217,39 +921,33 @@ public class TestRoomServiceImpl {
         RoomInfo r3 = createRoomInfo(b2, "3", "300", "North Room", "org.kuali.room.state.Active", "org.kuali.room.type.LectureHall", "the north room", "the north room");
         RoomInfo r4 = createRoomInfo(b2, "4", "405", "South Room", "org.kuali.room.state.Inactive", "org.kuali.room.type.ExecutionChamber", "the execution room", "the execution room");
 
-        try {
-            roomService.createRoom(r1.getBuildingId(), r1.getTypeKey(), r1, contextInfo);
-            roomService.createRoom(r2.getBuildingId(), r2.getTypeKey(), r2, contextInfo);
-            roomService.createRoom(r3.getBuildingId(), r3.getTypeKey(), r3, contextInfo);
-            roomService.createRoom(r4.getBuildingId(), r4.getTypeKey(), r4, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        roomService.createRoom(r1.getBuildingId(), r1.getTypeKey(), r1, contextInfo);
+        roomService.createRoom(r2.getBuildingId(), r2.getTypeKey(), r2, contextInfo);
+        roomService.createRoom(r3.getBuildingId(), r3.getTypeKey(), r3, contextInfo);
+        roomService.createRoom(r4.getBuildingId(), r4.getTypeKey(), r4, contextInfo);
 
 
-        testGetRoomIdsByBuilding(b1, b2, r1, r2, r3, r4);
+        testGetRoomIdsByBuilding(b1);
 
-        testGetRoomIdsByBuildingAndFloor(b1, b2, r1, r2, r3, r4);
+        testGetRoomIdsByBuildingAndFloor(b1, b2, r3, r4);
 
-        testGetRoomIdsByBuildingAndRoomType(b1, b2, r1, r2, r3, r4);
+        testGetRoomIdsByBuildingAndRoomType(b1, b2, r3, r4);
 
-        testGetRoomIdsByBuildingAndRoomTypes(b1, b2, r1, r2, r3, r4);
+        testGetRoomIdsByBuildingAndRoomTypes(b1, b2, r1, r2);
 
         testGetRoomIdsByType(r1, r2, r3, r4);
 
-        testGetRoomsByBuildingAndRoomCode(b1, b2, r1, r2, r3, r4);
+        testGetRoomsByBuildingAndRoomCode(b1, b2, r1, r2, r3);
     }
 
-    @Ignore
-    private void testGetRoomIdsByBuilding(BuildingInfo b1, BuildingInfo b2, RoomInfo r1, RoomInfo r2, RoomInfo r3, RoomInfo r4) {
+    private void testGetRoomIdsByBuilding(BuildingInfo b1) throws Exception {
         //test for null context
         try {
             roomService.getRoomIdsByBuilding(b1.getId(), null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test for null principalId
@@ -1257,9 +955,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuilding(b1.getId(), t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test for null currentDate
@@ -1267,9 +964,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuilding(b1.getId(), t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test for null buildingId
@@ -1277,9 +973,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuilding(null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("buildingId key is missing!", e.getMessage());
         }
 
         //test for blank buildingId
@@ -1287,39 +982,27 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuilding("", t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test for no matches
-        try {
-            List<String> ids = roomService.getRoomIdsByBuilding("doesnotmatch", contextInfo);
-            assertEquals(0, ids.size());
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        List<String> ids = roomService.getRoomIdsByBuilding("doesnotmatch", contextInfo);
+        assertTrue(ids.isEmpty());
 
         //test for matches
-        List<String> ids = null;
-        try {
-            ids = roomService.getRoomIdsByBuilding(b1.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        ids = roomService.getRoomIdsByBuilding(b1.getId(), contextInfo);
         assertEquals(ids.size(), 2);
     }
 
-    @Ignore
-    private void testGetRoomIdsByBuildingAndFloor(BuildingInfo b1, BuildingInfo b2, RoomInfo r1, RoomInfo r2, RoomInfo r3, RoomInfo r4) {
+    private void testGetRoomIdsByBuildingAndFloor(BuildingInfo b1, BuildingInfo b2, RoomInfo r3, RoomInfo r4) throws Exception {
         //test for NULL context
         try {
             roomService.getRoomIdsByBuildingAndFloor(b2.getId(), r3.getFloor(), null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test for null principalId
@@ -1327,9 +1010,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndFloor(b2.getId(), r3.getFloor(), t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test for null date
@@ -1337,9 +1019,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndFloor(b2.getId(), r3.getFloor(), t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test for null floor
@@ -1347,9 +1028,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndFloor(b2.getId(), null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("floor key is missing!", e.getMessage());
         }
 
         //test for empty floor
@@ -1357,9 +1037,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndFloor(b2.getId(), "", contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("floor key is missing!", e.getMessage());
         }
 
         //test for null buildingId
@@ -1367,9 +1046,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndFloor(null, r3.getFloor(), contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("buildingId key is missing!", e.getMessage());
         }
 
         //test for empty buildingId
@@ -1377,41 +1055,29 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndFloor("", r3.getFloor(), contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("buildingId key is missing!", e.getMessage());
         }
 
         List<String> ids;
         //test for no matches
-        try {
-            ids = roomService.getRoomIdsByBuildingAndFloor(b1.getId(), r3.getFloor(), contextInfo);
-            assertEquals(0, ids.size());
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        ids = roomService.getRoomIdsByBuildingAndFloor(b1.getId(), r3.getFloor(), contextInfo);
+        assertTrue(ids.isEmpty());
 
         //test normal
-        ids = null;
-        try {
-            ids = roomService.getRoomIdsByBuildingAndFloor(b2.getId(), r4.getFloor(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
-        assertEquals(ids.size(), 1);
+        ids = roomService.getRoomIdsByBuildingAndFloor(b2.getId(), r4.getFloor(), contextInfo);
+        assertEquals(1, ids.size());
 
     }
 
-    @Ignore
-    private void testGetRoomIdsByBuildingAndRoomType(BuildingInfo b1, BuildingInfo b2, RoomInfo r1, RoomInfo r2, RoomInfo r3, RoomInfo r4) {
+    private void testGetRoomIdsByBuildingAndRoomType(BuildingInfo b1, BuildingInfo b2, RoomInfo r3, RoomInfo r4) throws Exception {
         //test for NULL context
         try {
             roomService.getRoomIdsByBuildingAndRoomType(b2.getId(), r4.getTypeKey(), null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test for null principalId
@@ -1419,9 +1085,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndRoomType(b2.getId(), r4.getTypeKey(), t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test for null date
@@ -1429,9 +1094,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndRoomType(b2.getId(), r4.getTypeKey(), t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test for null typeKey
@@ -1439,9 +1103,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndRoomType(b2.getId(), null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("roomType key is missing!", e.getMessage());
         }
 
         //test for empty typeKey
@@ -1449,9 +1112,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndRoomType(b2.getId(), "", contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("roomType key is missing!", e.getMessage());
         }
 
         //test for null buildingId
@@ -1459,9 +1121,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndRoomType(null, r3.getTypeKey(), contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("buildingId key is missing!", e.getMessage());
         }
 
         //test for empty buildingId
@@ -1469,45 +1130,33 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndRoomType("", r3.getTypeKey(), contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("buildingId key is missing!", e.getMessage());
         }
 
         List<String> ids;
         //test for no matches
-        try {
-            ids = roomService.getRoomIdsByBuildingAndRoomType(b1.getId(), r3.getTypeKey(), contextInfo);
-            assertEquals(0, ids.size());
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        ids = roomService.getRoomIdsByBuildingAndRoomType(b1.getId(), r3.getTypeKey(), contextInfo);
+        assertTrue(ids.isEmpty());
 
-        ids = null;
-        try {
-            ids = roomService.getRoomIdsByBuildingAndRoomType(b2.getId(), r4.getTypeKey(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
-        assertEquals(ids.size(), 1);
+        ids = roomService.getRoomIdsByBuildingAndRoomType(b2.getId(), r4.getTypeKey(), contextInfo);
+        assertEquals(1, ids.size());
     }
 
-    @Ignore
-    private void testGetRoomIdsByBuildingAndRoomTypes(BuildingInfo b1, BuildingInfo b2, RoomInfo r1, RoomInfo r2, RoomInfo r3, RoomInfo r4) {
+    private void testGetRoomIdsByBuildingAndRoomTypes(BuildingInfo b1, BuildingInfo b2, RoomInfo r1, RoomInfo r2) throws Exception {
         List<String> typeKeys = new ArrayList<String>(2);
         typeKeys.add(r1.getTypeKey());
         typeKeys.add(r2.getTypeKey());
 
-        List<String> ids = null;
+        List<String> ids;
 
         //test for NULL context
         try {
             roomService.getRoomIdsByBuildingAndRoomTypes(b2.getId(), typeKeys, null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test for null principalId
@@ -1515,9 +1164,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndRoomTypes(b2.getId(), typeKeys, t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test for null date
@@ -1525,9 +1173,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndRoomTypes(b2.getId(), typeKeys, t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test for null typeKey
@@ -1535,19 +1182,17 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndRoomTypes(b2.getId(), null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("roomType list is null!", e.getMessage());
         }
 
         //test for empty typeKey
         try {
-            ids = roomService.getRoomIdsByBuildingAndRoomTypes(b2.getId(), new ArrayList<String>(0), contextInfo);
+            roomService.getRoomIdsByBuildingAndRoomTypes(b2.getId(), new ArrayList<String>(0), contextInfo);
             fail("Expected exception not thrown");
         } catch(MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("roomType list is null!", e.getMessage());
         }
 
         //test for null buildingId
@@ -1555,9 +1200,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndRoomTypes(null, typeKeys, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("buildingId key is missing!", e.getMessage());
         }
 
         //test for empty buildingId
@@ -1565,39 +1209,28 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByBuildingAndRoomTypes("", typeKeys, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("buildingId key is missing!", e.getMessage());
         }
 
         //test for no results
-        try {
-            ids = roomService.getRoomIdsByBuildingAndRoomTypes(b2.getId(), typeKeys, contextInfo);
-            assertEquals(0, ids.size());
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        ids = roomService.getRoomIdsByBuildingAndRoomTypes(b2.getId(), typeKeys, contextInfo);
+        assertTrue(ids.isEmpty());
 
         //normal use
-        try {
-            ids = roomService.getRoomIdsByBuildingAndRoomTypes(b1.getId(), typeKeys, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
-        assertEquals(ids.size(), 2);
+        ids = roomService.getRoomIdsByBuildingAndRoomTypes(b1.getId(), typeKeys, contextInfo);
+        assertEquals(2, ids.size());
     }
 
-    @Ignore
-    private void testGetRoomIdsByType(RoomInfo r1, RoomInfo r2, RoomInfo r3, RoomInfo r4) {
+    private void testGetRoomIdsByType(RoomInfo r1, RoomInfo r2, RoomInfo r3, RoomInfo r4) throws Exception {
 
         //test null context
         try {
             roomService.getRoomIdsByType(r1.getTypeKey(), null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test for null principalId
@@ -1605,9 +1238,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByType(r2.getTypeKey(), t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test for null date
@@ -1615,9 +1247,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByType(r3.getTypeKey(), t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test for null type
@@ -1625,9 +1256,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByType(null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("roomType key is missing!", e.getMessage());
         }
 
         //test for empty type
@@ -1635,39 +1265,28 @@ public class TestRoomServiceImpl {
             roomService.getRoomIdsByType("", contextInfo);
             fail("Expected exception not thrown");
         } catch(MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("roomType key is missing!", e.getMessage());
         }
 
         //test for no results
-        try {
-            List<String> ids = roomService.getRoomIdsByType(r4.getTypeKey() + "_not", contextInfo);
-            assertEquals(0, ids.size());
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        List<String> ids = roomService.getRoomIdsByType(r4.getTypeKey() + "_not", contextInfo);
+        assertTrue(ids.isEmpty());
 
         //normal use
-        try {
-            List<String> ids = roomService.getRoomIdsByType(r1.getTypeKey(), contextInfo);
-            assertEquals(2, ids.size());
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        ids = roomService.getRoomIdsByType(r1.getTypeKey(), contextInfo);
+        assertEquals(2, ids.size());
     }
 
-    @Ignore
-    private void testGetRoomsByBuildingAndRoomCode(BuildingInfo b1, BuildingInfo b2, RoomInfo r1, RoomInfo r2, RoomInfo r3, RoomInfo r4) {
+    private void testGetRoomsByBuildingAndRoomCode(BuildingInfo b1, BuildingInfo b2, RoomInfo r1, RoomInfo r2, RoomInfo r3) throws Exception {
 
         //test for NULL context
         try {
             roomService.getRoomsByBuildingAndRoomCode(b1.getBuildingCode(), r1.getRoomCode(), null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test for null principalId
@@ -1675,9 +1294,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomsByBuildingAndRoomCode(b2.getBuildingCode(), r1.getRoomCode(), t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test for null date
@@ -1685,9 +1303,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomsByBuildingAndRoomCode(b2.getBuildingCode(), r1.getRoomCode(), t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test for null roomCode
@@ -1695,9 +1312,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomsByBuildingAndRoomCode(b2.getBuildingCode(), null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("roomCode key is missing!", e.getMessage());
         }
 
         //test for empty roomCode
@@ -1705,9 +1321,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomsByBuildingAndRoomCode(b2.getBuildingCode(), "", contextInfo);
             fail("Expected exception not thrown");
         } catch(MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("roomCode key is missing!", e.getMessage());
         }
 
         //test for null buildingCode
@@ -1715,9 +1330,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomsByBuildingAndRoomCode(null, r2.getRoomCode(), contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("buildingCode key is missing!", e.getMessage());
         }
 
         //test for empty buildingCode
@@ -1725,33 +1339,22 @@ public class TestRoomServiceImpl {
             roomService.getRoomsByBuildingAndRoomCode("", r2.getRoomCode(), contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("buildingCode key is missing!", e.getMessage());
         }
 
         //test for no results
-        try {
-            List<RoomInfo> rooms = roomService.getRoomsByBuildingAndRoomCode(b2.getBuildingCode(), r2.getRoomCode(), contextInfo);
-            assertEquals(0, rooms.size());
-        } catch (DoesNotExistException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        List<RoomInfo> rooms = roomService.getRoomsByBuildingAndRoomCode(b2.getBuildingCode(), r2.getRoomCode(), contextInfo);
+        assertTrue(rooms.isEmpty());
 
 
         //normal use
-        try {
-            List<RoomInfo> rooms = roomService.getRoomsByBuildingAndRoomCode(b2.getBuildingCode(), r3.getRoomCode(), contextInfo);
-            assertEquals(1, rooms.size());
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        rooms = roomService.getRoomsByBuildingAndRoomCode(b2.getBuildingCode(), r3.getRoomCode(), contextInfo);
+        assertEquals(1, rooms.size());
     }
 
     @Test
-    public void testCreateRoomResponsibleOrg() {
+    public void testCreateRoomResponsibleOrg() throws Exception {
         contextInfo.setPrincipalId("testCreateRoomResponsibleOrg");
         contextInfo.setCurrentDate( new Date() );
 
@@ -1768,9 +1371,8 @@ public class TestRoomServiceImpl {
             roomService.createRoomResponsibleOrg(i.getRoomId(), i.getOrgId(), i.getTypeKey(), i, null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test invalid principalId
@@ -1778,9 +1380,8 @@ public class TestRoomServiceImpl {
             roomService.createRoomResponsibleOrg(i.getRoomId(), i.getOrgId(), i.getTypeKey(), i, t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test invalid date
@@ -1788,9 +1389,8 @@ public class TestRoomServiceImpl {
             roomService.createRoomResponsibleOrg(i.getRoomId(), i.getOrgId(), i.getTypeKey(), i, t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test null info
@@ -1798,18 +1398,13 @@ public class TestRoomServiceImpl {
             roomService.createRoomResponsibleOrg(i.getRoomId(), i.getOrgId(), i.getTypeKey(), null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("Object is missing!", e.getMessage());
         }
 
         //test null typeKey
-        RoomResponsibleOrgInfo i2 = null;
-        try {
-            i2 = roomService.createRoomResponsibleOrg(i.getRoomId(), i.getOrgId(), null, i, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        RoomResponsibleOrgInfo i2;
+        i2 = roomService.createRoomResponsibleOrg(i.getRoomId(), i.getOrgId(), null, i, contextInfo);
         assertEquals(i2.getOrgId(), i.getOrgId());
         assertEquals(i2.getTypeKey(), i.getTypeKey());
         assertEquals(i2.getRoomId(), i.getRoomId());
@@ -1818,87 +1413,42 @@ public class TestRoomServiceImpl {
         assertEquals(i2.getStateKey(), i.getStateKey());
 
         //test blank typeKey
-        i2 = null;
-        try {
-            i2 = roomService.createRoomResponsibleOrg(i.getRoomId(), i.getOrgId(), "", i, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        i2 = roomService.createRoomResponsibleOrg(i.getRoomId(), i.getOrgId(), "", i, contextInfo);
         assertEquals(i2.getTypeKey(), i.getTypeKey());
 
         //test new typeKey
-        i2 = null;
         String newTypeKey = i.getTypeKey() + "_new";
-        try {
-            i2 = roomService.createRoomResponsibleOrg(i.getRoomId(), i.getOrgId(), newTypeKey, i, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        i2 = roomService.createRoomResponsibleOrg(i.getRoomId(), i.getOrgId(), newTypeKey, i, contextInfo);
         assertEquals(i2.getTypeKey(), newTypeKey);
 
         //test null orgId
-        i2 = null;
-        try {
-            i2 = roomService.createRoomResponsibleOrg(i.getRoomId(), null, i.getTypeKey(), i, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        i2 = roomService.createRoomResponsibleOrg(i.getRoomId(), null, i.getTypeKey(), i, contextInfo);
         assertEquals(i2.getOrgId(), i.getOrgId());
 
         //test blank orgId
-        i2 = null;
-        try {
-            i2 = roomService.createRoomResponsibleOrg(i.getRoomId(), "", i.getTypeKey(), i, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        i2 = roomService.createRoomResponsibleOrg(i.getRoomId(), "", i.getTypeKey(), i, contextInfo);
         assertEquals(i2.getOrgId(), i.getOrgId());
 
         //test new orgId
-        i2 = null;
         String newOrgId = i.getOrgId() + "_new";
-        try {
-            i2 = roomService.createRoomResponsibleOrg(i.getRoomId(), newOrgId, i.getTypeKey(), i, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        i2 = roomService.createRoomResponsibleOrg(i.getRoomId(), newOrgId, i.getTypeKey(), i, contextInfo);
         assertEquals(i2.getOrgId(), newOrgId);
 
         //test null roomId
-        i2 = null;
-        try {
-            i2 = roomService.createRoomResponsibleOrg(null, i.getOrgId(), i.getTypeKey(), i, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        i2 = roomService.createRoomResponsibleOrg(null, i.getOrgId(), i.getTypeKey(), i, contextInfo);
         assertEquals(i2.getRoomId(), i.getRoomId());
 
         //test blank orgId
-        i2 = null;
-        try {
-            i2 = roomService.createRoomResponsibleOrg("", i.getOrgId(), i.getTypeKey(), i, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        i2 = roomService.createRoomResponsibleOrg("", i.getOrgId(), i.getTypeKey(), i, contextInfo);
         assertEquals(i2.getRoomId(), i.getRoomId());
 
         //test new orgId
-        i2 = null;
         String newRoomId = i.getRoomId() + "_new";
-        try {
-            i2 = roomService.createRoomResponsibleOrg(newRoomId, i.getOrgId(), i.getTypeKey(), i, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        i2 = roomService.createRoomResponsibleOrg(newRoomId, i.getOrgId(), i.getTypeKey(), i, contextInfo);
         assertEquals(i2.getRoomId(), newRoomId);
 
         //test nominal usage
-        i2 = null;
-        try {
-            i2 = roomService.createRoomResponsibleOrg(i.getRoomId(), i.getOrgId(), i.getTypeKey(), i, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        i2 = roomService.createRoomResponsibleOrg(i.getRoomId(), i.getOrgId(), i.getTypeKey(), i, contextInfo);
         assertEquals(i2.getRoomId(), roomId);
         assertEquals(i2.getOrgId(), orgId);
         assertEquals(i2.getTypeKey(), type);
@@ -1908,7 +1458,7 @@ public class TestRoomServiceImpl {
     }
 
     @Test
-    public void testGetRoomResponsibleOrg() {
+    public void testGetRoomResponsibleOrg() throws Exception {
         contextInfo.setPrincipalId("testGetRoomResponsibleOrg");
         contextInfo.setCurrentDate(new Date());
 
@@ -1920,40 +1470,33 @@ public class TestRoomServiceImpl {
         Date expDate = new Date( new Date().getTime() + 86400);
         RoomResponsibleOrgInfo i = createRoomResponsibleOrgInfo(roomId, orgId, state, type, effDate, expDate);
 
-        try {
-            i = roomService.createRoomResponsibleOrg(i.getRoomId(), i.getOrgId(), i.getTypeKey(), i, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        i = roomService.createRoomResponsibleOrg(i.getRoomId(), i.getOrgId(), i.getTypeKey(), i, contextInfo);
         //test null contextInfo
-        RoomResponsibleOrgInfo i2 = null;
+        RoomResponsibleOrgInfo i2;
         try {
-            i2 = roomService.getRoomResponsibleOrg(i.getId(), null);
+            roomService.getRoomResponsibleOrg(i.getId(), null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test invalid principalId
         try {
-            i2 = roomService.getRoomResponsibleOrg(i.getId(), t1);
+            roomService.getRoomResponsibleOrg(i.getId(), t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test invalid date
         try {
-            i2 = roomService.getRoomResponsibleOrg(i.getId(), t2);
+            roomService.getRoomResponsibleOrg(i.getId(), t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test null id
@@ -1961,9 +1504,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomResponsibleOrg(null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("roomResponsibleOrgId key is missing!", e.getMessage());
         }
 
         //test blank id
@@ -1971,17 +1513,12 @@ public class TestRoomServiceImpl {
             roomService.getRoomResponsibleOrg("", contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("roomResponsibleOrgId key is missing!", e.getMessage());
         }
 
         //nominal
-        try {
-            i2 = roomService.getRoomResponsibleOrg(i.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        i2 = roomService.getRoomResponsibleOrg(i.getId(), contextInfo);
 
         assertEquals(i2.getId(), i.getId());
         assertEquals(i2.getOrgId(), i.getOrgId());
@@ -1993,39 +1530,31 @@ public class TestRoomServiceImpl {
     }
 
     @Test
-    public void testUpdateRoomResponsibleOrg() {
-        contextInfo.setCurrentDate( new Date() );
+    public void testUpdateRoomResponsibleOrg() throws Exception {
+        final long currentTime = System.currentTimeMillis();
+        contextInfo.setCurrentDate( new Date(currentTime) );
         contextInfo.setPrincipalId( "createRoomResponsibleOrg" );
 
         String roomId = "roomId";
         String orgId = "orgId";
         String state = "state";
         String type = "type";
-        Date effDate = new Date( new Date().getTime() - 86400);
-        Date expDate = new Date( new Date().getTime() + 86400);
+        Date effDate = new Date( currentTime - 86400L);
+        Date expDate = new Date( currentTime + 86400L);
 
-        RoomResponsibleOrgInfo i = null;
-        try {
-            i = roomService.createRoomResponsibleOrg("", "", "", createRoomResponsibleOrgInfo(roomId, orgId, state, type, effDate, expDate), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        RoomResponsibleOrgInfo i;
+        i = roomService.createRoomResponsibleOrg("", "", "", createRoomResponsibleOrgInfo(roomId, orgId, state, type, effDate, expDate), contextInfo);
 
-        RoomResponsibleOrgInfo originalInfo = null;
-        try {
-            originalInfo = roomService.getRoomResponsibleOrg(i.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        RoomResponsibleOrgInfo originalInfo;
+        originalInfo = roomService.getRoomResponsibleOrg(i.getId(), contextInfo);
 
         //test missing ContextInfo
         try {
             roomService.updateRoomResponsibleOrg(i.getId(), i, null);
             fail("Expected exception not thrown"); //shouldn't get here
         } catch(MissingParameterException e) {
-            //exception we're expecting
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test no principal id
@@ -2033,9 +1562,8 @@ public class TestRoomServiceImpl {
             roomService.updateRoomResponsibleOrg(i.getId(), i, t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test no current date
@@ -2043,9 +1571,8 @@ public class TestRoomServiceImpl {
             roomService.updateRoomResponsibleOrg(i.getId(), i, t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //exception if no RoomResponsibleOrgInfo
@@ -2053,9 +1580,8 @@ public class TestRoomServiceImpl {
             roomService.updateRoomResponsibleOrg(i.getId(), null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("Object is missing!", e.getMessage());
         }
 
         //test 5, an actual update
@@ -2063,23 +1589,14 @@ public class TestRoomServiceImpl {
         i.setStateKey(i.getStateKey() + "_new");
         i.setOrgId(i.getOrgId() + "_new");
         i.setRoomId(i.getRoomId() + "_new");
-        i.setEffectiveDate(new Date(i.getEffectiveDate().getTime() - 86400));
-        i.setExpirationDate(new Date(i.getExpirationDate().getTime() + 86400));
+        i.setEffectiveDate(new Date(i.getEffectiveDate().getTime() - 86400L));
+        i.setExpirationDate(new Date(i.getExpirationDate().getTime() + 86400L));
 
         contextInfo.setPrincipalId("testUpdateRoomResponsibleOrg");
-        //sleep for 1 sec to allow Time to change
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
-        contextInfo.setCurrentDate(new Date());
+        contextInfo.setCurrentDate(new Date(currentTime + 1000L));
 
-        RoomResponsibleOrgInfo newInfo = null;
-        try {
-            newInfo = roomService.updateRoomResponsibleOrg(i.getId(), i, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        RoomResponsibleOrgInfo newInfo;
+        newInfo = roomService.updateRoomResponsibleOrg(i.getId(), i, contextInfo);
         assertEquals(originalInfo.getId(), newInfo.getId());
 
         MetaInfo metaInfo = originalInfo.getMeta();
@@ -2096,64 +1613,37 @@ public class TestRoomServiceImpl {
         assertFalse(originalInfo.getEffectiveDate().equals(i.getEffectiveDate()));
         assertFalse(originalInfo.getTypeKey().equals(i.getTypeKey()));
 
-        //sleep for 1 sec to allow Time to change
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
-        contextInfo.setCurrentDate(new Date());
-        RoomResponsibleOrgInfo newnewInfo = null;
-        try {
-            newnewInfo = roomService.updateRoomResponsibleOrg(newInfo.getId(), newInfo, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        contextInfo.setCurrentDate(new Date(currentTime + 2000L));
+        RoomResponsibleOrgInfo newnewInfo;
+        newnewInfo = roomService.updateRoomResponsibleOrg(newInfo.getId(), newInfo, contextInfo);
         assertFalse(newnewInfo.getMeta().getUpdateTime().equals(newInfo.getMeta().getUpdateTime()));
 
-        //sleep for 1 sec to allow Time to change
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
-        contextInfo.setCurrentDate(new Date());
+        contextInfo.setCurrentDate(new Date(currentTime + 3000L));
 
-        RoomResponsibleOrgInfo newnewnewInfo = null;
-        try {
-            newnewnewInfo = roomService.updateRoomResponsibleOrg(newnewInfo.getId(), newnewInfo, contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        RoomResponsibleOrgInfo newnewnewInfo;
+        newnewnewInfo = roomService.updateRoomResponsibleOrg(newnewInfo.getId(), newnewInfo, contextInfo);
         assertFalse(newnewnewInfo.getMeta().getUpdateTime().equals(newnewInfo.getMeta().getUpdateTime()));
 
     }
 
     @Test
-    public void testSearchAndDeleteRoomResponsibleOrg() {
+    public void testSearchAndDeleteRoomResponsibleOrg() throws Exception {
         RoomResponsibleOrgInfo i1 = createRoomResponsibleOrgInfo("roomId1", "orgId1", "state1", "type1", new Date(), new Date());
         RoomResponsibleOrgInfo i2 = createRoomResponsibleOrgInfo("roomId1", "orgId2", "state2", "type2", new Date(), new Date());
 
-        try {
-            i1 = roomService.createRoomResponsibleOrg(null, null, null, i1, contextInfo);
-            i1 = roomService.getRoomResponsibleOrg(i1.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        i1 = roomService.createRoomResponsibleOrg(null, null, null, i1, contextInfo);
+        i1 = roomService.getRoomResponsibleOrg(i1.getId(), contextInfo);
 
-        try {
-            i2 = roomService.createRoomResponsibleOrg(null, null, null, i2, contextInfo);
-            i2 = roomService.getRoomResponsibleOrg(i2.getId(), contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        i2 = roomService.createRoomResponsibleOrg(null, null, null, i2, contextInfo);
+        i2 = roomService.getRoomResponsibleOrg(i2.getId(), contextInfo);
 
         //test null contextInfo
         try {
             roomService.getRoomResponsibleOrgIdsByRoom("roomId1", null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test empty principalId
@@ -2161,9 +1651,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomResponsibleOrgIdsByRoom("roomId2", t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch(Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test null date
@@ -2171,9 +1660,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomResponsibleOrgIdsByRoom("roomId1", t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test null id
@@ -2181,9 +1669,8 @@ public class TestRoomServiceImpl {
             roomService.getRoomResponsibleOrgIdsByRoom(null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("roomId key is missing!", e.getMessage());
         }
 
         //test blank id
@@ -2191,17 +1678,12 @@ public class TestRoomServiceImpl {
             roomService.getRoomResponsibleOrgIdsByRoom("", contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("roomId key is missing!", e.getMessage());
         }
 
-        List<String> ids = null;
-        try {
-            ids = roomService.getRoomResponsibleOrgIdsByRoom("roomId1", contextInfo);
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        List<String> ids;
+        ids = roomService.getRoomResponsibleOrgIdsByRoom("roomId1", contextInfo);
         assertEquals(2, ids.size());
 
         //test null contextInfo
@@ -2209,9 +1691,8 @@ public class TestRoomServiceImpl {
             roomService.deleteRoomResponsibleOrg(i2.getId(), null);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("contextInfo is null!", e.getMessage());
         }
 
         //test invalid principalId
@@ -2219,9 +1700,8 @@ public class TestRoomServiceImpl {
             roomService.deleteRoomResponsibleOrg(i1.getId(), t1);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e){
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("principalId is missing!", e.getMessage());
         }
 
         //test invalid currentDate
@@ -2229,9 +1709,8 @@ public class TestRoomServiceImpl {
             roomService.deleteRoomResponsibleOrg(i1.getId(), t2);
             fail("Expected exception not thrown");
         } catch (InvalidParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("currentDate is missing!", e.getMessage());
         }
 
         //test null key
@@ -2239,9 +1718,8 @@ public class TestRoomServiceImpl {
             roomService.deleteRoomResponsibleOrg(null, contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("roomResponsibleOrgId key is missing!", e.getMessage());
         }
 
         //test blank key
@@ -2249,27 +1727,17 @@ public class TestRoomServiceImpl {
             roomService.deleteRoomResponsibleOrg("", contextInfo);
             fail("Expected exception not thrown");
         } catch (MissingParameterException e) {
-            //this is the exception we expect
-        } catch (Throwable t) {
-            fail(t.toString());
+            assertNotNull(e.getMessage());
+            assertEquals("roomResponsibleOrgId key is missing!", e.getMessage());
         }
 
         //normal delete
-        try {
-            StatusInfo statusInfo = roomService.deleteRoomResponsibleOrg(i2.getId(), contextInfo);
-            assertTrue(statusInfo.getIsSuccess());
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        StatusInfo statusInfo = roomService.deleteRoomResponsibleOrg(i2.getId(), contextInfo);
+        assertTrue(statusInfo.getIsSuccess());
 
         //double-check record was deleted
-        ids = null;
-        try {
-            ids = roomService.getRoomResponsibleOrgIdsByRoom("roomId1", contextInfo);
-            assertEquals(1, ids.size());
-        } catch (Throwable t) {
-            fail(t.toString());
-        }
+        ids = roomService.getRoomResponsibleOrgIdsByRoom("roomId1", contextInfo);
+        assertEquals(1, ids.size());
 
     }
 

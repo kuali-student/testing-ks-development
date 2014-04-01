@@ -25,14 +25,12 @@ import org.kuali.student.r2.common.dto.StatusInfo;
 import org.kuali.student.r1.common.rice.StudentIdentityConstants;
 import org.kuali.student.r1.common.rice.authorization.PermissionType;
 import org.kuali.student.r2.core.comment.dto.CommentInfo;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.core.comment.service.CommentService;
 
-import javax.naming.OperationNotSupportedException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.kuali.student.r2.core.class1.type.dto.TypeInfo;
 
 public class CommentRpcGwtServlet extends BaseRpcGwtServletAbstract<CommentService> implements CommentRpcService {
 
