@@ -16,26 +16,28 @@
  */
 package org.kuali.student.cm.course.form;
 
+import org.apache.commons.lang.StringUtils;
 import org.kuali.rice.krad.web.form.MaintenanceDocumentForm;
+import org.kuali.student.cm.common.util.CurriculumManagementConstants.CourseViewSections;
+import org.kuali.student.r2.core.proposal.dto.ProposalInfo;
 
 /**
- * This class //TODO ...
- *
- * @author Kuali Student Team
+ * Form for create course.
  */
-public class CreateCourseForm extends MaintenanceDocumentForm {
-    private boolean renderNavigationPanel = false;
+public class CourseInitialForm extends MaintenanceDocumentForm {
+
     private String createCourseInitialAction;
-    private boolean useCMreviewProcess = false;
 
-    private int selectedTabIndex = 0;
+    private boolean useReviewProcess;
 
-    public boolean isRenderNavigationPanel() {
-        return renderNavigationPanel;
-    }
+    private boolean curriculumSpecialistUser;
 
-    public void setRenderNavigationPanel(boolean renderNavigationPanel) {
-        this.renderNavigationPanel = renderNavigationPanel;
+    public CourseInitialForm() {
+        super();
+        // assume user is not a Curriculum Specialist (CS) user
+        curriculumSpecialistUser = false;
+        // default to true as only CS users are able to disable curriculum review
+        useReviewProcess = true;
     }
 
     public String getCreateCourseInitialAction() {
@@ -46,19 +48,20 @@ public class CreateCourseForm extends MaintenanceDocumentForm {
         this.createCourseInitialAction = createCourseInitialAction;
     }
 
-    public boolean isUseCMreviewProcess() {
-        return useCMreviewProcess;
+    public boolean isUseReviewProcess() {
+        return useReviewProcess;
     }
 
-    public void setUseCMreviewProcess(boolean useCMreviewProcess) {
-        this.useCMreviewProcess = useCMreviewProcess;
+    public void setUseReviewProcess(boolean useReviewProcess) {
+        this.useReviewProcess = useReviewProcess;
     }
 
-    public int getSelectedTabIndex() {
-        return selectedTabIndex;
+    public boolean isCurriculumSpecialistUser() {
+        return curriculumSpecialistUser;
     }
 
-    public void setSelectedTabIndex(int selectedTabIndex) {
-        this.selectedTabIndex = selectedTabIndex;
+    public void setCurriculumSpecialistUser(boolean curriculumSpecialistUser) {
+        this.curriculumSpecialistUser = curriculumSpecialistUser;
     }
+
 }

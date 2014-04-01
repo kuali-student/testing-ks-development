@@ -20,8 +20,8 @@ import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
 import org.kuali.rice.krad.lookup.LookupableImpl;
 import org.kuali.rice.krad.lookup.LookupForm;
 import org.kuali.student.cm.course.form.OrganizationInfoWrapper;
-import org.kuali.student.lum.lu.util.CurriculumManagementConstants;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.cm.common.util.CurriculumManagementConstants;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.core.organization.service.OrganizationService;
 import org.kuali.student.r2.core.search.dto.SearchParamInfo;
 import org.kuali.student.r2.core.search.dto.SearchRequestInfo;
@@ -30,14 +30,14 @@ import org.kuali.student.r2.core.search.dto.SearchResultInfo;
 import org.kuali.student.r2.core.search.dto.SearchResultRowInfo;
 import org.kuali.student.r2.core.search.service.SearchService;
 import org.kuali.student.r2.lum.util.constants.CourseServiceConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.kuali.student.logging.FormattedLogger.debug;
-import static org.kuali.student.logging.FormattedLogger.info;
 
 
 /**
@@ -53,8 +53,9 @@ public class OrganizationInfoLookupableImpl extends LookupableImpl {
     public static final String ORGANIZATION_NAME = "organizationName";
     public static final String ABBREVIATION = "abbreviation";
     public static final String ID = "id";
-	
-	private SearchService searchService;
+    private static final Logger LOG = LoggerFactory.getLogger(OrganizationInfoLookupableImpl.class);
+
+    private SearchService searchService;
 	private OrganizationService organizationService;
 
 
@@ -71,54 +72,53 @@ public class OrganizationInfoLookupableImpl extends LookupableImpl {
         
         if (StringUtils.isNotBlank(id)) {
             final SearchParamInfo idParam = new SearchParamInfo();
-            idParam.setKey(CurriculumManagementConstants.QUERY_PARAM_OPTIONAL_ID);
+            idParam.setKey(CurriculumManagementConstants.OrganizationMessageKeys.ORG_QUERY_PARAM_OPTIONAL_ID);
             idParam.getValues().add(id);
             queryParamValueList.add(idParam);
         }
         if (StringUtils.isNotBlank(organizationName)) {
             final SearchParamInfo displayNameParam = new SearchParamInfo();
-            displayNameParam.setKey(CurriculumManagementConstants.QUERY_PARAM_OPTIONAL_LONG_NAME);
+            displayNameParam.setKey(CurriculumManagementConstants.OrganizationMessageKeys.ORG_QUERY_PARAM_OPTIONAL_LONG_NAME);
             displayNameParam.getValues().add(organizationName);
             queryParamValueList.add(displayNameParam);
         }
 
         if (StringUtils.isNotBlank(shortName)) {
             final SearchParamInfo shortNameParam = new SearchParamInfo();
-            shortNameParam.setKey(CurriculumManagementConstants.QUERY_PARAM_OPTIONAL_SHORT_NAME);
+            shortNameParam.setKey(CurriculumManagementConstants.OrganizationMessageKeys.ORG_QUERY_PARAM_OPTIONAL_SHORT_NAME);
             shortNameParam.getValues().add(shortName);
             queryParamValueList.add(shortNameParam);
         }
 
-        info("Searching for %s", queryParamValueList);
+        LOG.info("Searching for {}", queryParamValueList);
 
         final SearchRequestInfo searchRequest = new SearchRequestInfo();
-        searchRequest.setSearchKey(CurriculumManagementConstants.SEARCH_GENERIC);
+        searchRequest.setSearchKey(CurriculumManagementConstants.OrganizationMessageKeys.ORG_SEARCH_GENERIC);
         searchRequest.setParams(queryParamValueList);
         searchRequest.setStartAt(0);
         searchRequest.setNeededTotalResults(false);
-        searchRequest.setSortColumn(CurriculumManagementConstants.RESULT_COLUMN_OPTIONAL_ID);
+        searchRequest.setSortColumn(CurriculumManagementConstants.OrganizationMessageKeys.ORG_RESULT_COLUMN_OPTIONAL_ID);
 
         SearchResultInfo searchResult = null;
         try {
         	searchResult = getOrganizationService().search(searchRequest, ContextUtils.getContextInfo());
 		} catch (Exception e) {
-			e.printStackTrace();
+            LOG.error("An error occurred in getting search result.", e);
 		}
 
         for (final SearchResultRowInfo result : searchResult.getRows()) {
             final List<SearchResultCellInfo> cells = result.getCells();
             final OrganizationInfoWrapper cluOrgInfoDisplay = new OrganizationInfoWrapper();
             for (final SearchResultCellInfo cell : cells) {
-                debug("Got key %s", cell.getKey());
-                debug("Got value %s", cell.getValue());
-                
-                if ((CurriculumManagementConstants.RESULT_COLUMN_ID).equals(cell.getKey())) {
+                LOG.debug("Got key: {} value: {}", cell.getKey(), cell.getValue());
+
+                if ((CurriculumManagementConstants.OrganizationMessageKeys.ORG_RESULT_COLUMN_ID).equals(cell.getKey())) {
                     cluOrgInfoDisplay.setId(cell.getValue());
                 } 
-                else if ((CurriculumManagementConstants.RESULT_COLUMN_OPTIONAL_LONG_NAME).equals(cell.getKey())) {
+                else if ((CurriculumManagementConstants.OrganizationMessageKeys.ORG_RESULT_COLUMN_OPTIONAL_LONG_NAME).equals(cell.getKey())) {
                     cluOrgInfoDisplay.setOrganizationName(cell.getValue());
                 } 
-                else if ((CurriculumManagementConstants.RESULT_COLUMN_SHORT_NAME).equals(cell.getKey())) {
+                else if ((CurriculumManagementConstants.OrganizationMessageKeys.ORG_RESULT_COLUMN_SHORT_NAME).equals(cell.getKey())) {
                     cluOrgInfoDisplay.setAbbreviation(cell.getValue());
                 }
             }

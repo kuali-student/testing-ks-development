@@ -26,6 +26,7 @@
 				<!-- KSCM Application Bean Files -->
 				<!-- Curriculum Management Course Info -->
 				<value>classpath:org/kuali/student/cm/main/CourseMaintenanceView.xml</value>
+                <value>classpath:org/kuali/student/cm/main/CreateCourseInitialView.xml</value>
                 <value>classpath:org/kuali/student/cm/main/CourseRuleMaintenance.xml</value>
 				<value>classpath:org/kuali/student/cm/main/CourseViewCourseInfo.xml</value>
 				<value>classpath:org/kuali/student/cm/main/CourseViewGovernance.xml</value>
@@ -46,7 +47,7 @@
                 <value>classpath:org/kuali/student/cm/lookup/LoCategoryInfoWrapperView.xml</value>
                 <value>classpath:org/kuali/student/cm/lookup/LoDisplayInfoWrapperLookupView.xml</value>
 
-                <value>classpath:ks-CourseInfo-dictionary.xml</value> <!-- KSCM-720  Curriculum Management Course Info -->
+                <value>classpath:ks-CourseInfo-dictionary.xml</value>
                 <value>classpath:ks-ProposalInfo-dictionary.xml</value>
                 <value>classpath:org/kuali/student/cm/UifKsCmDefinitions.xml</value>
 
@@ -55,6 +56,7 @@
                 <value>classpath:org/kuali/student/cm/main/CourseSelectView.xml</value>
                 <value>classpath:org/kuali/student/cm/main/FindCourseLookupView.xml</value>
                 <value>classpath:org/kuali/student/cm/main/CMLUCustomComponents.xml</value>
+                <value>classpath:org/kuali/student/cm/lookup/ProposalLookup.xml</value>
 			</list>
 			</constructor-arg>
 		</bean>  

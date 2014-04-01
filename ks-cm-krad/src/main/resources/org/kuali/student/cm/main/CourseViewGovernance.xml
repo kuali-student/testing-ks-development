@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<!--
   Copyright 2005-2013 The Kuali Foundation
- 
+
   Licensed under the Educational Community License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
- 
+
   http://www.opensource.org/licenses/ecl2.php
- 
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,57 +15,48 @@
   limitations under the License.
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="KS-CourseView-GovernancePage" parent="KS-CourseView-BasePage"
-          p:headerText="Governance">
-        <property name="items">
-            <list> 
-                <ref bean="KS-CourseView-GovernancePage-Widgets" /> 
-            </list> 
-        </property> 
-    </bean>
-
-    <bean id="KS-CourseView-GovernancePage-Widgets" parent="Uif-VerticalBoxSection">
+    <bean id="KS-CourseView-Governance-Section" parent="KS-CourseView-VerticalBoxSection">
         <property name="headerText" value="Governance"/>
-        <property name="header.render" value="false"/>
         <property name="items">
             <list>
-                <bean parent="KS-Uif-InputField-LabelTop" p:propertyName="course.campusLocations" p:label="Campus Locations"
-                      p:instructionalText="" p:width="auto">
+                <bean parent="KS-Uif-InputField-LabelTop" p:propertyName="courseInfo.campusLocations" p:label="Campus Locations"
+                      p:instructionalText="" p:width="auto" >
                     <property name="control">
                         <bean parent="Uif-VerticalCheckboxesControl" />
                     </property>
                     <property name="optionsFinder">
                         <bean class="org.kuali.student.lum.lu.ui.course.keyvalues.CampusLocationsKeyValuesFinder"
                               p:addBlankOption="false" />
-                        
+
                     </property>
                 </bean>
 
-                <bean parent="Uif-HorizontalBoxSection"
+                <bean id="KS-Course-CurriculumOversight-field" parent="Uif-HorizontalBoxSection"
                       p:headerText="Curriculum Oversight"
                       p:instructionalText="This is the organization(s) responsible for the content of the course. This selection will determine the workflow/approval process for this proposal.">
+                    <property name="refreshWhenChangedPropertyNames" value="#dp.dataObject.courseInfo.subjectArea"/>
                     <property name="items">
                         <list>
-                            <bean parent="KS-Uif-InputField-LabelTop"
-                                  p:propertyName="unitsContentOwnerToAdd">
+                            <bean id="KS-Course-CurriculumOversight-input-field" parent="KS-Uif-InputField-LabelTop"
+                                  p:propertyName="unitsContentOwnerToAdd" >
                                 <property name="optionsFinder">
                                     <bean class="org.kuali.student.lum.lu.ui.course.keyvalues.OrgsBySubjectCodeValuesFinder"
                                           p:blankOption="true" />
                                 </property>
                                 <property name="control">
                                     <bean parent="Uif-DropdownControl" />
-                                </property>                            
+                                </property>
                             </bean>
-                            <bean parent="Uif-SecondaryActionButton-Small" p:actionLabel="Add" p:methodToCall="addUnitsContentOwner" />
+                            <bean parent="Uif-SecondaryActionButton-Small" p:id="addCurriculumOversight" p:actionLabel="Add" p:methodToCall="addUnitsContentOwner" />
                         </list>
                     </property>
                 </bean>
 
-                <bean parent="Uif-StackedCollectionGroup"
+                <bean id = "KS-Course-CurriculumOversight-Section" parent="Uif-StackedCollectionGroup"
                       p:propertyName="unitsContentOwner"
                       p:headerText="Curriculum Oversight"
                       p:collectionObjectClass="org.kuali.rice.core.api.util.ConcreteKeyValue"
@@ -95,7 +86,7 @@
                     </property>
                     <property name="items">
                         <list>
-                            <bean parent="Uif-DataField" p:labelRendered="false" p:propertyName="key"/>
+                            <bean parent="Uif-DataField" p:labelRendered="false" p:propertyName="key" />
                         </list>
                     </property>
                 </bean>
@@ -113,13 +104,19 @@
                   value="Organization @{(#index + 1)}" />
         <!-- <property name="collectionLookup.quickfinderAction.render"
                   value="false" /> -->
-        <property name="help">
-            <bean parent="Uif-Help"
+        <!--<property name="help">
+            <bean parent="Uif-KS-Help"
                   p:tooltipHelpContent="This is not a restrictive list - organizations here are additional organizations that can administer this course." />
+        </property>-->
+        <property name="header">
+            <bean parent="Uif-KS-IconHeader">
+                <property name="richHeaderMessage.iconToolTipText" value="This is not a restrictive list - organizations here are additional organizations that can administer this course."/>
+            </bean>
         </property>
         <property name="cssClasses">
             <list merge="true">
                 <value>cm-collection-width</value>
+                <value>admin-not-required-field</value>
             </list>
         </property>
         <property name="addLineActions">
@@ -129,10 +126,10 @@
         </property>
         <property name="items">
             <list>
-                <bean parent="Uif-InputField" p:propertyName="organizationName" p:id="organizationName">
+                <bean parent="Uif-InputField" p:propertyName="organizationName" p:id="organizationName" >
                     <property name="refreshWhenChangedPropertyNames" value="organizationName"/>
                     <property name="control">
-                        <bean parent="Uif-TextControl" p:size="50"/>
+                        <bean parent="Uif-TextControl" p:size="50" />
                     </property>
                     <property name="quickfinder">
                         <bean parent="Uif-QuickFinder">

@@ -19,35 +19,53 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="KS-CourseView-CourseRequisitesPage" parent="KS-CourseView-BasePage"
-		p:headerText="Course Requisites">
- 		<property name="items">
-			<list> 
- 				<bean parent="KRMS-AgendaMaintenance-DisclosureLinks"/>
-                <bean parent="KRMS-AgendaManage-Section" class="org.kuali.student.cm.course.service.util.CourseAgendaSection">
-                    <property name="propertyName" value="courseRuleManagementWrapper.agendas"/>
-                    <property name="rulePrototype">
-                        <ref bean="KS-AgendaManage-RulePrototype"/>
-                    </property>
-                </bean>
- 			</list> 
- 		</property> 
-	</bean>
-
-    <bean id="KS-CourseView-CourseRequisites-Widgets" parent="Uif-VerticalBoxSection">
+    <bean id="KS-CourseView-CourseRequisites-Section" parent="KS-CourseView-VerticalBoxSection">
         <property name="headerText" value="Course Requisites"/>
-        <property name="header.render" value="false"/>
         <property name="items">
             <list>
-                <bean parent="KRMS-AgendaMaintenance-DisclosureLinks"/>
-                <bean parent="KRMS-AgendaManage-Section" class="org.kuali.student.cm.course.service.util.CourseAgendaSection">
-                    <property name="propertyName" value="courseRuleManagementWrapper.agendas"/>
-                    <property name="rulePrototype">
-                        <ref bean="KS-AgendaManage-RulePrototype"/>
-                    </property>
+                <ref bean="CourseRequisites-NoRequiredMessageLink" />
+                <ref bean="CourseRequisites-CollectionSection" />
+            </list>
+        </property>
+    </bean>
+    <bean id="CourseRequisites-NoRequiredMessageLink" parent="Uif-HorizontalFieldGroup" >
+        <property name="style" value="display: none;" />
+        <property name="cssClasses">
+            <list merge="true">
+                <value>hide-when-show-all-fields</value>
+            </list>
+        </property>
+        <property name="items">
+            <list>
+                <bean parent="Uif-Message" p:id="CourseRequisites-NoRequiredMessage"
+                      p:messageText="No required fields." p:style="margin-top: 5px; margin-right: 0px;">
+                </bean>
+                <bean parent="KS-Uif-ActionLink" p:id="CourseRequisites-NoRequiredMessage-expand-link"
+                      p:actionScript="createCourseShowHideObjectiveElements('CourseRequisites-NoRequiredMessageLink', 'CourseRequisites-CollectionSection');"
+                      p:actionLabel="Show all fields" p:style="margin-right: 15pt; margin-top: 0px;">
                 </bean>
             </list>
         </property>
     </bean>
 
+    <bean id="CourseRequisites-CollectionSection" parent="Uif-VerticalBoxSection" p:headerText="">
+        <property name="cssClasses">
+            <list merge="true">
+                <value>admin-not-required-field</value>
+            </list>
+        </property>
+        <property name="items">
+            <list>
+                <bean parent="KRMS-AgendaMaintenance-DisclosureLinks"/>
+                <!-- KSCM-1727 - Move the Rules wrapper within CourseInfoWrapper
+                <bean parent="KRMS-AgendaManage-Section" class="org.kuali.student.cm.course.service.util.CourseAgendaSection">
+                    <property name="propertyName" value="document.newMaintainableObject.courseRuleManagementWrapper.agendas"/>
+                    <property name="rulePrototype">
+                        <ref bean="KS-AgendaManage-RulePrototype"/>
+                    </property>
+                </bean>
+                -->
+            </list>
+        </property>
+    </bean>
 </beans>

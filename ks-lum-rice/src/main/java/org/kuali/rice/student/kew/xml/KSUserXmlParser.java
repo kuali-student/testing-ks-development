@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.kuali.rice.kew.xml.UserXmlParser;
@@ -37,6 +36,8 @@ import org.kuali.rice.kim.impl.identity.type.EntityTypeContactInfoBo;
 import org.kuali.rice.kns.service.KNSServiceLocator;
 import org.kuali.rice.krad.data.KradDataServiceLocator;
 import org.kuali.rice.krad.service.SequenceAccessorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -45,7 +46,7 @@ import org.kuali.rice.krad.service.SequenceAccessorService;
  */
 public class KSUserXmlParser extends UserXmlParser {
 	
-    protected final Logger LOG = Logger.getLogger(getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(KSUserXmlParser.class);
 	
     private static final Namespace NAMESPACE = Namespace.getNamespace("", "ns:workflow/User");
 

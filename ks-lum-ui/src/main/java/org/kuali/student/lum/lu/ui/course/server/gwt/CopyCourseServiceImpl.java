@@ -3,7 +3,6 @@ package org.kuali.student.lum.lu.ui.course.server.gwt;
 import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.log4j.Logger;
 import org.kuali.student.common.ui.client.service.DataSaveResult;
 import org.kuali.student.common.ui.server.gwt.DataService;
 import org.kuali.student.r1.common.assembly.data.Data;
@@ -13,7 +12,6 @@ import org.kuali.student.r1.core.statement.dto.StatementTreeViewInfo;
 import org.kuali.student.r1.core.statement.service.StatementService;
 import org.kuali.student.r1.lum.statement.typekey.ReqComponentFieldTypes;
 import org.kuali.student.r2.common.dto.ContextInfo;
-import org.kuali.student.r2.common.dto.CurrencyAmountInfo;
 import org.kuali.student.r2.common.dto.DtoConstants;
 import org.kuali.student.r2.common.exceptions.AlreadyExistsException;
 import org.kuali.student.r2.common.exceptions.CircularRelationshipException;
@@ -26,7 +24,7 @@ import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
 import org.kuali.student.r2.common.exceptions.UnsupportedActionException;
 import org.kuali.student.r2.common.exceptions.VersionMismatchException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.core.proposal.dto.ProposalInfo;
 import org.kuali.student.r2.core.proposal.service.ProposalService;
 import org.kuali.student.r2.lum.clu.dto.AffiliatedOrgInfo;
@@ -42,11 +40,13 @@ import org.kuali.student.r2.lum.course.dto.CourseVariationInfo;
 import org.kuali.student.r2.lum.course.dto.FormatInfo;
 import org.kuali.student.r2.lum.course.dto.LoDisplayInfo;
 import org.kuali.student.r2.lum.course.service.CourseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(noRollbackFor = {DoesNotExistException.class}, rollbackFor = {Throwable.class})
 public class CopyCourseServiceImpl {
-    final static Logger LOG = Logger.getLogger(CopyCourseServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CopyCourseServiceImpl.class);
 
     private DataService courseDataService;
     private DataService courseProposalDataService;
@@ -105,12 +105,11 @@ public class CopyCourseServiceImpl {
             originalProposal.setName(null);
 
             //Create the proposal
-            ProposalInfo copiedProposal = proposalService.createProposal(documentType, originalProposal, ContextUtils.getContextInfo());
 
-            return copiedProposal;
+            return proposalService.createProposal(documentType, originalProposal, ContextUtils.getContextInfo());
 
         } catch (Exception e) {
-            LOG.error("Error copying proposal id:" + originalProposalId, e);
+            LOG.error(String.format("Error copying proposal id: %s", originalProposalId), e);
             throw e;
         }
     }

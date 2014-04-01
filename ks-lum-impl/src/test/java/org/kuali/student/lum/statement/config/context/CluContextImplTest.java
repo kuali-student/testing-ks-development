@@ -17,7 +17,7 @@ import org.kuali.student.r1.core.statement.dto.ReqCompFieldInfo;
 import org.kuali.student.r1.core.statement.dto.ReqComponentInfo;
 import org.kuali.student.r1.lum.statement.typekey.ReqComponentFieldTypes;
 import org.kuali.student.r2.common.exceptions.OperationFailedException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.lum.clu.dto.CluInfo;
 import org.kuali.student.r2.lum.clu.service.CluService;
 import org.kuali.student.r2.lum.statement.config.context.CluContextImpl;
@@ -202,14 +202,14 @@ public class CluContextImplTest extends AbstractServiceTest {
 		NLCluSet testCluSet = (NLCluSet) contextMap.get(CluContextImpl.TEST_CLU_SET_TOKEN);
 
 		Assert.assertNotNull(contextMap);
-		Assert.assertEquals(null, clu);
-		Assert.assertEquals(null, courseClu);
-		Assert.assertEquals(null, programClu);
-		Assert.assertEquals(null, testClu);
-		Assert.assertEquals(null, cluSet);
-		Assert.assertEquals(null, courseCluSet);
-		Assert.assertEquals(null, programCluSet);
-		Assert.assertEquals(null, testCluSet);
+		Assert.assertNull(clu);
+		Assert.assertNull(courseClu);
+		Assert.assertNull(programClu);
+		Assert.assertNull(testClu);
+		Assert.assertNull(cluSet);
+		Assert.assertNull(courseCluSet);
+		Assert.assertNull(programCluSet);
+		Assert.assertNull(testCluSet);
 
 	}
 

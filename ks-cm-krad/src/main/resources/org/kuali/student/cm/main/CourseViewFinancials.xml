@@ -1,73 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2005-2013 The Kuali Foundation Licensed under the Educational Community License, Version 2.0 (the "License"); 
-    you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.opensource.org/licenses/ecl2.php 
-    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS 
-    IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
+<!-- Copyright 2005-2013 The Kuali Foundation Licensed under the Educational Community License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.opensource.org/licenses/ecl2.php
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS
+    IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
     governing permissions and limitations under the License. -->
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:p="http://www.springframework.org/schema/p"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="KS-CourseView-FinancialsPage" parent="KS-CourseView-BasePage" p:headerText="Financials">
+    <bean id="KS-CourseView-Financials-Section" parent="KS-CourseView-VerticalBoxSection">
+        <property name="headerText" value="Financials"/>
         <property name="items">
             <list>
-                <ref bean="KS-CourseView-FinancialsPage-CourseFees-Widgets" />
-                <ref bean="KS-CourseView-FinancialsPage-Widgets" />
+                <ref bean="CourseView-Financials-NoRequiredMessageLink" />
+                <ref bean="CourseView-Financials-CollectionSection" />
             </list>
         </property>
     </bean>
 
-    <bean id="KS-CourseView-Financials" parent="Uif-VerticalBoxSection">
-        <property name="headerText" value="Logistics"/>
-        <property name="header.render" value="false"/>
+    <bean id="CourseView-Financials-CollectionSection" parent="Uif-VerticalBoxSection" p:headerText="">
+        <property name="cssClasses">
+            <list merge="true">
+                <value>admin-not-required-field</value>
+            </list>
+        </property>
         <property name="items">
             <list>
-                <ref bean="KS-CourseView-FinancialsPage-CourseFees-Widgets" />
-                <ref bean="KS-CourseView-FinancialsPage-Widgets" />
+                <ref bean="KS-CourseView-Financials-CourseFees-Widgets" />
+                <ref bean="KS-CourseView-Financials-Widgets" />
             </list>
         </property>
     </bean>
 
-    <bean id="KS-CourseView-FinancialsPage-CourseFees-Widgets" parent="Uif-HorizontalBoxSection" p:headerText="Course Fees">
+    <bean id="CourseView-Financials-NoRequiredMessageLink" parent="Uif-HorizontalFieldGroup" >
+        <property name="style" value="display: none;" />
+        <property name="cssClasses">
+            <list merge="true">
+                <value>hide-when-show-all-fields</value>
+            </list>
+        </property>
+        <property name="items">
+            <list>
+                <bean parent="Uif-Message" p:id="CourseView-Financials-NoRequiredMessage"
+                      p:messageText="No required fields." p:style="margin-top: 5px; margin-right: 0px;">
+                </bean>
+                <bean parent="KS-Uif-ActionLink" p:id="CourseRequisites-NoRequiredMessage-expand-link"
+                      p:actionScript="createCourseShowHideObjectiveElements('CourseView-Financials-NoRequiredMessageLink', 'CourseView-Financials-CollectionSection');"
+                      p:actionLabel="Show all fields" p:style="margin-right: 15pt; margin-top: 0px;">
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="KS-CourseView-Financials-CourseFees-Widgets" parent="Uif-HorizontalBoxSection" p:headerText="Course Fees">
         <property name="instructionalText" value="These are the required fees for the course, for example lab, material, field trips." />
     </bean>
 
-    <bean id="KS-CourseView-FinancialsPage-Widgets" parent="Uif-VerticalBoxSection">
+    <bean id="KS-CourseView-Financials-Widgets" parent="Uif-VerticalBoxSection">
         <property name="items">
             <list>
                 <!-- Rice 2.4 upgrade : Uif-RequiredMessage was replaced by requiredIndicator" -->
                 <bean parent="Uif-RequiredInstructionsMessage" p:messageText="Required on @{document.newMaintainableObject.requiredWorkflowMode}"/>
-                <bean parent="KS-Uif-InputField-LabelTop" p:label="Justification of Fees" p:propertyName="course.feeJustification.plain">
+                <bean parent="KS-Uif-InputField-LabelTop" p:label="Justification of Fees" p:propertyName="courseInfo.feeJustification.plain">
                     <property name="instructionalText" value="This is for internal use only and will not be seen by students." />
                     <!-- Rice 2.4 upgrade : removing fieldLabel.requiredMessage -->
                     <!--property name="fieldLabel.requiredMessage">
-                        <bean parent="Uif-RequiredMessage" p:messageText="Required on @{document.newMaintainableObject.requiredWorkflowMode}" />
+                        <bean parent="Uif-RequiredMessage" p:messageText="Required on @{document.newMaintainableObject.dataObject.requiredWorkflowMode}" />
                     </property-->
                     <property name="cssClasses">
                         <list>
                             <value>uif-label</value>
                         </list>
                     </property>
-                    <property name="simpleConstraint">
-                        <bean parent="RequiredConstraint">
-                            <property name="states">
-                                <list>
-                                    <value>S+</value>
+                    <property name="control">
+                        <bean parent="Uif-LargeTextAreaControl">
+                            <property name="cssClasses">
+                                <list merge="true">
+                                    <value>cm-charcount-max-500</value>
                                 </list>
                             </property>
                         </bean>
                     </property>
-                    <property name="control">
-                        <bean parent="Uif-LargeTextAreaControl" />
-                    </property>
                 </bean>
-
-
             </list>
         </property>
     </bean>
-
-
-
 </beans>

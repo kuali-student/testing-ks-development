@@ -1,20 +1,5 @@
 package org.kuali.student.lum.program   .service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -22,14 +7,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kuali.student.common.conversion.util.R1R2ConverterUtil;
 import org.kuali.student.common.test.util.ContextInfoTestUtility;
-import org.kuali.student.r2.lum.course.service.assembler.CourseAssemblerConstants;
-import org.kuali.student.r2.lum.program.service.assembler.MajorDisciplineDataGenerator;
-import org.kuali.student.r2.lum.program.service.assembler.ProgramAssemblerConstants;
 import org.kuali.student.r1.common.assembly.data.Metadata;
 import org.kuali.student.r1.common.assembly.dictionary.MetadataServiceImpl;
 import org.kuali.student.r1.core.statement.dto.ReqCompFieldTypeInfo;
-import org.kuali.student.r1.core.statement.dto.ReqComponentTypeInfo;
-import org.kuali.student.r1.core.statement.dto.StatementOperatorTypeKey;
 import org.kuali.student.r1.core.statement.service.StatementService;
 import org.kuali.student.r2.common.dto.AttributeInfo;
 import org.kuali.student.r2.common.dto.ContextInfo;
@@ -54,6 +34,7 @@ import org.kuali.student.r2.core.statement.dto.StatementOperator;
 import org.kuali.student.r2.core.statement.dto.StatementTreeViewInfo;
 import org.kuali.student.r2.lum.clu.dto.AdminOrgInfo;
 import org.kuali.student.r2.lum.course.dto.LoDisplayInfo;
+import org.kuali.student.r2.lum.course.service.assembler.CourseAssemblerConstants;
 import org.kuali.student.r2.lum.lo.dto.LoCategoryInfo;
 import org.kuali.student.r2.lum.lo.dto.LoInfo;
 import org.kuali.student.r2.lum.program.dto.CoreProgramInfo;
@@ -62,12 +43,30 @@ import org.kuali.student.r2.lum.program.dto.MajorDisciplineInfo;
 import org.kuali.student.r2.lum.program.dto.ProgramRequirementInfo;
 import org.kuali.student.r2.lum.program.dto.ProgramVariationInfo;
 import org.kuali.student.r2.lum.program.service.ProgramService;
+import org.kuali.student.r2.lum.program.service.assembler.MajorDisciplineDataGenerator;
+import org.kuali.student.r2.lum.program.service.assembler.ProgramAssemblerConstants;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.beans.IntrospectionException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:program-test-context.xml"})
@@ -113,7 +112,7 @@ public class TestProgramServiceImpl {
         assertNotNull(metadata);
 
         Map<String, Metadata> properties = metadata.getProperties();
-        assertTrue(properties.size() > 0);
+        assertTrue(!properties.isEmpty());
 
         assertTrue(properties.containsKey("universityClassification"));
         metadata = properties.get("universityClassification");
@@ -202,13 +201,13 @@ public class TestProgramServiceImpl {
 
     @Test
     public void testGetCoreProgram() throws InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, DoesNotExistException {
-        CoreProgramInfo core = null;
+        CoreProgramInfo core;
         try {
-            core = programService.getCoreProgram("d4ea77dd-b492-4554-b104-863e42c5f8b7", contextInfo);
+            programService.getCoreProgram("d4ea77dd-b492-4554-b104-863e42c5f8b7", contextInfo);
             fail("Should have received DoesNotExistException");
         } catch (DoesNotExistException dnee) {
             String expectedExceptionMessage = "Specified CLU is not a CoreProgram";
-            assertEquals("Expected DoesNotExistException has incorrect message:", expectedExceptionMessage, dnee.getMessage());
+            assertEquals("Expected DoesNotExistException has correct message:", expectedExceptionMessage, dnee.getMessage());
         }
         core = programService.getCoreProgram("00f5f8c5-fff1-4c8b-92fc-789b891e0849", contextInfo);
 
@@ -271,15 +270,15 @@ public class TestProgramServiceImpl {
     }
     @Test
     public void testGetMajorDiscipline() throws InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, DoesNotExistException {
-        MajorDisciplineInfo major = null;
+        MajorDisciplineInfo major;
 //        	MajorDisciplineDataGenerator generator = new MajorDisciplineDataGenerator();
         // MajorDisciplineInfo majorDisciplineInfo = generator.getMajorDisciplineInfoTestData();
         try {
-            major = programService.getMajorDiscipline("0d8c42bc-77ba-450e-ae0e-eecd76fae779", contextInfo);
+            programService.getMajorDiscipline("0d8c42bc-77ba-450e-ae0e-eecd76fae779", contextInfo);
             fail("Should have received DoesNotExistException");
         } catch (DoesNotExistException dnee) {
             String expectedExceptionMessage = "Specified CLU is not a Major Discipline";
-            assertEquals("Expected DoesNotExistException has incorrect message:", expectedExceptionMessage, dnee.getMessage());
+            assertEquals("Expected DoesNotExistException has correct message:", expectedExceptionMessage, dnee.getMessage());
         }
         major = programService.getMajorDiscipline("d4ea77dd-b492-4554-b104-863e42c5f8b7", contextInfo);
 
@@ -658,14 +657,8 @@ public class TestProgramServiceImpl {
         // Make the created the current version
         programService.setCurrentMajorDisciplineVersion(newMajorDiscipline.getId(), null, contextInfo);
 
-        MajorDisciplineInfo	newMajor = null;
-        try {
-            newMajor = programService.createNewMajorDisciplineVersion(createdMajor.getVersion().getVersionIndId(), "test make a new version", contextInfo);
-            assertTrue(true);
-        } catch (Exception e) {
-            assertTrue(false);
-        }
-
+        MajorDisciplineInfo	newMajor;
+        newMajor = programService.createNewMajorDisciplineVersion(createdMajor.getVersion().getVersionIndId(), "test make a new version", contextInfo);
         assertNotNull(newMajor);
 
     }
@@ -776,14 +769,6 @@ public class TestProgramServiceImpl {
         checkRichText(reqComponent.getDescr(), reqComponent2.getDescr());
         checkReqCompFields(reqComponent.getReqCompFields(), reqComponent.getReqCompFields());
         // TODO checkReqComponentType(reqComponent.getRequiredComponentType(), reqComponent2.getRequiredComponentType());
-    }
-
-    private static void checkReqComponentType(
-            ReqComponentTypeInfo requiredComponentType,
-            ReqComponentTypeInfo requiredComponentType2) {
-        assertNotNull(requiredComponentType);
-        assertNotNull(requiredComponentType2);
-        checkReqCompFieldTypes(requiredComponentType.getReqCompFieldTypeInfos(), requiredComponentType2.getReqCompFieldTypeInfos());
     }
 
     private static void checkReqCompFieldTypes(
@@ -1013,9 +998,12 @@ public class TestProgramServiceImpl {
 
         programService.deleteMajorDiscipline(majorDisciplineId, contextInfo);
         try {
-            retrievedMD = programService.getMajorDiscipline(majorDisciplineId, contextInfo);
+            programService.getMajorDiscipline(majorDisciplineId, contextInfo);
             fail("Retrieval of deleted MajorDiscipline should have thrown exception");
-        } catch (DoesNotExistException e) {}
+        } catch (DoesNotExistException e) {
+            assertNotNull(e.getMessage());
+            assertEquals(majorDisciplineId, e.getMessage());
+        }
     }
 
     private void fixLoCategoryIds(List<LoDisplayInfo> loDisplayInfoList) {
@@ -1066,13 +1054,6 @@ public class TestProgramServiceImpl {
         major.getCatalogDescr().setPlain(major.getCatalogDescr().getPlain() + "-updated");
         major.getCatalogPublicationTargets().add("kuali.lu.publication.GradCatalog");
 
-        for (String orgInfoId : major.getDivisionsFinancialControl()) {
-            orgInfoId = orgInfoId + "-updated";
-        }
-        for (String orgInfoId : major.getUnitsDeployment()) {
-            orgInfoId = orgInfoId + "-updated";
-        }
-
         List<String> reqIds = new ArrayList<String>();
         reqIds.add("REQ-200");
         reqIds.add("REQ-300");
@@ -1111,7 +1092,7 @@ public class TestProgramServiceImpl {
         programService.deleteProgramRequirement(req1.getId(), contextInfo);
         retrievedMD.getProgramRequirements().clear();
         MajorDisciplineInfo updatedMD2 = programService.updateMajorDiscipline(retrievedMD.getId(), retrievedMD, contextInfo);
-        assertEquals(0, updatedMD2.getProgramRequirements().size());
+        assertTrue(updatedMD2.getProgramRequirements().isEmpty());
         retrievedMD = programService.getMajorDiscipline(major.getId(), contextInfo);
         assertEquals(0, retrievedMD.getProgramRequirements() == null ? 0 : retrievedMD.getProgramRequirements().size());
     }
@@ -1152,7 +1133,7 @@ public class TestProgramServiceImpl {
     @Transactional
     public void testCreateBaccCredentialProgram() throws IllegalArgumentException, SecurityException, IntrospectionException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchFieldException, AlreadyExistsException, DataValidationErrorException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
         CredentialProgramDataGenerator generator = new CredentialProgramDataGenerator(ProgramAssemblerConstants.BACCALAUREATE_PROGRAM);
-        CredentialProgramInfo credentialProgramInfo = null;
+        CredentialProgramInfo credentialProgramInfo;
         assertNotNull(credentialProgramInfo = generator.getCPTestData());
         List<String> coreProgramIds = new ArrayList<String>();
         coreProgramIds.add("00f5f8c5-fff1-4c8b-92fc-789b891e0849");
@@ -1172,11 +1153,11 @@ public class TestProgramServiceImpl {
 
         try{
             programService.deleteCredentialProgram(credentialProgramId, contextInfo);
-            try {
-                retrievedCP = programService.getCredentialProgram(credentialProgramId, contextInfo);
-                fail("Retrieval of deleted CredentialProgram should have thrown exception");
-            } catch (DoesNotExistException e) {}
-        }catch (OperationFailedException e) {}
+            fail("OperationFailedException should have been thrown");
+        } catch (OperationFailedException e) {
+            assertNotNull(e.getMessage());
+            assertEquals("Deletion of CredentialProgram is not supported.", e.getMessage());
+        }
     }
 
     @Test
@@ -1243,7 +1224,7 @@ public class TestProgramServiceImpl {
     @Test
     @Transactional
     public void testUpdateVariationsByMajorDiscipline() throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, DataValidationErrorException, VersionMismatchException{
-        MajorDisciplineInfo majorDisciplineInfo = null;
+        MajorDisciplineInfo majorDisciplineInfo;
 
         majorDisciplineInfo = programService.getMajorDiscipline("d4ea77dd-b492-4554-b104-863e42c5f8b7", contextInfo);
         assertNotNull(majorDisciplineInfo);
@@ -1337,7 +1318,7 @@ public class TestProgramServiceImpl {
     @Test
     @Transactional
     public void testCreateVariationsByMajorDiscipline() throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, DataValidationErrorException, VersionMismatchException, PermissionDeniedException{
-        MajorDisciplineInfo majorDisciplineInfo = null;
+        MajorDisciplineInfo majorDisciplineInfo;
 
         majorDisciplineInfo = programService.getMajorDiscipline("d4ea77dd-b492-4554-b104-863e42c5f8b7", contextInfo);
         assertNotNull(majorDisciplineInfo);
@@ -1387,7 +1368,7 @@ public class TestProgramServiceImpl {
     @Test
     @Transactional
     public void testDeleteVariationsByMajorDiscipline() throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, DataValidationErrorException, VersionMismatchException{
-        MajorDisciplineInfo majorDisciplineInfo = null;
+        MajorDisciplineInfo majorDisciplineInfo;
 
         majorDisciplineInfo = programService.getMajorDiscipline("d4ea77dd-b492-4554-b104-863e42c5f8b7", contextInfo);
         assertNotNull(majorDisciplineInfo);
@@ -1490,13 +1471,12 @@ public class TestProgramServiceImpl {
         CoreProgramInfo retrievedCP = programService.getCoreProgram(coreProgramId, contextInfo);
         assertNotNull(retrievedCP);
 
-        try{
+        try {
             programService.deleteCoreProgram(coreProgramId, contextInfo);
-            try {
-                retrievedCP = programService.getCoreProgram(coreProgramId, contextInfo);
-                fail("Retrieval of deleted coreProgram should have thrown exception");
-            } catch (DoesNotExistException e) {}
-        }catch (OperationFailedException e) {}
+        } catch (OperationFailedException e) {
+            assertNotNull(e.getMessage());
+            assertEquals("Deletion of CoreProgram is not supported.", e.getMessage());
+        }
 
     }
 
@@ -1615,7 +1595,7 @@ public class TestProgramServiceImpl {
             // create a set of null parameters to pass to the method
             Object[] params = new Object[dummyMethod.getParameterTypes().length];
             try {
-                Object returned = dummyMethod.invoke(programService, params);
+                dummyMethod.invoke(programService, params);
                 fail("The invocation of " + s + " did not throw an UnsupportedOperationException");
             } catch (InvocationTargetException e) {
                 if (!(e.getTargetException() instanceof UnsupportedOperationException)) {
@@ -1643,19 +1623,13 @@ public class TestProgramServiceImpl {
         programService.setCurrentCoreProgramVersion(newCore.getId(), null,  contextInfo);
 
         // create a second version, and ensure the sequence numbers are different
-        CoreProgramInfo secondVersion = null;
+        CoreProgramInfo secondVersion;
 
-        try {
-            secondVersion = programService.createNewCoreProgramVersion(core.getVersion().getVersionIndId(), "test core program second version", contextInfo);
-            assertTrue(true);
-        }
-        catch (Exception e) {
-            assertTrue(false);
-        }
+        secondVersion = programService.createNewCoreProgramVersion(core.getVersion().getVersionIndId(), "test core program second version", contextInfo);
 
         assertNotNull(secondVersion);
 
-        assertTrue(newCore.getVersion().getSequenceNumber() != secondVersion.getVersion().getSequenceNumber());
+        assertFalse(newCore.getVersion().getSequenceNumber().equals(secondVersion.getVersion().getSequenceNumber()));
 
     }
 

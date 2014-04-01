@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.kuali.student.common.ui.client.service.DataSaveResult;
 import org.kuali.student.common.ui.server.gwt.DataGwtServlet;
 import org.kuali.student.core.statement.ui.client.widgets.rules.ReqComponentInfoUi;
@@ -18,7 +17,7 @@ import org.kuali.student.r1.common.assembly.data.Data;
 import org.kuali.student.r2.common.dto.RichTextInfo;
 import org.kuali.student.r2.core.search.dto.SearchRequestInfo;
 import org.kuali.student.r2.core.search.dto.SearchResultInfo;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r1.core.statement.dto.ReqComponentInfo;
 import org.kuali.student.r1.core.statement.dto.StatementTreeViewInfo;
 import org.kuali.student.r1.core.statement.service.StatementService;
@@ -27,12 +26,14 @@ import org.kuali.student.r2.core.proposal.service.ProposalService;
 import org.kuali.student.r2.lum.clu.service.CluService;
 import org.kuali.student.r2.lum.program.dto.ProgramRequirementInfo;
 import org.kuali.student.r2.lum.program.service.ProgramService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MajorDisciplineProposalRpcServlet extends DataGwtServlet implements MajorDisciplineProposalRpcService {
 
     public static final String PREVIOUS_VERSION_INFO = "previousVersionInfo";
 
-    final Logger LOG = Logger.getLogger(MajorDisciplineProposalRpcServlet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MajorDisciplineProposalRpcServlet.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -80,8 +81,9 @@ public class MajorDisciplineProposalRpcServlet extends DataGwtServlet implements
         Map<Integer, ProgramRequirementInfo> storedRules = new HashMap<Integer, ProgramRequirementInfo>();
         try
         {
-            for (Integer key : progReqs.keySet()) {
-                ProgramRequirementInfo rule = progReqs.get(key);
+            for (Map.Entry<Integer, ProgramRequirementInfo> entry : progReqs.entrySet()) {
+                final Integer key = entry.getKey();
+                final ProgramRequirementInfo rule = entry.getValue();
                 switch (states.get(key)) {
                     case STORED:
                         //rule was not changed so continue

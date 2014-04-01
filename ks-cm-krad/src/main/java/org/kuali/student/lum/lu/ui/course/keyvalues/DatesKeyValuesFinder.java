@@ -15,13 +15,6 @@
  */
 package org.kuali.student.lum.lu.ui.course.keyvalues;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.xml.namespace.QName;
-
 import org.kuali.rice.core.api.criteria.PredicateFactory;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
 import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
@@ -30,11 +23,18 @@ import org.kuali.rice.core.api.util.KeyValue;
 import org.kuali.rice.krad.uif.control.UifKeyValuesFinderBase;
 import org.kuali.rice.krad.uif.view.ViewModel;
 import org.kuali.rice.krad.web.form.MaintenanceDocumentForm;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.cm.course.form.CourseInfoWrapper;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.core.atp.dto.AtpInfo;
 import org.kuali.student.r2.core.atp.service.AtpService;
 import org.kuali.student.r2.core.constants.AtpServiceConstants;
 import org.kuali.student.r2.lum.course.dto.CourseInfo;
+
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * This is the helper class for CourseView
@@ -82,11 +82,11 @@ public class DatesKeyValuesFinder extends UifKeyValuesFinderBase {
             List<AtpInfo> searchResult) {
         if (model instanceof MaintenanceDocumentForm) {
             MaintenanceDocumentForm courseForm = (MaintenanceDocumentForm) model;
-            final CourseInfo courseInfo = (CourseInfo) courseForm.getDocument().getNewMaintainableObject().getDataObject();
-            if (courseInfo.isPilotCourse()) {
+            CourseInfoWrapper courseInfoWrapper = ((CourseInfoWrapper) courseForm.getDocument().getNewMaintainableObject().getDataObject());
+            if (courseInfoWrapper.isPilotCourse()) {
 
                 for (int i = 0; i < searchResult.size(); i++) {
-                    if (courseInfo.getStartTerm().equals(searchResult.get(i).getId().toString())) {
+                    if (courseInfoWrapper.getStartTerm().equals(searchResult.get(i).getId().toString())) {
                         break;
                     }
                     else {
@@ -94,6 +94,8 @@ public class DatesKeyValuesFinder extends UifKeyValuesFinderBase {
                         i--;
                     }
                 }
+            } else {
+                courseInfoWrapper.setEndTerm(null);
             }
             for (AtpInfo result : searchResult) {
                 keyValues.add(new ConcreteKeyValue(result.getId(), result.getName()));

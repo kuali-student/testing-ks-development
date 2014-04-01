@@ -2281,6 +2281,9 @@
                 <search:resultColumn id="course.code">
                     <search:dataType>string</search:dataType>
                 </search:resultColumn>
+                <search:resultColumn id="course.versionIndId">
+                    <search:dataType>string</search:dataType>
+                </search:resultColumn>
             </search:resultColumns>
         </search:searchResultTypeInfo>
         <search:searchCriteriaTypeInfo>
@@ -2683,6 +2686,24 @@
             </search:queryParams>
         </search:searchCriteriaTypeInfo>
     </search:searchType>-->
+    <search:searchType id="ksap.course.lui.code.find">
+        <search:searchResultTypeInfo>
+            <search:name/>
+            <search:desc/>
+            <search:resultColumns>
+                <search:resultColumn id="ksap.course.lui.code.find.result.code">
+                    <search:dataType>string</search:dataType>
+                </search:resultColumn>
+                <search:resultColumn id="ksap.course.lui.code.find.result.division">
+                    <search:dataType>string</search:dataType>
+                </search:resultColumn>
+            </search:resultColumns>
+        </search:searchResultTypeInfo>
+        <search:searchCriteriaTypeInfo>
+            <search:queryParams>
+            </search:queryParams>
+        </search:searchCriteriaTypeInfo>
+    </search:searchType>
 
     <bean id="queryMap" parent="queryMap-parent">
         <property name="sourceMap">
@@ -2736,6 +2757,7 @@
                         AND lui.CLU_ID = clu.ID
                         AND clu.ST = 'Active'
                         AND lui.ATP_ID IN :termList
+                        AND lui.LUI_STATE = 'kuali.lui.course.offering.state.offered'
                         ORDER BY ident.LUI_CD
                     </value>
                 </entry>
@@ -2769,13 +2791,16 @@
                         clu.ID
                         FROM
                         KSEN_LUI lui,
-                        KSLU_CLU clu
+                        KSLU_CLU clu,
+                        KSEN_LUI_IDENT ident
                         WHERE
                         UPPER( ' ' || lui.DESCR_PLAIN || ' ' ) LIKE '%' || :queryText || '%'
                         AND lui.CLU_ID = clu.ID
                         AND clu.ST = 'Active'
                         AND lui.ATP_ID IN :termList
-
+                        AND lui.LUI_STATE = 'kuali.lui.course.offering.state.offered'
+                        AND lui.ID = ident.LUI_ID
+                        ORDER BY ident.LUI_CD
                     </value>
                 </entry>
 
@@ -2821,7 +2846,7 @@
                         AND clu.id NOT IN (SELECT att.owner FROM CluAttribute att where
                         att.name='course.catalogOmit_ind' and att.value='Y')
                         AND clu.state='Active'
-                        ORDER BY ident.suffixCode
+                        ORDER BY ident.code
                     </value>
                 </entry>
 
@@ -2843,7 +2868,7 @@
                         AND clu.id NOT IN (SELECT att.owner FROM CluAttribute att where
                         att.name='course.catalogOmit_ind' and att.value='Y')
                         AND clu.state='Active'
-                        ORDER BY ident.suffixCode
+                        ORDER BY ident.code
                     </value>
                 </entry>
                 <entry key="ksap.lu.search.courseCode">
@@ -2862,7 +2887,7 @@
                         AND clu.id NOT IN (SELECT att.owner FROM CluAttribute att where
                         att.name='course.catalogOmit_ind' and att.value='Y')
                         AND clu.state='Active'
-                        ORDER BY ident.suffixCode
+                        ORDER BY ident.code
                     </value>
                 </entry>
                 <entry key="ksap.lu.search.exactCode">
@@ -2881,7 +2906,7 @@
                         AND clu.id NOT IN (SELECT att.owner FROM CluAttribute att where
                         att.name='course.catalogOmit_ind' and att.value='Y')
                         AND clu.state='Active'
-                        ORDER BY ident.suffixCode
+                        ORDER BY ident.code
                     </value>
                 </entry>
                 <entry key="ksap.lu.search.exactLevel">
@@ -2900,7 +2925,7 @@
                         AND clu.id NOT IN (SELECT att.owner FROM CluAttribute att where
                         att.name='course.catalogOmit_ind' and att.value='Y')
                         AND clu.state='Active'
-                        ORDER BY ident.suffixCode
+                        ORDER BY ident.code
                     </value>
                 </entry>
                 <entry key="ksap.lu.search.additionalDivision">
@@ -2919,7 +2944,7 @@
                         AND clu.id NOT IN (SELECT att.owner FROM CluAttribute att where
                         att.name='course.catalogOmit_ind' and att.value='Y')
                         AND clu.state='Active'
-                        ORDER BY ident.suffixCode
+                        ORDER BY ident.code
                     </value>
                 </entry>
                 <entry key="ksap.lu.search.division">
@@ -2938,38 +2963,9 @@
                         AND clu.id NOT IN (SELECT att.owner FROM CluAttribute att where
                         att.name='course.catalogOmit_ind' and att.value='Y')
                         AND clu.state='Active'
-                        ORDER BY ident.suffixCode
+                        ORDER BY ident.code
                     </value>
                 </entry>
-                <!--<entry key="ksap.course.info">-->
-                <!--<value>NATIVE:-->
-                <!--SELECT-->
-                <!--ident.LNG_NAME,-->
-                <!--trim( ident.SUFX_CD ),-->
-                <!--trim( ident.DIVISION ),-->
-                <!--trim( ident.LVL ),-->
-                <!--opt.RES_COMP_ID,-->
-                <!--ident.cd-->
-                <!--FROM-->
-                <!--KSLU_CLU clu,-->
-                <!--KSLU_CLU_IDENT ident,-->
-                <!--KSLU_CLU_RSLT res,-->
-                <!--KSLU_CLURES_JN_RESOPT jn,-->
-                <!--KSLU_RSLT_OPT opt-->
-                <!--WHERE-->
-                <!--clu.offic_clu_id = ident.id-->
-                <!--and-->
-                <!--clu.id = res.clu_id-->
-                <!--AND-->
-                <!--res.id = jn.clu_res_id-->
-                <!--AND-->
-                <!--jn.res_opt_id = opt.id-->
-                <!--AND-->
-                <!--res.TYPE_KEY_ID = 'kuali.resultType.creditCourseResult'-->
-                <!--AND-->
-                <!--clu.id = :courseID-->
-                <!--</value>-->
-                <!--</entry>-->
 
                 <entry key="ksap.course.info">
                     <value>NATIVE:
@@ -2980,7 +2976,8 @@
                         trim( ident.DIVISION ),
                         trim( ident.LVL ),
                         opt.RES_COMP_ID,
-                        ident.cd
+                        ident.cd,
+                        clu.ver_ind_id
                         FROM
                         KSLU_CLU clu,
                         KSLU_CLU_IDENT ident,
@@ -3016,36 +3013,23 @@
                 <entry key="ksap.course.info.gened">
                     <value>NATIVE:
                         SELECT
-                        OWNER,
-                        ATTR_NAME
-                        FROM KSLU_CLU_ATTR
+                        setJnClu.CLU_VER_IND_ID,
+                        setAttr.ATTR_VALUE
+                        FROM
+                        KSLU_CLU_SET_ATTR setAttr,
+                        KSLU_CLU_SET_JN_CLU setJnClu,
+                        KSLU_CLU_SET_JN_CLU_SET setJnSet,
+                        KSLU_CLU_SET cluSet
                         WHERE
-                        owner IN :courseIDs
-                        AND
-                        ATTR_VALUE = 'Y'
-                        AND
-                        ATTR_NAME like 'course.genEdRequirement.%'
+                        setJnClu.CLU_VER_IND_ID IN :courseIDs
+                        AND setAttr.OWNER = setJnClu.CLU_SET_ID
+                        AND setJnClu.CLU_SET_ID = setJNSet.CLU_SET_CHILD_ID
+                        AND setJnSet.CLU_SET_PARENT_ID = cluSet.ID
+                        AND cluSet.NAME = 'General Education'
+
                     </value>
                 </entry>
 
-                <!--<entry key="ksap.course.info.credits.details">-->
-                <!--<value>NATIVE:-->
-                <!--SELECT-->
-                <!--max( v.result_scale_id ),-->
-                <!--max( c.result_scale_type ),-->
-                <!--min( to_number( v.result_value )),-->
-                <!--max( to_number( v.result_value ))-->
-                <!--from-->
-                <!--ksen_lrc_result_value v,-->
-                <!--ksen_lrc_result_scale c-->
-                <!--where-->
-                <!--c.id = v.result_scale_id-->
-                <!--and-->
-                <!--c.result_scale_type = 'kuali.result.scale.type.credit'-->
-                <!--group by-->
-                <!--v.result_scale_id-->
-                <!--</value>-->
-                <!--</entry>-->
                 <entry key="ksap.course.info.credits.details">
                     <value>NATIVE:
                         SELECT
@@ -3176,7 +3160,7 @@
                         AND clu.id NOT IN (SELECT att.owner FROM CluAttribute att where
                         att.name='course.catalogOmit_ind' and att.value='Y')
                         AND clu.state='Active'
-                        ORDER BY ident.division, ident.suffixCode
+                        ORDER BY ident.division, ident.code
                     </value>
                 </entry>
 
@@ -3196,7 +3180,7 @@
                         AND clu.id NOT IN (SELECT att.owner FROM CluAttribute att where
                         att.name='course.catalogOmit_ind' and att.value='Y')
                         AND clu.state='Active'
-                        ORDER BY ident.division, ident.suffixCode
+                        ORDER BY ident.division, ident.code
                     </value>
                 </entry>
                 <entry key="ksap.course.version.id">
@@ -3205,6 +3189,23 @@
                         FROM KSLU_CLU clu
                         WHERE clu.id = :courseId OR (clu.ver_ind_id = :courseId) AND clu.EXP_FIRST_ATP = (select min(c.EXP_FIRST_ATP)
                         FROM KSLU_CLU c where c.ver_ind_id = clu.ver_ind_id and c.LAST_ATP >= :lastScheduledTerm group by c.ver_ind_id )
+                    </value>
+                </entry>
+                <entry key="ksap.course.lui.code.find">
+                    <value>NATIVE:
+                        SELECT DISTINCT
+                        cluIdent.SUFX_CD,
+                        cluIdent.DIVISION
+                        FROM
+                        KSLU_CLU clu,
+                        KSLU_CLU_IDENT cluIdent,
+                        KSEN_LUI lui,
+                        KSEN_LUI_IDENT luiIdent
+                        WHERE
+                        luiIdent.LUI_CD = :courseCd
+                        AND luiIdent.LUI_ID = lui.ID
+                        AND lui.CLU_ID = clu.ID
+                        AND clu.OFFIC_CLU_ID = cluIdent.ID
                     </value>
                 </entry>
 

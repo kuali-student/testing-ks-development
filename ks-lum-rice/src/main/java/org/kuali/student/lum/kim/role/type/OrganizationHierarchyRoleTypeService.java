@@ -19,7 +19,6 @@
 package org.kuali.student.lum.kim.role.type;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
 import org.kuali.rice.core.web.format.BooleanFormatter;
 import org.kuali.rice.kns.kim.role.RoleTypeServiceBase;
@@ -30,9 +29,11 @@ import org.kuali.student.r2.common.exceptions.InvalidParameterException;
 import org.kuali.student.r2.common.exceptions.MissingParameterException;
 import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.core.organization.dto.OrgInfo;
 import org.kuali.student.r2.core.organization.service.OrganizationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ import java.util.Map;
  *
  */
 public class OrganizationHierarchyRoleTypeService extends RoleTypeServiceBase {
-    private static final Logger LOG = Logger.getLogger(OrganizationHierarchyRoleTypeService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OrganizationHierarchyRoleTypeService.class);
 
     public static final String DESCEND_HIERARCHY_TRUE_VALUE = "Y";
     public static final String DESCEND_HIERARCHY_FALSE_VALUE = "N";
@@ -102,7 +103,7 @@ public class OrganizationHierarchyRoleTypeService extends RoleTypeServiceBase {
              */
             return false;
         } catch (Exception e) {
-            LOG.error(e);
+            LOG.error("Exception occurred", e);
             throw new RuntimeException(e);
         }
     }

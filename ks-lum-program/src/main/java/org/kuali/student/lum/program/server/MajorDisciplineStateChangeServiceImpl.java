@@ -11,7 +11,7 @@ import org.kuali.student.r2.common.exceptions.InvalidParameterException;
 import org.kuali.student.r2.common.exceptions.MissingParameterException;
 import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 
 import org.kuali.student.r2.core.atp.dto.AtpInfo;
 import org.kuali.student.r2.core.atp.service.AtpService;
@@ -182,8 +182,8 @@ public class MajorDisciplineStateChangeServiceImpl implements StateChangeService
 
 		List<VersionDisplayInfo> versions = programService.getVersions(ProgramServiceConstants.PROGRAM_NAMESPACE_MAJOR_DISCIPLINE_URI, 
 				selectedVersion.getVersion().getVersionIndId(),ContextUtils.getContextInfo());
-		Long startSeq = new Long(1);
 
+        Long startSeq = Long.valueOf(1);
 		if (!isSelectedVersionCurrent) {
 						
 			startSeq = currentVersion.getVersion().getSequenceNumber() + 1;

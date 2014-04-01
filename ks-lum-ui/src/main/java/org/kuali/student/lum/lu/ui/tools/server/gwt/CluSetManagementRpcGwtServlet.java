@@ -15,7 +15,6 @@
 
 package org.kuali.student.lum.lu.ui.tools.server.gwt;
 
-import org.apache.log4j.Logger;
 import org.kuali.student.common.ui.client.service.DataSaveResult;
 import org.kuali.student.common.ui.client.service.exceptions.OperationFailedException;
 import org.kuali.student.common.ui.server.gwt.DataGwtServlet;
@@ -23,21 +22,21 @@ import org.kuali.student.r2.core.search.dto.SearchRequestInfo;
 import org.kuali.student.r2.core.search.dto.SearchResultCellInfo;
 import org.kuali.student.r2.core.search.dto.SearchResultInfo;
 import org.kuali.student.r2.core.search.dto.SearchResultRowInfo;
-import org.kuali.student.r2.lum.lrc.dto.ResultValueRangeInfo;
 import org.kuali.student.r2.lum.lrc.service.LRCService;
 import org.kuali.student.lum.common.client.widgets.CluInformation;
 import org.kuali.student.lum.common.client.widgets.CluSetInformation;
 import org.kuali.student.lum.common.client.widgets.CluSetManagementRpcService;
 import org.kuali.student.r1.common.assembly.data.AssemblyException;
 import org.kuali.student.r1.common.assembly.data.Data;
-import org.kuali.student.r2.common.dto.AttributeInfo;
 import org.kuali.student.r2.common.dto.ContextInfo;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.core.versionmanagement.dto.VersionDisplayInfo;
 import org.kuali.student.r2.lum.clu.dto.*;
 import org.kuali.student.r2.lum.clu.service.CluService;
 import org.kuali.student.r2.lum.lrc.dto.ResultValuesGroupInfo;
 import org.kuali.student.r2.lum.util.constants.CluServiceConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +46,7 @@ public class CluSetManagementRpcGwtServlet extends DataGwtServlet implements
 		CluSetManagementRpcService {
 
 	private static final long serialVersionUID = 1L;
-	final static Logger LOG = Logger.getLogger(CluSetManagementRpcGwtServlet.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CluSetManagementRpcGwtServlet.class);
 	private CluService cluService;
 	private LRCService lrcService;
     
@@ -169,7 +168,8 @@ public class CluSetManagementRpcGwtServlet extends DataGwtServlet implements
                     if (cluInfo != null) {
 
                         //retrieve credits
-                        String credits = "";
+                        StringBuffer credits = new StringBuffer("");
+
                         List<CluResultInfo> cluResultInfos = cluService.getCluResultByClu(versionInfo.getId(), contextInfo);
                         if (cluResultInfos != null) {
                             for (CluResultInfo cluResultInfo : cluResultInfos) {
@@ -198,22 +198,25 @@ public class CluSetManagementRpcGwtServlet extends DataGwtServlet implements
                                     continue;
                                 }
 
-                                if (!credits.isEmpty()) {
-                                    credits = credits + "; ";
+                                if (!credits.toString().isEmpty()) {
+                                    credits.append("; ");
                                 }
 
                                 if (creditType.equals("kuali.result.values.group.type.fixed")) {
-                                    credits = credits + resultValues.get(0).substring(33);
+                                    credits.append(resultValues.get(0).substring(33)) ;
                                 } else if (creditType.equals("kuali.result.values.group.type.multiple")) {
                                     boolean firstValue = true;
                                     for (String resultValue : resultValues) {
-                                        credits = credits + (firstValue ? "" :", ")  + resultValue.substring(33);
+                                        credits.append(firstValue ? "" :", ");
+                                        credits.append(resultValue.substring(33));
                                         firstValue = false;
                                     }
                                 } else if (creditType.equals("kuali.result.values.group.type.range")) {
                                     String minCredits = resultComponentInfo.getResultValueRange().getMinValue();
                                     String maxCredits = resultComponentInfo.getResultValueRange().getMaxValue();
-                                    credits += minCredits + " - " + maxCredits;
+                                    credits.append(minCredits);
+                                    credits.append(" - ");
+                                    credits.append(maxCredits);
                                 }
                             }
                         }
@@ -222,7 +225,7 @@ public class CluSetManagementRpcGwtServlet extends DataGwtServlet implements
                         if (cluInfo.getOfficialIdentifier() != null) {
                             cluInformation.setCode(cluInfo.getOfficialIdentifier().getCode());
                             cluInformation.setTitle(cluInfo.getOfficialIdentifier().getShortName());
-                            cluInformation.setCredits(credits);
+                            cluInformation.setCredits(credits.toString());
                         }
                         
                         cluInformation.setType(cluInfo.getTypeKey());

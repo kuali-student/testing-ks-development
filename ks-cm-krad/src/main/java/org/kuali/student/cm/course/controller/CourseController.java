@@ -19,58 +19,52 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
 import org.kuali.rice.core.api.util.ConcreteKeyValue;
 import org.kuali.rice.core.api.util.KeyValue;
 import org.kuali.rice.kew.api.KewApiConstants;
+import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.kim.api.KimConstants;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.identity.entity.Entity;
-import org.kuali.rice.kim.api.identity.entity.EntityDefault;
 import org.kuali.rice.kim.api.identity.name.EntityNameContract;
+import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
 import org.kuali.rice.krad.uif.UifConstants;
 import org.kuali.rice.krad.uif.UifParameters;
+import org.kuali.rice.krad.util.ErrorMessage;
+import org.kuali.rice.krad.util.GlobalVariables;
+import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.web.form.DocumentFormBase;
 import org.kuali.rice.krad.web.form.MaintenanceDocumentForm;
 import org.kuali.rice.krad.web.form.UifFormBase;
-import org.kuali.student.cm.course.form.CluInstructorInfoWrapper;
-import org.kuali.student.cm.course.form.CourseJointInfoWrapper;
-import org.kuali.student.cm.course.form.CourseRuleManagementWrapper;
-import org.kuali.student.cm.course.form.CreateCourseForm;
+import org.kuali.student.cm.common.util.CurriculumManagementConstants;
+import org.kuali.student.cm.common.util.CurriculumManagementConstants.CourseViewSections;
+import org.kuali.student.cm.course.form.CourseInfoWrapper;
 import org.kuali.student.cm.course.form.LoDisplayInfoWrapper;
 import org.kuali.student.cm.course.form.LoDisplayWrapperModel;
-import org.kuali.student.cm.course.form.OrganizationInfoWrapper;
 import org.kuali.student.cm.course.form.RecentlyViewedDocsUtil;
-import org.kuali.student.cm.course.form.ReviewInfo;
 import org.kuali.student.cm.course.form.SupportingDocumentInfoWrapper;
 import org.kuali.student.cm.course.service.CourseInfoMaintainable;
-import org.kuali.student.cm.course.service.util.CourseCodeSearchUtil;
-import org.kuali.student.lum.lu.util.CurriculumManagementConstants;
-import org.kuali.student.core.organization.ui.client.mvc.model.MembershipInfo;
-import org.kuali.student.core.workflow.ui.client.widgets.WorkflowUtilities.DecisionRationaleDetail;
+import org.kuali.student.cm.course.util.CourseProposalUtil;
+import org.kuali.student.common.uif.util.GrowlIcon;
+import org.kuali.student.common.uif.util.KSUifUtils;
+import org.kuali.student.common.uif.util.KSViewAttributeValueReader;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r1.core.subjectcode.service.SubjectCodeService;
-import org.kuali.student.r2.common.dto.DtoConstants;
+import org.kuali.student.r2.common.constants.CommonServiceConstants;
 import org.kuali.student.r2.common.dto.DtoConstants.DtoState;
 import org.kuali.student.r2.common.dto.RichTextInfo;
-import org.kuali.student.r2.common.exceptions.DoesNotExistException;
-import org.kuali.student.r2.common.exceptions.InvalidParameterException;
-import org.kuali.student.r2.common.exceptions.MissingParameterException;
-import org.kuali.student.r2.common.exceptions.OperationFailedException;
-import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.r2.common.util.date.DateFormatters;
+import org.kuali.student.r2.core.class1.type.service.TypeService;
 import org.kuali.student.r2.core.comment.dto.CommentInfo;
-import org.kuali.student.r2.core.comment.dto.DecisionInfo;
 import org.kuali.student.r2.core.comment.service.CommentService;
 import org.kuali.student.r2.core.constants.CommentServiceConstants;
 import org.kuali.student.r2.core.constants.DocumentServiceConstants;
-import org.kuali.student.r2.core.constants.KSKRMSServiceConstants;
 import org.kuali.student.r2.core.constants.ProposalServiceConstants;
+import org.kuali.student.r2.core.constants.TypeServiceConstants;
 import org.kuali.student.r2.core.document.dto.DocumentInfo;
 import org.kuali.student.r2.core.document.dto.RefDocRelationInfo;
 import org.kuali.student.r2.core.document.service.DocumentService;
-import org.kuali.student.r2.core.proposal.dto.ProposalInfo;
 import org.kuali.student.r2.core.proposal.service.ProposalService;
 import org.kuali.student.r2.core.search.dto.SearchRequestInfo;
 import org.kuali.student.r2.core.search.dto.SearchResultCellInfo;
@@ -78,11 +72,11 @@ import org.kuali.student.r2.core.search.dto.SearchResultRowInfo;
 import org.kuali.student.r2.lum.clu.service.CluService;
 import org.kuali.student.r2.lum.course.dto.CourseCrossListingInfo;
 import org.kuali.student.r2.lum.course.dto.CourseInfo;
-import org.kuali.student.r2.lum.course.dto.CourseVariationInfo;
-import org.kuali.student.r2.lum.course.dto.LoDisplayInfo;
 import org.kuali.student.r2.lum.course.service.CourseService;
 import org.kuali.student.r2.lum.util.constants.CluServiceConstants;
 import org.kuali.student.r2.lum.util.constants.CourseServiceConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -94,32 +88,21 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static org.kuali.student.logging.FormattedLogger.debug;
-import static org.kuali.student.logging.FormattedLogger.error;
-import static org.kuali.student.logging.FormattedLogger.info;
-import static org.kuali.student.logging.FormattedLogger.warn;
 
 /**
  * This controller handles all the requests from the 'Create a Course' UI.
- * 
- * @author OpenCollab/rSmart KRAD CM Conversion Alliance!
  */
 @Controller
-@RequestMapping(value = "/courses")
+@RequestMapping(value = CurriculumManagementConstants.ControllerRequestMappings.CREATE_COURSE)
 public class CourseController extends CourseRuleEditorController {
-        
-    private static final String DECISIONS_DIALOG_KEY        = "decisionsDialog";    
-    private static final String VIEW_CURRENT_PAGE_ID        = "view.currentPageId";
-    private static final String COURSE_MODIFY_DOC_TYPE_NAME = "kuali.proposal.type.course.modify";
-    private static final String COURSE_CREATE_DOC_TYPE_NAME = "kuali.proposal.type.course.create";
-    private static final String COURSE_RETIRE_DOC_TYPE_NAME = "kuali.proposal.type.course.retire";
-    private static final String CREDIT_COURSE_CLU_TYPE_KEY  = "kuali.lu.typeKey.CreditCourse";
+
+    private static final Logger LOG = LoggerFactory.getLogger(CourseController.class);
+
+    public static final String URL_PARAM_USE_CURRICULUM_REVIEW = "useCurriculumReview";
+    private static final String DECISIONS_DIALOG_KEY = "decisionsDialog";
 
     private CourseService courseService;
     private CommentService commentService;
@@ -128,192 +111,170 @@ public class CourseController extends CourseRuleEditorController {
     private IdentityService identityService;
     private CluService cluService;
     private ProposalService proposalService;
-    
-    private enum CourseViewPages {
-        CREATE_COURSE_ENTRY("KS-CourseView-createCourseInitialPage"),
-        COURSE_INFO("KS-CourseView-CourseInfoPage"),
-        GOVERNANCE("KS-CourseView-GovernancePage"), 
-        COURSE_LOGISTICS("KS-CourseView-CourseLogisticsPage"), 
-        LEARNING_OBJECTIVES("KS-CourseView-LearningObjectivesPage"), 
-        COURSE_REQUISITES("KS-CourseView-CourseRequisitesPage"), 
-        ACTIVE_DATES("KS-CourseView-ActiveDatesPage"), 
-        FINANCIALS("KS-CourseView-FinancialsPage"),
-        AUTHORS_AND_COLLABORATORS("KS-CourseView-AuthorsAndCollaboratorsPage"),
-        SUPPORTING_DOCUMENTS("KS-CourseView-SupportingDocumentsPage"),
-        REVIEW_PROPOSAL("KS-CourseView-ReviewProposalPage");
-        
-        private String pageId;
-        
-        CourseViewPages(String pageId) {
-            this.pageId = pageId;
-        }
-        
-        String getPageId() {
-            return this.pageId;
-        }
+    private TypeService typeService;
 
+    /**
+     * The bean ids of the pages within the view.
+     */
+    public static class PageNames {
+        public final static String REVIEW_PROPOSAL = "KS-CourseView-ReviewProposalPage";
+        public final static String CREATE_COURSE = "KS-CourseView-CoursePage";
     }
 
+    /**
+     * This method creates the form and in the case of a brand new proposal where this method is called after the user uses
+     * the Initial Create Proposal screen, this method will also set the document type name based on the request parameter
+     * #URL_PARAM_USE_CURRICULUM_REVIEW
+     *
+     * @param request
+     * @return a new instance of a MaintenanceDocumentForm
+     */
     @Override
-    protected CreateCourseForm createInitialForm(HttpServletRequest request) {
-        return new CreateCourseForm();
+    protected MaintenanceDocumentForm createInitialForm(HttpServletRequest request) {
+        MaintenanceDocumentForm form = new MaintenanceDocumentForm();
+        String useReviewProcessParam = request.getParameter(URL_PARAM_USE_CURRICULUM_REVIEW);
+        // only do the manually setup of the MaintenanceDocumentForm fields if the URL_PARAM_USE_CURRICULUM_REVIEW param was passed in from initial view
+        if (StringUtils.isNotBlank(useReviewProcessParam)) {
+            Boolean isUseReviewProcess = new Boolean(useReviewProcessParam);
+            // throw an exception if the user is not a CS use but attempts to disable Curriculum Review for a proposal
+            if (!isUseReviewProcess && !CourseProposalUtil.isUserCurriculumSpecialist()) {
+                throw new RuntimeException("A user " + GlobalVariables.getUserSession().getPerson().getPrincipalName() + " who is not allowed to disable Curriculum Review (Workflow Approval) has attempted to.");
+            }
+            // set the doc type name based on the whether the user is CS and if they have chosen to use curriculum review
+            form.setDocTypeName((!isUseReviewProcess) ? CurriculumManagementConstants.DocumentTypeNames.CourseProposal.COURSE_CREATE_ADMIN : CurriculumManagementConstants.DocumentTypeNames.CourseProposal.COURSE_CREATE);
+        }
+        return form;
     }
-    
+
     /**
-     * After the document is loaded calls method to setup the maintenance object
+     * Overridden because we needed a point at which the form is loaded with the document before we can initialize some
+     * form fields. This method is used for when a new document is created.
+     *
+     * @param form - form instance that contains the doc type parameter and where
+     *             the new document instance should be set
      */
+    @Override
+    protected void createDocument(DocumentFormBase form) throws WorkflowException {
+        super.createDocument(form);
+        // at this point we have the document type name set on the form so we use it to update the Course specific fields
+        updateCourseForm(form);
+    }
+
+    /**
+     * Overridden because we needed a point at which the form is loaded with the document before we can initialize some
+     * form fields. This method is used for loading an existing document.
+     *
+     * @param form - form instance that contains the doc id parameter and where
+     *             the retrieved document instance should be set
+     */
+    @Override
+    protected void loadDocument(DocumentFormBase form) throws WorkflowException {
+        super.loadDocument(form);
+        // at this point we have the document type name set on the form so we use it to update the Course specific fields
+        updateCourseForm(form);
+    }
+
+    /**
+     * Currently updates the MaintenanceDocumentForm to set the 'useReviewProcess' property based on the document type name. If
+     * the document type name is CurriculumManagementConstants#DocumentTypeNames#CourseProposal#COURSE_CREATE_ADMIN or
+     * CurriculumManagementConstants#DocumentTypeNames#CourseProposal#COURSE_MODIFY_ADMIN then set 'useReviewProcss' to
+     * false
+     *
+     * @param form the DocumentFormBase object to update
+     */
+    protected void updateCourseForm(DocumentFormBase form) {
+        CourseInfoWrapper wrapper = ((CourseInfoWrapper)((MaintenanceDocumentForm)form).getDocument().getNewMaintainableObject().getDataObject());
+        wrapper.getUiHelper()
+                .setUseReviewProcess(!ArrayUtils.contains(CurriculumManagementConstants.DocumentTypeNames.ADMIN_DOC_TYPE_NAMES, form.getDocTypeName()));
+        wrapper.getUiHelper()
+                .setCurriculumSpecialistUser(CourseProposalUtil.isUserCurriculumSpecialist());
+    }
+
+    /**
+     * This method is being overridden to validate the Review Proposal page before it is displayed.
+     *
+     * {@inheritDoc}
+     */
+    @Override
     @RequestMapping(params = "methodToCall=docHandler")
-    public ModelAndView docHandler(@ModelAttribute("KualiForm") DocumentFormBase form, BindingResult result,
-                HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ModelAndView docHandler(@ModelAttribute("KualiForm") DocumentFormBase formBase, BindingResult result, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        ModelAndView modelAndView = super.docHandler(formBase, result, request, response);
 
-        final MaintenanceDocumentForm maintenanceDocForm = (MaintenanceDocumentForm) form;
-
-        maintenanceDocForm.setDocTypeName(COURSE_CREATE_DOC_TYPE_NAME);
-        maintenanceDocForm.setDataObjectClassName(CourseInfo.class.getName());
-
-        try {
-            redrawDecisionTable(maintenanceDocForm);
+        if (formBase.getPageId().equals(PageNames.REVIEW_PROPOSAL)) {
+            KRADServiceLocatorWeb.getViewValidationService().validateViewAgainstNextState(formBase);
         }
-        catch (Exception e) {
-            error(CurriculumManagementConstants.ConfigProperties.UNABLE_TO_CREATE_DECISION_TABLE, e.getMessage());
+        return modelAndView;
+    }
+    @Override
+    public ModelAndView route(@ModelAttribute("KualiForm") DocumentFormBase form, BindingResult result, HttpServletRequest request, HttpServletResponse response) {
+        // manually call the view validation service as this validation cannot be run client-side in current setup
+//        KRADServiceLocatorWeb.getViewValidationService().validateView(form.getPostedView(), form, KewApiConstants.ROUTE_HEADER_ENROUTE_CD);
+        KSViewAttributeValueReader reader = new KSViewAttributeValueReader(form);
+        KRADServiceLocatorWeb.getDictionaryValidationService().validate(reader, true, KewApiConstants.ROUTE_HEADER_ENROUTE_CD, form.getView().getStateMapping());
+        if (!GlobalVariables.getMessageMap().hasErrors()) {
+            return super.route(form, result, request, response);    //To change body of overridden methods use File | Settings | File Templates.
         }
-
-        // Create the document in the super method
-        final ModelAndView retval = super.docHandler(maintenanceDocForm, result, request, response);
-                
-        final CourseInfoMaintainable maintainable = getCourseMaintainableFrom(maintenanceDocForm);
-        
-        // We can actually get this from the workflow document initiator id. It doesn't need to be stored in the form.
-        maintainable.setUserId(ContextUtils.getContextInfo().getPrincipalId());
-        
-        // Initialize Course Requisites
-        final CourseRuleManagementWrapper ruleWrapper = maintainable.getCourseRuleManagementWrapper();
-        ruleWrapper.setNamespace(KSKRMSServiceConstants.NAMESPACE_CODE);
-
-        ruleWrapper.setRefDiscriminatorType(CourseServiceConstants.REF_OBJECT_URI_COURSE);
-        ruleWrapper.setRefObjectId(maintainable.getCourse().getId());
-
-        ruleWrapper.setAgendas(maintainable.getAgendasForRef(ruleWrapper.getRefDiscriminatorType(), ruleWrapper.getRefObjectId()));
-
-        if (KewApiConstants.INITIATE_COMMAND.equals(maintenanceDocForm.getCommand())) {
-            
-            // After creating the document, modify the state
-            maintainable.getCourse().setStateKey(DtoConstants.STATE_DRAFT);
-            maintainable.setLastUpdated(DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss").print(new DateTime()));
-            maintainable.getCourse().setEffectiveDate(new java.util.Date());
-
-            maintainable.getCourse().setTypeKey(CREDIT_COURSE_CLU_TYPE_KEY);
-
-            // Initialize Curriculum Oversight if it hasn't already been.
-            if (maintainable.getCourse().getUnitsContentOwner() == null) {
-                maintainable.getCourse().setUnitsContentOwner(new ArrayList<String>());
-            }
-            
-        } 
-        else if (ArrayUtils.contains(DOCUMENT_LOAD_COMMANDS, maintenanceDocForm.getCommand()) && maintenanceDocForm.getDocId() != null) {
-            ProposalInfo proposal = null;
-            try {            
-                proposal = getProposalService().getProposalByWorkflowId(maintenanceDocForm.getDocument().getDocumentHeader().getDocumentNumber(), ContextUtils.getContextInfo());
-                maintainable.setProposal(proposal);
-            }
-            catch (Exception e) {
-                warn(CurriculumManagementConstants.ConfigProperties.UNABLE_TO_RETRIEVE_PROPOSAL, e.getMessage());
-            }
-        }
-        
-        return retval;
+        return getUIFModelAndView(form);
     }
 
     /**
-     * After the Craete course initial data is filled call the method to show the navigation panel and
-     * setup the maintenance object
+     * load the course proposal review page
      */
-    @RequestMapping(params = "methodToCall=ContinueCreateCourse")
-    public ModelAndView ContinueCreateCourse(@ModelAttribute("KualiForm") DocumentFormBase form, BindingResult result,
-                                   HttpServletRequest request, HttpServletResponse response) throws Exception {
-        final CreateCourseForm maintenanceDocForm = (CreateCourseForm) form;
-
-        maintenanceDocForm.setDocTypeName(COURSE_CREATE_DOC_TYPE_NAME);
-        maintenanceDocForm.setDataObjectClassName(CourseInfo.class.getName());
-        maintenanceDocForm.setPageId(getNextPageId(request.getParameter(VIEW_CURRENT_PAGE_ID)));
-        try {
-            redrawDecisionTable(maintenanceDocForm);
-        }
-        catch (Exception e) {
-            error(CurriculumManagementConstants.ConfigProperties.UNABLE_TO_CREATE_DECISION_TABLE, e.getMessage());
-        }
-
-        maintenanceDocForm.setRenderNavigationPanel(true);
-        // Create the document in the super method
-        super.docHandler(maintenanceDocForm, result, request, response);
-
-        final CourseInfoMaintainable maintainable = getCourseMaintainableFrom(maintenanceDocForm);
-
-        CourseInfo coInfo = maintainable.getCourse();
-
-        // We can actually get this from the workflow document initiator id. It doesn't need to be stored in the form.
-        maintainable.setUserId(ContextUtils.getContextInfo().getPrincipalId());
-
-        // Initialize Course Requisites
-        final CourseRuleManagementWrapper ruleWrapper = maintainable.getCourseRuleManagementWrapper();
-        ruleWrapper.setNamespace(KSKRMSServiceConstants.NAMESPACE_CODE);
-
-        ruleWrapper.setRefDiscriminatorType(CourseServiceConstants.REF_OBJECT_URI_COURSE);
-        ruleWrapper.setRefObjectId(coInfo.getId());
-
-        ruleWrapper.setAgendas(maintainable.getAgendasForRef(ruleWrapper.getRefDiscriminatorType(), ruleWrapper.getRefObjectId()));
-
-        if (KewApiConstants.INITIATE_COMMAND.equals(maintenanceDocForm.getCommand())) {
-
-            // After creating the document, modify the state
-            coInfo.setStateKey(DtoConstants.STATE_DRAFT);
-            maintainable.setLastUpdated(DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss").print(new DateTime()));
-            coInfo.setEffectiveDate(new java.util.Date());
-
-            coInfo.setTypeKey(CREDIT_COURSE_CLU_TYPE_KEY);
-
-            // Initialize Curriculum Oversight if it hasn't already been.
-            if (coInfo.getUnitsContentOwner() == null) {
-                coInfo.setUnitsContentOwner(new ArrayList<String>());
-            }
-
-        }
-        else if (ArrayUtils.contains(DOCUMENT_LOAD_COMMANDS, maintenanceDocForm.getCommand()) && maintenanceDocForm.getDocId() != null) {
-            ProposalInfo proposal = null;
-            try {
-                proposal = getProposalService().getProposalByWorkflowId(maintenanceDocForm.getDocument().getDocumentHeader().getDocumentNumber(), ContextUtils.getContextInfo());
-                maintainable.setProposal(proposal);
-            }
-            catch (Exception e) {
-                warn(CurriculumManagementConstants.ConfigProperties.UNABLE_TO_RETRIEVE_PROPOSAL, e.getMessage());
-            }
-        }
-
-        return getUIFModelAndView(form, "KS-CourseView-CoursePage");
+    @RequestMapping(params = "methodToCall=reviewCourseProposal")
+    public ModelAndView reviewCourseProposal(@ModelAttribute("KualiForm") DocumentFormBase form, BindingResult result,
+                                             HttpServletRequest request, HttpServletResponse response) throws Exception {
+        ((CourseInfoMaintainable)((MaintenanceDocumentForm)form).getDocument().getNewMaintainableObject()).updateReview();
+        return getUIFModelAndView(form, PageNames.REVIEW_PROPOSAL);
     }
-        /**
-        * Add a Supporting Document line
-        *
-        *
-        * @param form {@link MaintenanceDocumentForm} instance used for this action
-        * @param result
-        * @param request {@link HttpServletRequest} instance of the actual HTTP request made
-        * @param response The intended {@link HttpServletResponse} sent back to the user
-        * @return The new {@link ModelAndView} that contains the newly created/updated Supporting document information.
-        */
+
+    /**
+     * load the course proposal review page
+     */
+    @RequestMapping(params = "methodToCall=editCourseProposalPage")
+    public ModelAndView editCourseProposalPage(@ModelAttribute("KualiForm") DocumentFormBase form, BindingResult result,
+                                             HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+
+        String displaySectionId = form.getActionParameters().get("displaySection");
+        CourseInfoWrapper wrapper = ((CourseInfoWrapper)((MaintenanceDocumentForm)form).getDocument().getNewMaintainableObject().getDataObject());
+
+        if (displaySectionId == null) {
+            wrapper.getUiHelper().setSelectedSection(CourseViewSections.COURSE_INFO);
+        }  else {
+            CourseViewSections section = CourseViewSections.getSection(displaySectionId);
+            wrapper.getUiHelper().setSelectedSection(section);
+        }
+
+        return getUIFModelAndView(form, PageNames.CREATE_COURSE);
+    }
+
+    /**
+    * Add a Supporting Document line
+    *
+    *
+    * @param form {@link MaintenanceDocumentForm} instance used for this action
+    * @param result
+    * @param request {@link HttpServletRequest} instance of the actual HTTP request made
+    * @param response The intended {@link HttpServletResponse} sent back to the user
+    * @return The new {@link ModelAndView} that contains the newly created/updated Supporting document information.
+    */
     @RequestMapping(method = RequestMethod.POST, params = "methodToCall=addSupportingDocument")
     public ModelAndView addSupportingDocument(@ModelAttribute("KualiForm") MaintenanceDocumentForm form, BindingResult result,
                                 HttpServletRequest request, HttpServletResponse response) {
         final CourseInfoMaintainable maintainable = getCourseMaintainableFrom(form);
         final ModelAndView retval = addLine(form, result, request, response);
 
+        CourseInfoWrapper courseInfoWrapper = (CourseInfoWrapper) form.getDocument().getNewMaintainableObject().getDataObject();
+
+
         // Resulting Add Line is at the bottom
-        final SupportingDocumentInfoWrapper addLineResult = maintainable.getDocumentsToAdd().get(maintainable.getDocumentsToAdd().size() - 1);
+        final SupportingDocumentInfoWrapper addLineResult = courseInfoWrapper.getDocumentsToAdd().get(courseInfoWrapper.getDocumentsToAdd().size() - 1);
 
         // New document
         DocumentInfo toAdd = new DocumentInfo();
         toAdd.setFileName(addLineResult.getDocumentUpload().getOriginalFilename());
-        toAdd.setDescr(new RichTextInfo() {{ 
+        toAdd.setDescr(new RichTextInfo() {{
             setPlain(addLineResult.getDescription());
             setFormatted(addLineResult.getDescription());
         }});
@@ -321,30 +282,18 @@ public class CourseController extends CourseRuleEditorController {
         
         try {
             toAdd.getDocumentBinary().setBinary(new String(Base64.encodeBase64(addLineResult.getDocumentUpload().getBytes())));
-        }
-        catch (Exception e) {
-            warn("Failed to get binary data: %s", e.getMessage());
-        }
-
-        try {
             getSupportingDocumentService().createDocument("documentType.doc", "documentCategory.proposal", toAdd, ContextUtils.getContextInfo());
-        }
-        catch (Exception e) {
-            warn("Unable to create a document: %s", e.getMessage());
-        }
 
-        // Now relate the document to the course
-        RefDocRelationInfo docRelation = new RefDocRelationInfo();
-        try {
+            // Now relate the document to the course
+            RefDocRelationInfo docRelation = new RefDocRelationInfo();
             getSupportingDocumentService().createRefDocRelation("kuali.lu.type.CreditCourse",
-                                                      maintainable.getCourse().getId(),
-                                                      toAdd.getId(),
-                                                      "kuali.org.DocRelation.allObjectTypes",
-                                                      docRelation,
-                                                      ContextUtils.getContextInfo());
-        }
-        catch (Exception e) {
-            warn("Unable to relate a document with the course: %s", e.getMessage());
+                    courseInfoWrapper.getCourseInfo().getId(),
+                    toAdd.getId(),
+                    "kuali.org.DocRelation.allObjectTypes",
+                    docRelation,
+                    ContextUtils.getContextInfo());
+        } catch (Exception e) {
+            LOG.warn("Unable to add supporting document to the course for file: " + toAdd.getFileName(), e);
         }
 
         return retval;
@@ -364,11 +313,14 @@ public class CourseController extends CourseRuleEditorController {
     public ModelAndView removeSupportingDocument(@ModelAttribute("KualiForm") MaintenanceDocumentForm form, BindingResult result,
                                 HttpServletRequest request, HttpServletResponse response) {
         final CourseInfoMaintainable maintainable = getCourseMaintainableFrom(form);
+
+        CourseInfoWrapper courseInfoWrapper = (CourseInfoWrapper) form.getDocument().getNewMaintainableObject().getDataObject();
         // final ModelAndView retval = super.deleteLine(form, result, request, response);
 
         final String selectedCollectionPath = form.getActionParamaterValue(UifParameters.SELECTED_COLLECTION_PATH);
         if (StringUtils.isBlank(selectedCollectionPath)) {
-            throw new RuntimeException("Selected collection was not set for add line action, cannot add new line");
+            GlobalVariables.getMessageMap().putErrorForSectionId(CourseViewSections.SUPPORTING_DOCUMENTS.getSectionId(), CurriculumManagementConstants.MessageKeys.UNABLE_TO_ADD_LINE);
+            return getUIFModelAndView(form);
         }
 
         String selectedLine = form.getActionParamaterValue(UifParameters.SELECTED_LINE_INDEX);
@@ -380,15 +332,17 @@ public class CourseController extends CourseRuleEditorController {
         }
 
         if (selectedLineIndex == -1) {
-            throw new RuntimeException("Selected line index was not set for delete line action, cannot delete line");
+            GlobalVariables.getMessageMap().putErrorForSectionId(CourseViewSections.SUPPORTING_DOCUMENTS.getSectionId(), CurriculumManagementConstants.MessageKeys.UNABLE_TO_DELETE_LINE);
+            return getUIFModelAndView(form);
         }
         
-        final DocumentInfo toRemove = maintainable.getSupportingDocuments().remove(selectedLineIndex);
+        final DocumentInfo toRemove = courseInfoWrapper.getSupportingDocuments().remove(selectedLineIndex);
         try {
             getSupportingDocumentService().deleteDocument(toRemove.getId(), ContextUtils.getContextInfo());
         }
         catch (Exception e) {
-            warn("Unable to delete document: %s, reason: %s", toRemove.getId(), e.getMessage());
+            LOG.warn("Unable to delete document: " + toRemove.getId(),e);
+            throw new RuntimeException("Unable to delete document: " + toRemove.getId(), e);
         }
         
         return deleteLine(form, result, request, response);
@@ -407,7 +361,7 @@ public class CourseController extends CourseRuleEditorController {
                                        final HttpServletRequest request,
                                        final HttpServletResponse response) throws Exception {
 
-        form.setDocTypeName(COURSE_MODIFY_DOC_TYPE_NAME);
+        form.setDocTypeName(CurriculumManagementConstants.DocumentTypeNames.CourseProposal.COURSE_MODIFY);
         form.setDataObjectClassName(CourseInfo.class.getName());
         final ModelAndView retval = super.docHandler(form, result, request, response);
 
@@ -427,15 +381,39 @@ public class CourseController extends CourseRuleEditorController {
                                        final BindingResult result,
                                        final HttpServletRequest request,
                                        final HttpServletResponse response) throws Exception {
-        form.setDocTypeName(COURSE_RETIRE_DOC_TYPE_NAME);
+        form.setDocTypeName(CurriculumManagementConstants.DocumentTypeNames.CourseProposal.COURSE_RETIRE);
         form.setDataObjectClassName(CourseInfo.class.getName());
         final ModelAndView retval = super.docHandler(form, result, request, response);
 
         return retval;
     }
 
+    public void performWorkflowActionSuper(DocumentFormBase form, UifConstants.WorkflowAction action, boolean checkSensitiveData) {
+        super.performWorkflowAction(form,action,checkSensitiveData);
+    }
+
+    /**
+     * Here we move the success messages displayed in UI from header to growl.
+     * @param form
+     * @param action
+     * @param checkSensitiveData
+     */
+    @Override
+    protected void performWorkflowAction(DocumentFormBase form, UifConstants.WorkflowAction action, boolean checkSensitiveData) {
+        CourseControllerTransactionHelper helper = GlobalResourceLoader.getService(new QName(CommonServiceConstants.REF_OBJECT_URI_GLOBAL_PREFIX + "courseControllerTransactionHelper", CourseControllerTransactionHelper.class.getSimpleName()));
+        helper.performWorkflowActionSuper(form, action, checkSensitiveData, this);
+        List<ErrorMessage> infoMessages = GlobalVariables.getMessageMap().getInfoMessagesForProperty(KRADConstants.GLOBAL_MESSAGES);
+        if (infoMessages != null) {
+            for (ErrorMessage message : infoMessages) {
+                KSUifUtils.addGrowlMessageIcon(GrowlIcon.SUCCESS, message.getErrorKey(), message.getMessageParameters());
+            }
+            GlobalVariables.getMessageMap().removeAllInfoMessagesForProperty(KRADConstants.GLOBAL_MESSAGES);
+        }
+    }
+
     /**
      * This will save the Course Proposal.
+     *
      * @param form {@link MaintenanceDocumentForm} instance used for this action
      * @param result
      * @param request {@link HttpServletRequest} instance of the actual HTTP request made
@@ -444,100 +422,41 @@ public class CourseController extends CourseRuleEditorController {
      */
     @RequestMapping(method = RequestMethod.POST, params = "methodToCall=saveProposal")
     public ModelAndView saveProposal(@ModelAttribute("KualiForm") MaintenanceDocumentForm form, BindingResult result,
-            HttpServletRequest request, HttpServletResponse response) {
-        final CourseInfoMaintainable maintainable = getCourseMaintainableFrom(form);
-        
-        //Clear collection fields (those with matching 'wrapper' collections)
-        maintainable.getCourse().getJoints().clear();
-        maintainable.getCourse().getInstructors().clear();
-        maintainable.getCourse().getUnitsDeployment().clear();
-        maintainable.getCourse().getCourseSpecificLOs().clear();
-        
-        //Retrieve the collection display values and get the fully loaded object (containing all the IDs and related IDs)
-        if (maintainable.getCourseJointWrappers() != null) {
-            for (final CourseJointInfoWrapper jointInfoDisplay : maintainable.getCourseJointWrappers()) {
-                maintainable.getCourse().getJoints().add(CourseCodeSearchUtil.getCourseJointInfoWrapper(jointInfoDisplay.getCourseCode(), getCluService()));
-            }
-        }
-        
-        if (maintainable.getInstructorWrappers() != null) {
-            for (final CluInstructorInfoWrapper instructorDisplay : maintainable.getInstructorWrappers()) {
-                final CluInstructorInfoWrapper retrievedInstructor = getCourseMaintainableFrom(form).getInstructor(getInstructorSearchString(instructorDisplay.getDisplayName()));
-                maintainable.getCourse().getInstructors().add(retrievedInstructor);
-            }
+            HttpServletRequest request, HttpServletResponse response) throws Exception {
+//        final CourseInfoMaintainable maintainable = getCourseMaintainableFrom(form);
+//        CourseInfoWrapper courseInfoWrapper = (CourseInfoWrapper) form.getDocument().getNewMaintainableObject().getDataObject();
+//
+//
+
+        CourseInfoWrapper courseInfoWrapper = (CourseInfoWrapper)form.getDocument().getNewMaintainableObject().getDataObject();
+        form.getDocument().getDocumentHeader().setDocumentDescription(courseInfoWrapper.getProposalInfo().getName());
+
+        ModelAndView modelAndView;
+
+        modelAndView = save(form, result, request, response);
+
+        if (GlobalVariables.getMessageMap().hasErrors()){
+            return modelAndView;
         }
 
-        if (maintainable.getAdministeringOrganizations() != null) {
-            for (final OrganizationInfoWrapper org : maintainable.getAdministeringOrganizations()) {
-                maintainable.getCourse().getUnitsDeployment().add(org.getOrganizationName());
-            }
-        }
-        
-        if (maintainable.getLoDisplayWrapperModel() != null && maintainable.getLoDisplayWrapperModel().getLoWrappers() != null) {
-            List<LoDisplayInfoWrapper> loWrappers = maintainable.getLoDisplayWrapperModel().getLoWrappers();
-            List<LoDisplayInfo> courseLos = maintainable.getCourse().getCourseSpecificLOs();
-            for (int i = 0; i < loWrappers.size(); i++) {
-                
-                LoDisplayInfoWrapper currentLo = loWrappers.get(i);
-                
-                boolean rootLevel = true;
-                int parentIndex = i - 1;
-                while (parentIndex >= 0) {
-                    LoDisplayInfoWrapper potentialParent = loWrappers.get(parentIndex);
-                    boolean parentMatch = currentLo.getIndentLevel() > potentialParent.getIndentLevel();
-                    if (parentMatch) {
-                        // TODO: Implement this on the 'Find Course' functionality
-                        //currentLo.setParentLoRelationid(potentialParent.getLoInfo().getId());
-                        //currentLo.setParentRelType(CourseAssemblerConstants.COURSE_LO_RELATION_INCLUDES);
-                        potentialParent.getLoDisplayInfoList().add(currentLo);
-                        
-                        rootLevel = false;
-                        break;
-                    } else {
-                        parentIndex--;
-                    }
-                }
-                
-                if (rootLevel) {
-                    courseLos.add(currentLo);
-                }
-            }
-        }
-        
-        // Set derived course fields before saving/updating
-        maintainable.setCourse(calculateCourseDerivedFields(maintainable.getCourse()));
-        maintainable.setLastUpdated(DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss").print(new DateTime()));
-
-        maintainable.getCourse().setUnitsContentOwner(new ArrayList<String>());
-        for (final KeyValue wrapper : maintainable.getUnitsContentOwner()) {
-            maintainable.getCourse().getUnitsContentOwner().add(wrapper.getValue());
-        }
-
-        form.getDocument().getDocumentHeader().setDocumentDescription(maintainable.getProposal().getName());
-
-        try {
-//            if (form.getDocument().getDocumentHeader().getWorkflowDocument().isInitiated()) {
-                handleFirstTimeSave(form);
-//            }
-            save(form, result, request, response);
-        }
-        catch (Exception e) {
-            error("Unable to save document: %s", e.getMessage());
-        }
-
-        RecentlyViewedDocsUtil.addRecentDoc(form.getDocument().getDocumentHeader().getDocumentDescription(), form.getDocument().getDocumentHeader().getWorkflowDocument().getDocumentHandlerUrl() + "&docId=" + form.getDocument().getDocumentHeader().getWorkflowDocument().getDocumentId());
+        RecentlyViewedDocsUtil.addRecentDoc(form.getDocument().getDocumentHeader().getDocumentDescription(),
+                form.getDocument().getDocumentHeader().getWorkflowDocument().getDocumentHandlerUrl() + "&docId="
+                        + form.getDocument().getDocumentHeader().getWorkflowDocument().getDocumentId());
 
         String nextOrCurrentPage = form.getActionParameters().get("displayPage");
-        if (StringUtils.equalsIgnoreCase(nextOrCurrentPage,"NEXT")){
-            if ( ((CreateCourseForm)form).getSelectedTabIndex() < 10){
-                ((CreateCourseForm)form).setSelectedTabIndex(((CreateCourseForm) form).getSelectedTabIndex() + 1);
+
+        if (StringUtils.equalsIgnoreCase(nextOrCurrentPage, "NEXT")) {
+            CourseViewSections currentSection = courseInfoWrapper.getUiHelper().getSelectedSection();
+            if (currentSection.ordinal() < CourseViewSections.values().length) {
+                 CourseViewSections nextSection = CourseViewSections.values()[currentSection.ordinal() + 1];
+                 courseInfoWrapper.getUiHelper().setSelectedSection(nextSection);
             }
-//            return getUIFModelAndView(form, getNextPageId(request.getParameter(VIEW_CURRENT_PAGE_ID)));
             return getUIFModelAndView(form);
+        } else if (StringUtils.equalsIgnoreCase(nextOrCurrentPage, "KS-CourseView-ReviewProposalLink")) {
+            return getUIFModelAndView(form, PageNames.REVIEW_PROPOSAL);
         } else {
             return getUIFModelAndView(form);
         }
-
     }
 
     @Override
@@ -555,72 +474,56 @@ public class CourseController extends CourseRuleEditorController {
 
     /**
      *
-     * @param maintainable
+     * @param form
      */
-    protected void updateReview(final CourseInfoMaintainable maintainable) {
+    /*protected void updateReview(final DocumentFormBase form) {
+        CourseInfoWrapper courseInfoWrapper = (CourseInfoWrapper)((MaintenanceDocumentForm)form).getDocument().getNewMaintainableObject().getDataObject();
+        CourseInfo savedCourseInfo = courseInfoWrapper.getCourseInfo();
 
-        // Update course info
-        final ReviewInfo reviewData = maintainable.getReviewInfo();
-        reviewData.getCourseInfo().setCourseTitle(maintainable.getCourse().getCourseTitle());
-        reviewData.getCourseInfo().setProposalName(maintainable.getProposal().getName());
-        reviewData.getCourseInfo().setTranscriptTitle(maintainable.getCourse().getTranscriptTitle());
-        reviewData.getCourseInfo().setSubjectArea(maintainable.getCourse().getSubjectArea());
-        reviewData.getCourseInfo().setCourseNumberSuffix(maintainable.getCourse().getCourseNumberSuffix());
+        // Update course section
+        final ReviewProposalDisplay reviewData = courseInfoWrapper.getReviewProposalDisplay();
+        reviewData.getcourseSection().setProposalName(courseInfoWrapper.getProposalInfo().getName());
+        reviewData.getcourseSection().setCourseTitle(savedCourseInfo.getCourseTitle());
+        reviewData.getcourseSection().setTranscriptTitle(savedCourseInfo.getTranscriptTitle());
+        reviewData.getcourseSection().setSubjectArea(savedCourseInfo.getSubjectArea());
+        reviewData.getcourseSection().setCourseNumberSuffix(savedCourseInfo.getCourseNumberSuffix());
 
-        // Update governance info
-        reviewData.getGovernanceInfo().getCampusLocations().clear();
-        reviewData.getGovernanceInfo().getCampusLocations().addAll(maintainable.getCourse().getCampusLocations());
-        reviewData.getGovernanceInfo().getCurriculumOversight().clear();
-        reviewData.getGovernanceInfo().getCurriculumOversight().addAll(maintainable.getCourse().getUnitsContentOwner());
-    }
+        // Update governance section
+        reviewData.getgovernanceSection().getCampusLocations().clear();
+        reviewData.getgovernanceSection().getCampusLocations().addAll(savedCourseInfo.getCampusLocations());
+        reviewData.getgovernanceSection().getCurriculumOversight().clear();
+        reviewData.getgovernanceSection().getCurriculumOversight().addAll(savedCourseInfo.getUnitsContentOwner());
 
-
-    /**
-     * Handles functionality that should only happen when the document is first saved.
-     *
-     * @param form {@link MaintenanceDocumentForm} instance
-     */
-    protected void handleFirstTimeSave(final MaintenanceDocumentForm form) throws Exception {
-        final CourseInfoMaintainable maintainable = getCourseMaintainableFrom(form);
-
-        final CourseInfo course = maintainable.getCourse();
-        for (final CourseVariationInfo variation : course.getVariations()) {
-            variation.setTypeKey("kuali.lu.type.Variation");
-        }
-        if (StringUtils.isBlank(course.getId())){
-            maintainable.setCourse(getCourseService().createCourse(course, ContextUtils.getContextInfo()));
-        } else {
-            maintainable.setCourse(getCourseService().updateCourse(course.getId(), course, ContextUtils.getContextInfo()));
-        }
-        
-        info("Saving Proposal for course %s", maintainable.getCourse().getId());
-
-        ProposalInfo proposal = maintainable.getProposal();
-        proposal.setWorkflowId(form.getDocument().getDocumentHeader().getDocumentNumber());
-        if (StringUtils.isBlank(proposal.getId())){
-            proposal.setState(DtoConstants.STATE_DRAFT);
-            proposal.setType(ProposalServiceConstants.PROPOSAL_TYPE_COURSE_CREATE_KEY);
-            proposal.setProposalReferenceType("kuali.proposal.referenceType.clu");
-            proposal.getProposalReference().add(maintainable.getCourse().getId());
-            proposal.getProposerOrg().clear();
-            proposal.getProposerPerson().clear();
-        }
-                        
+        // update course logistics section
+        reviewData.getcourseLogisticsSection().getTerms().clear();
         try {
-            if (StringUtils.isBlank(proposal.getId())){
-                proposal = getProposalService().createProposal(ProposalServiceConstants.PROPOSAL_TYPE_COURSE_CREATE_KEY, proposal, ContextUtils.getContextInfo());
-            } else {
-                proposal = getProposalService().updateProposal(proposal.getId(), proposal, ContextUtils.getContextInfo());
+            for(String termType : savedCourseInfo.getTermsOffered())  {
+                TypeInfo term = getTypeService().getType(termType, ContextUtils.getContextInfo());
+                reviewData.getcourseLogisticsSection().getTerms().add(term.getName());
             }
-            maintainable.setProposal(proposal);
+        } catch (Exception e) {
+            throw new RiceIllegalStateException(e);
         }
-        catch (Exception e) {
-            warn("Unable to create a proposal: %s", e.getMessage());
-        }
-    }
 
-        
-    
+      if(savedCourseInfo.getDuration() != null &&  StringUtils.isNotBlank(savedCourseInfo.getDuration().getAtpDurationTypeKey())) {
+        try{
+                TypeInfo term = getTypeService().getType(savedCourseInfo.getDuration().getAtpDurationTypeKey(), ContextUtils.getContextInfo());
+                reviewData.getcourseLogisticsSection().setAtpDurationType(term.getName());
+            } catch (Exception e) {
+                throw new RiceIllegalStateException(e);
+            }
+      }
+
+        reviewData.getcourseLogisticsSection().setTimeQuantity(savedCourseInfo.getDuration().getTimeQuantity());
+
+        // update learning Objectives Section;
+        // update  course Requisites Section;
+        // update  active Dates Section;
+        // update  financials Section;
+        // update  collaborator Section;
+        // update  supporting Documents Section;
+    }*/
+
     /**
      * Copied this method from CourseDataService.
      * This calculates and sets fields on course object that are derived from other course object fields.
@@ -670,17 +573,17 @@ public class CourseController extends CourseRuleEditorController {
     /**
      * Determines to which page to navigate.
      * 
-     * @param currentPageId The current page id.
+     * @param currentSectionId The current page id.
      * @return The id of the next page to navigate to.
      */
-    protected String getNextPageId(final String currentPageId) {
+    protected String getNextSectionId(final String currentSectionId) {
         String nextPageId = null;
-        final CourseViewPages[] pages = CourseViewPages.values();
+        final CourseViewSections[] pages = CourseViewSections.values();
         for (int i = 0; i < pages.length; i++) {
-            if (pages[i].getPageId().equals(currentPageId)) {
+            if (pages[i].getSectionId().equals(currentSectionId)) {
                 //Get the next page in the enum, except when it's the last page in the enum
                 if (i + 1 < pages.length) {
-                    nextPageId = pages[++i].getPageId();
+                    nextPageId = pages[++i].getSectionId();
                     break;
                 }
             }
@@ -689,12 +592,12 @@ public class CourseController extends CourseRuleEditorController {
     }
 
 
-    protected String getPreviousPageId(final String currentPageId) {
+    protected String getPreviousSectionId(final String currentSectionId) {
         String prevPageId = null;
-        final CourseViewPages[] pages = CourseViewPages.values();
+        final CourseViewSections[] pages = CourseViewSections.values();
         for (int i = 1; i < pages.length; i++) {
-            if (pages[i].getPageId().equals(currentPageId)) {
-                prevPageId = pages[--i].getPageId();
+            if (pages[i].getSectionId().equals(currentSectionId)) {
+                prevPageId = pages[--i].getSectionId();
                 break;
             }
         }
@@ -738,19 +641,20 @@ public class CourseController extends CourseRuleEditorController {
         String tempRefTypeKey = "referenceType.clu.proposal";
         
         final CourseInfoMaintainable maintainable = getCourseMaintainableFrom(form);
+        CourseInfoWrapper courseInfoWrapper = (CourseInfoWrapper) form.getDocument().getNewMaintainableObject().getDataObject();
         
-        final String dateStr = DateTimeFormat.forPattern("MMMM dd, yyyy - hh:mmaaa").print(new DateTime());
+        final String dateStr = DateFormatters.MONTH_DATE_YEAR_HOUR_MIN_CONCAT_AMPM_FORMATTER.format(new DateTime());
         final Date date = new Date();
         
         // This needs to be looked at when Reference data is retrieved. Lookup what comments are in the DB
         // prob might move to showComment so that it displays the comments already made.
         //List<CommentInfo> commentInfoFromDB = getCommentService().getCommentsByReferenceAndType(tempRefId, tempRefTypeKey,ContextUtils.getContextInfo());
         
-        for (CommentInfo ittCommentInfo : maintainable.getCommentInfos()) {
+        for (CommentInfo ittCommentInfo : courseInfoWrapper.getCommentInfos()) {
             CommentInfo commentInfo = ittCommentInfo;
             commentInfo.getCommentText().setFormatted(commentInfo.getCommentText().getPlain());
             //get the userID from the form to save with the comment made.
-            commentInfo.setCommenterId(getUserNameLoggedin(maintainable.getUserId()) + " " + dateStr);
+            commentInfo.setCommenterId(getUserNameLoggedin(courseInfoWrapper.getUserId()) + " " + dateStr);
             if(commentInfo.getEffectiveDate() == null){
                 commentInfo.setEffectiveDate(date);
             }
@@ -764,7 +668,9 @@ public class CourseController extends CourseRuleEditorController {
                         commentInfo.getReferenceTypeKey(), commentInfo.getTypeKey(), commentInfo,
                         ContextUtils.getContextInfo());
             } catch (Exception e) {
-                throw new RuntimeException("Error creating a new comment.", e);
+                LOG.error("Error creating a new comment", e);
+                GlobalVariables.getMessageMap().putError(KRADConstants.GLOBAL_ERRORS,CurriculumManagementConstants.MessageKeys.ERROR_CREATE_COMMENT);
+                return getUIFModelAndView(form);
             }
             ittCommentInfo = newComment;
         }
@@ -828,122 +734,13 @@ public class CourseController extends CourseRuleEditorController {
                                       HttpServletRequest request, HttpServletResponse response) throws Exception {
         
         if (!hasDialogBeenAnswered(DECISIONS_DIALOG_KEY, form)) {
-            redrawDecisionTable(form);
+//            redrawDecisionTable(form);
             return showDialog(DECISIONS_DIALOG_KEY, form, request, response);
         }
 
         form.getDialogManager().removeDialog(DECISIONS_DIALOG_KEY);
         
         return getUIFModelAndView(form);
-    }
-
-    /**
-     *
-     * @param form the {@link MaintenanceDocumentForm} instance where the decisions are to be stored for the lightbox.
-     * @throws InvalidParameterException when incorrect parameters are used for looking up the comments made
-     * @throws MissingParameterException when null or empty parameters are used for looking up the comments made
-     * @throws OperationFailedException when it cannot be determined what comments were made.
-     * @throws PermissionDeniedException when the user doesn't have rights to look up comments.
-     */
-    protected void redrawDecisionTable(final MaintenanceDocumentForm form) 
-        throws InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
-        List<CommentInfo> commentInfos = null;
-        try {
-            commentInfos = getCommentService()
-                .getCommentsByReferenceAndType("temp_reference_id",
-                                               "referenceType.clu.proposal",
-                                               ContextUtils.getContextInfo());
-        }
-        catch (DoesNotExistException e) {
-            // Add a dummy row
-            // form.getDecisions().add(new DecisionInfo());
-
-            // If there are no comments, don't go any further
-            return;
-        }
-
-        // Collect person ids to search 
-		final List<String> personIds = new ArrayList<String>();
-		for (CommentInfo comment : commentInfos) {
-			if(comment.getMeta().getCreateId()!=null){
-				personIds.add(comment.getMeta().getCreateId());
-			}
-			else{
-				personIds.add("");
-			}
-		}
-
-        final Map<String, MembershipInfo> members = getNamesForPersonIds(personIds);
-
-        redrawDecisionTable(form, commentInfos, members);
-    }
-    
-    /**
-     * Responsible for rebuilding/reloading content within the decision view's HTML table. 
-     *
-     * @param form is the {@link MaintenanceDocumentForm} for the request
-     * @param commentInfos {@link List} of {@link CommentInfo} instances that currently exist. 
-     * These are comments for decisions that represent our rationale
-     * @param members {@link Map} of {@link MembershipInfo} instances mapped by commenter ids. 
-     * Commenter ids are supplied in the {@link CommentInfo} instances. The {@link MembershipInfo} 
-     * is used to determine who is responsible for the decision.
-     * @see {@link #getNamesForPersonIds(List)} for the method that typically populates the members parameter.
-     */
-	protected void redrawDecisionTable(final MaintenanceDocumentForm form,
-                                       final List<CommentInfo> commentInfos,
-                                       final Map<String, MembershipInfo> members) {
-	    
-        final CourseInfoMaintainable maintainable = getCourseMaintainableFrom(form);
-        
-        final DateTimeFormatter dateFormat = DateTimeFormat.forPattern("MM/dd/yyyy");
-
-		if (commentInfos != null) {
-			for (final CommentInfo commentInfo : commentInfos) {
-			    /* we only want decision rationale comments so if no DecisionRationaleDetail is returned for comment
-                 * type then don't add that comment to the table
-                 */
-			    final DecisionRationaleDetail drDetails = DecisionRationaleDetail.getByType(commentInfo.getTypeKey());
-			    if (drDetails != null) {
-                    final DecisionInfo decision = new DecisionInfo();
-                    decision.setDecision(drDetails.getLabel());
-                    decision.setId(commentInfo.getId());
-
-                    final String rationaleDate = dateFormat.print(new DateTime(commentInfo.getMeta().getCreateTime().getTime()));
-    				decision.setDate(rationaleDate);
-    
-    				if (members.get(commentInfo.getMeta().getCreateId()) != null) {
-    					final MembershipInfo memberInfo = members.get(commentInfo.getMeta().getCreateId());
-    					final StringBuilder memberName = new StringBuilder();
-    					memberName.append(memberInfo.getFirstName());
-    					memberName.append(" ");
-    					memberName.append(memberInfo.getLastName());
-
-    					decision.setActor(memberName.toString());
-    				}
-    				decision.setRationale(commentInfo.getCommentText().getPlain());
-    				maintainable.getDecisions().add(decision);
-			    }
-			}
-		}
-	}
-
-    /**
-     * Retrieve {@link MembershipInfo} instances populated with first and last names using {@link EntityDefault}
-     * instances of the personIds
-     *
-     * @param personIds {@link List} of ids used to get {@link EntityDefault}s with first and last names
-     * @param {@link Map} of {@link MembershipInfo} instances with first and last names mapped to each personId
-     */
-    protected Map<String, MembershipInfo> getNamesForPersonIds(final List<String> personIds) {
-        final Map<String, MembershipInfo> identities = new HashMap<String, MembershipInfo>();
-        for (String pId : personIds ){
-            final EntityDefault entity = getIdentityService().getEntityDefaultByPrincipalId(pId);
-            final MembershipInfo memeberEntity = new MembershipInfo();
-            memeberEntity.setFirstName(entity.getName().getFirstName());
-            memeberEntity.setLastName(entity.getName().getLastName());
-            identities.put(pId, memeberEntity);
-        }
-        return identities;
     }
 
     /**
@@ -960,18 +757,24 @@ public class CourseController extends CourseRuleEditorController {
                                                 final BindingResult result,
                                                 final HttpServletRequest request,
                                                 final HttpServletResponse response) {
-        info("Adding a unitsContentOwner");
+        LOG.info("Adding a unitsContentOwner");
         final CourseInfoMaintainable maintainable = (CourseInfoMaintainable) form.getDocument().getNewMaintainableObject();
-        if (maintainable.getUnitsContentOwnerToAdd() == null) {
-            info("Units Content Owner is null");
+        CourseInfoWrapper courseInfoWrapper = (CourseInfoWrapper) form.getDocument().getNewMaintainableObject().getDataObject();
+        if(StringUtils.isBlank(courseInfoWrapper.getPreviousSubjectCode()) ||
+                !StringUtils.equals(courseInfoWrapper.getPreviousSubjectCode(), courseInfoWrapper.getCourseInfo().getSubjectArea())) {
+            courseInfoWrapper.getUnitsContentOwner().clear();
+            courseInfoWrapper.setPreviousSubjectCode(courseInfoWrapper.getCourseInfo().getSubjectArea());
+        }
+        if (courseInfoWrapper.getUnitsContentOwnerToAdd() == null) {
+            LOG.info("Units Content Owner is null");
             return getUIFModelAndView(form);
         }
 
-        final String toAdd = maintainable.getUnitsContentOwnerToAdd();
-        info("Adding ", toAdd);
-        maintainable.getUnitsContentOwner().add(getOrganizationBy(maintainable.getCourse().getSubjectArea(), toAdd));
-        maintainable.setUnitsContentOwnerToAdd("");
-        
+        final String toAdd = courseInfoWrapper.getUnitsContentOwnerToAdd();
+        LOG.info("Adding {}", toAdd);
+        courseInfoWrapper.getUnitsContentOwner().add(getOrganizationBy(courseInfoWrapper.getCourseInfo().getSubjectArea(), toAdd));
+        courseInfoWrapper.setUnitsContentOwnerToAdd("");
+
         return getUIFModelAndView(form);
     }
 
@@ -984,7 +787,7 @@ public class CourseController extends CourseRuleEditorController {
      * @return KeyValue
      */
     protected KeyValue getOrganizationBy(final String code, final String orgId) {
-        debug("Using code: %s and orgId: %s for the search", code, orgId);
+        LOG.debug("Using code: {} and orgId: {} for the search", code, orgId);
         final SearchRequestInfo searchRequest = new SearchRequestInfo();
         searchRequest.setSearchKey("subjectCode.search.orgsForSubjectCode");
         searchRequest.addParam("subjectCode.queryParam.code", code);
@@ -1007,11 +810,11 @@ public class CourseController extends CourseRuleEditorController {
                 return new ConcreteKeyValue(subjectCodeOptionalLongName, subjectCodeId);
             }
         } catch (Exception e) {
-        	error("Error building KeyValues List %s", e);
+            LOG.error("Error building KeyValues List", e);
             throw new RuntimeException(e);
         }
-        
-        info("Returning a null from org search");
+
+        LOG.info("Returning a null from org search");
         return null;
     }
     
@@ -1058,7 +861,7 @@ public class CourseController extends CourseRuleEditorController {
         final ModelAndView retval = super.navigate(form, result, request, response);
         final CourseInfoMaintainable maintainable = getCourseMaintainableFrom((MaintenanceDocumentForm) form);
 
-        updateReview(maintainable);
+        ((CourseInfoMaintainable)((MaintenanceDocumentForm)form).getDocument().getNewMaintainableObject()).updateReview();
 
         return retval;
     }
@@ -1076,7 +879,8 @@ public class CourseController extends CourseRuleEditorController {
     
     private LoDisplayWrapperModel setupLoModel(MaintenanceDocumentForm form) {
         final CourseInfoMaintainable courseInfoMaintainable = getCourseMaintainableFrom(form);
-        LoDisplayWrapperModel loDisplayWrapperModel = courseInfoMaintainable.getLoDisplayWrapperModel();
+        CourseInfoWrapper courseInfoWrapper = (CourseInfoWrapper) form.getDocument().getNewMaintainableObject().getDataObject();
+        LoDisplayWrapperModel loDisplayWrapperModel = courseInfoWrapper.getLoDisplayWrapperModel();
         List<LoDisplayInfoWrapper> loWrappers = loDisplayWrapperModel.getLoWrappers();
         LoDisplayInfoWrapper selectedLoWrapper = getSelectedLoWrapper(loWrappers);
         loDisplayWrapperModel.setCurrentLoWrapper(selectedLoWrapper);
@@ -1151,5 +955,13 @@ public class CourseController extends CourseRuleEditorController {
 			subjectCodeService = GlobalResourceLoader.getService(new QName(CourseServiceConstants.NAMESPACE_SUBJECTCODE, SubjectCodeService.class.getSimpleName()));
 		}
 		return subjectCodeService;
-	}	
+	}
+
+    protected TypeService getTypeService() {
+        if(typeService == null) {
+            typeService =  (TypeService) GlobalResourceLoader.getService(new QName(TypeServiceConstants.NAMESPACE, TypeServiceConstants.SERVICE_NAME_LOCAL_PART));
+        }
+
+        return typeService;
+    }
 }

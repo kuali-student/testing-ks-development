@@ -19,15 +19,13 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-
-    <bean id="KS-CourseView-createCourseInitialPage" parent="Uif-MaintenancePage"   p:style="margin-left: -18px;"
-        p:headerText="Create Course"
-        p:disclosure.render="false">
-        <property name="header" ref="KS-CourseView-InitialPage-Header" />
+    <bean id="KS-CourseView-createCourseInitialPage" parent="KS-Uif-Page">
         <property name="breadcrumbOptions.breadcrumbOverrides">
-             <list>
-                  <ref bean="KS-HomewardPathBreadcrumbs-CreateCourseInitial-Page"/>
-             </list>
+            <list>
+                <ref bean="KS-HomewardPathBreadcrumbs-Home"/>
+                <ref bean="KS-HomewardPathBreadcrumbs-CurriculumManagement"/>
+                <ref bean="KS-HomewardPathBreadcrumbs-CreateCourseInitial-Page"/>
+            </list>
         </property>
 
         <property name="items">
@@ -38,6 +36,21 @@
         <property name="footer">
             <bean parent="KS-CourseCreate-InitialView-Footer"/>
         </property>
+
+    </bean>
+
+    <bean id="KS-CourseView-createCourseInitialView" parent="KS-Uif-FormView">
+        <property name="id" value="createCourseInitialView"/>
+        <property name="headerText"  value="Create Course " />
+        <property name="formClass" value="org.kuali.student.cm.course.form.CourseInitialForm"/>
+        <property name="viewHelperServiceClass" value="org.kuali.student.cm.course.service.impl.CourseInfoMaintainableImpl" />
+        <property name="viewSourceFile" value="CreateCourseInitialView.xml" /> <!-- Shows up in HTML so devs can find the code -->
+        <property name="items">
+            <list>
+                <ref bean="KS-CourseView-createCourseInitialPage"/>
+            </list>
+        </property>
+
     </bean>
 
     <bean id="KS-CourseCreate-InitialView-Page-Widgets" parent="Uif-VerticalBoxSection"  p:style="margin-left: 18px;">
@@ -92,7 +105,7 @@
         </property>
     </bean>
 
-    <bean id="KS-CreateCourse-Review-Section" parent="Uif-VerticalBoxSubSection"  p:render="@{#hasPerm('KS-SYS', 'Create Course By Admin Proposal')}">
+    <bean id="KS-CreateCourse-Review-Section" parent="Uif-VerticalBoxSubSection"  p:render="@{#form.curriculumSpecialistUser}">
         <property name="headerText" value="Review Process"/>
         <property name="cssClasses">
             <list merge="true">
@@ -103,7 +116,7 @@
             <list>
                 <bean id="createCourseInitial_is_reviewProcess"
                       parent="KS-Uif-InputField"
-                      p:propertyName="useCMreviewProcess" p:bindingInfo.bindToForm="true"
+                      p:propertyName="useReviewProcess" p:bindingInfo.bindToForm="true"
                       p:required="false">
                     <property name="control">
                         <bean parent="Uif-CheckboxControl" p:style="margin-left: 6px;" p:checkboxLabel="Use curriculum review process"/>
@@ -113,52 +126,25 @@
         </property>
     </bean>
 
-
-    <bean id="KS-CourseView-InitialPage-Header" parent="Uif-HeaderOne" p:style="margin-bottom: 20px;">
-        <property name="upperGroup">
-            <bean parent="Uif-VerticalBoxGroup">
-                <property name="items">
-                    <list>
-                        <bean parent="Uif-VerticalBoxGroup" >
-                            <property name="items">
-                                <list>
-                                    <bean parent="Uif-HeaderOne" p:style="margin-top: 20px; margin-left: -4px; min-height: 46px;">
-                                        <property name="cssClasses">
-                                            <list merge="true">
-                                                <value>uif-viewHeader-contentWrapper</value>
-                                                <value>uif-create-course-initial-page-header-contentWrapper</value>
-                                            </list>
-                                        </property>
-                                        <property name="headerText" value="Create Course"/>
-                                    </bean>
-                                 </list>
-                            </property>
-                        </bean>
-                     </list>
-                </property>
-            </bean>
-        </property>
-    </bean>
-
     <bean id="KS-CourseCreate-InitialView-Footer" parent="Uif-FooterBase">
         <property name="items">
             <list>
                 <bean id="createCourseInitial-continueCreate"
                       parent="Uif-PrimaryActionButton"
                       p:ajaxSubmit="false"
-                      p:methodToCall="ContinueCreateCourse"
+                      p:methodToCall="continueCreateCourse"
                       p:actionLabel="Continue"
-                      p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_SAVE]}"/>
+                        />
                 <bean id="createCourseInitial-cancel"
                       parent="Uif-CancelAction"
                       p:ajaxSubmit="false"
                       p:methodToCall="cancel"  p:style="margin-right: 100px;"
-                      p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_CANCEL]}"/>
+                        />
             </list>
         </property>
     </bean>
 
-    <bean id="KS-HomewardPathBreadcrumbs-CreateCourseInitial-Page" parent="Uif-BreadcrumbItem" p:render="@{!#form.renderNavigationPanel}" >
+    <bean id="KS-HomewardPathBreadcrumbs-CreateCourseInitial-Page" parent="Uif-BreadcrumbItem">
         <property name="label" value="Create Course"></property>
     </bean>
 </beans>

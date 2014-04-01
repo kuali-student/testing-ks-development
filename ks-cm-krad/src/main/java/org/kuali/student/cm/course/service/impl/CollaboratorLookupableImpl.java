@@ -20,10 +20,8 @@ import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
 import org.kuali.rice.krad.lookup.LookupableImpl;
 import org.kuali.rice.krad.lookup.LookupForm;
 import org.kuali.student.cm.course.form.CollaboratorWrapper;
-import org.kuali.student.lum.lu.util.CurriculumManagementConstants;
-import org.kuali.student.logging.FormattedLogger;
 import org.kuali.student.r1.core.personsearch.service.impl.QuickViewByGivenName;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.core.search.dto.SearchParamInfo;
 import org.kuali.student.r2.core.search.dto.SearchRequestInfo;
 import org.kuali.student.r2.core.search.dto.SearchResultCellInfo;
@@ -31,6 +29,8 @@ import org.kuali.student.r2.core.search.dto.SearchResultInfo;
 import org.kuali.student.r2.core.search.dto.SearchResultRowInfo;
 import org.kuali.student.r2.core.search.service.SearchService;
 import org.kuali.student.r2.lum.util.constants.CourseServiceConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -47,6 +47,7 @@ public class CollaboratorLookupableImpl extends LookupableImpl {
 	private static final long serialVersionUID = -3027283578926320100L;
     private static final String PERSON_ID = "personId";
     private static final String DISPLAY_NAME ="displayName";
+    private static final Logger LOG = LoggerFactory.getLogger(CollaboratorLookupableImpl.class);
 
     private SearchService searchService;
 
@@ -105,7 +106,7 @@ public class CollaboratorLookupableImpl extends LookupableImpl {
                 }
         	}
 		} catch (Exception e) {
-		    FormattedLogger.error(CurriculumManagementConstants.ConfigProperties.ERROR_OCCURRED_RETRIEVING_COLLABORATORS + e);
+            LOG.error("An error occurred retrieving the Collaborators", e);
 		}
         
 		return collaboratorDisplays;

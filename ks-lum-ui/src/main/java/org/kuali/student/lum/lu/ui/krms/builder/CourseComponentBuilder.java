@@ -15,7 +15,6 @@
  */
 package org.kuali.student.lum.lu.ui.krms.builder;
 
-import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.criteria.PredicateFactory;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
 import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
@@ -27,7 +26,7 @@ import org.kuali.student.lum.lu.ui.krms.util.CluSearchUtil;
 import org.kuali.student.lum.lu.ui.krms.util.LUKRMSConstants;
 import org.kuali.student.r2.common.constants.CommonServiceConstants;
 import org.kuali.student.r2.common.exceptions.DoesNotExistException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.core.acal.dto.TermInfo;
 import org.kuali.student.r2.core.acal.service.AcademicCalendarService;
 import org.kuali.student.r2.core.constants.AcademicCalendarServiceConstants;
@@ -49,20 +48,18 @@ import java.util.Map;
  */
 public class CourseComponentBuilder extends CluComponentBuilder {
 
-    private final static Logger LOG = Logger.getLogger(CourseComponentBuilder.class);
-
     private CourseService courseService;
     private AcademicCalendarService acalService = null;
     private SearchService searchService = null;
 
     @Override
     public List<String> getComponentIds() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public void resolveTermParameters(LUPropositionEditor propositionEditor, Map<String, String> termParameters) {
-        String courseId = termParameters.get(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_CLU_KEY);
+        String courseId = termParameters.get(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_COURSE_CLU_KEY);
         String termCode1 = termParameters.get(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_TERMCODE_KEY);
         String termCode2 = termParameters.get(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_TERMCODE2_KEY);
 
@@ -93,7 +90,7 @@ public class CourseComponentBuilder extends CluComponentBuilder {
     public Map<String, String> buildTermParameters(LUPropositionEditor propositionEditor) {
         Map<String, String> termParameters = new HashMap<String, String>();
         if (propositionEditor.getCourseInfo() != null) {
-            termParameters.put(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_CLU_KEY, propositionEditor.getCourseInfo().getVersion().getVersionIndId());
+            termParameters.put(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_COURSE_CLU_KEY, propositionEditor.getCourseInfo().getVersion().getVersionIndId());
         }
 
         if (propositionEditor.getTermInfo() != null) {

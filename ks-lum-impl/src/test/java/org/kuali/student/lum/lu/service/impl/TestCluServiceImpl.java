@@ -49,7 +49,7 @@ import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
 import org.kuali.student.r2.common.exceptions.ReadOnlyException;
 import org.kuali.student.r2.common.exceptions.UnsupportedActionException;
 import org.kuali.student.r2.common.exceptions.VersionMismatchException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.common.util.date.DateFormatters;
 import org.kuali.student.r2.core.search.dto.SearchParamInfo;
 import org.kuali.student.r2.core.search.dto.SearchRequestInfo;
@@ -109,7 +109,6 @@ public class TestCluServiceImpl extends AbstractServiceTest {
     public CluService client;
 
     private  CluResultInfo dto;
-    private CluResultInfo createCluResult;
     private ContextInfo contextInfo;
 
     @Before
@@ -153,17 +152,19 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertEquals(clu.getId(), "CLU-1");
 
         try {
-            clu = client.getClu("CLX-1", contextInfo);
-            assertTrue(false);
+            client.getClu("CLX-1", contextInfo);
+            fail("DoesNotExistException should have been thrown");
         } catch (DoesNotExistException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("CLX-1", e.getMessage());
         }
 
         try {
-            clu = client.getClu(null, contextInfo);
-            assertTrue(false);
+            client.getClu(null, contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("cluId can not be null", e.getMessage());
         }
 
         // getClusByIdList
@@ -179,15 +180,16 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertTrue(clus == null || clus.size() == 0);
 
         try {
-            clus = client.getClusByIds(null, contextInfo);
-            assertTrue(false);
+            client.getClusByIds(null, contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("cluIds can not be null", e.getMessage());
         }
 
         // getCluIdsByLuType
         ids = client.getCluIdsByLuType("luType.shell.program", "STATE2", contextInfo);
-        assertTrue(null != ids);
+        assertNotNull(null != ids);
         assertEquals(1, ids.size());
         assertEquals("CLU-2", ids.get(0));
 
@@ -197,22 +199,24 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertTrue(ids == null || ids.size() == 0);
 
         try {
-            ids = client.getCluIdsByLuType(null, "STATE1", contextInfo);
-            assertTrue(false);
+            client.getCluIdsByLuType(null, "STATE1", contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("luTypeKey can not be null", e.getMessage());
         }
 
         try {
-            ids = client.getCluIdsByLuType("luType.shell.course", null, contextInfo);
-            assertTrue(false);
+            client.getCluIdsByLuType("luType.shell.course", null, contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("luState can not be null", e.getMessage());
         }
 
         // getClusByLuType
         clus = client.getClusByLuType("luType.shell.program", "STATE2", contextInfo);
-        assertTrue(null != clus);
+        assertNotNull(clus);
         assertEquals(1, clus.size());
         assertEquals("CLU-2", clus.get(0).getId());
 
@@ -222,17 +226,19 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertTrue(clus == null || clus.size() == 0);
 
         try {
-            clus = client.getClusByLuType(null, "STATE1", contextInfo);
-            assertTrue(false);
+            client.getClusByLuType(null, "STATE1", contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("luTypeKey can not be null", e.getMessage());
         }
 
         try {
-            clus = client.getClusByLuType("luType.shell.course", null, contextInfo);
-            assertTrue(false);
+            client.getClusByLuType("luType.shell.course", null, contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("lustate can not be null", e.getMessage());
         }
     }
 
@@ -248,17 +254,19 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertNotNull(csi);
 
         try {
-            csi = client.getCluSet("CLUSETXX-42", contextInfo);
-            assertTrue(false);
+            client.getCluSet("CLUSETXX-42", contextInfo);
+            fail("DoesNotExistException should have been thrown");
         } catch (DoesNotExistException e1) {
-            assertTrue(true);
+            assertNotNull(e1.getMessage());
+            assertEquals("CLUSETXX-42", e1.getMessage());
         }
 
         try {
-            csi = client.getCluSet(null, contextInfo);
-            assertTrue(false);
+            client.getCluSet(null, contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("cluSetId can not be null", e.getMessage());
         }
 
         // getCluSetInfoByIdList
@@ -273,10 +281,11 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertTrue(cluSets == null || cluSets.size() == 0);
 
         try {
-            cluSets = client.getCluSetsByIds(null, contextInfo);
-            assertTrue(false);
+            client.getCluSetsByIds(null, contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("cluSetIds can not be null", e.getMessage());
         }
 
         // getCluIdsFromCluSet
@@ -285,17 +294,19 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertEquals("CLU-1", ids.get(0));
 
         try {
-            ids = client.getCluIdsFromCluSet("CLUSETXXX-42", contextInfo);
-            assertTrue(false);
+            client.getCluIdsFromCluSet("CLUSETXXX-42", contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (DoesNotExistException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("CLUSETXXX-42", e.getMessage());
         }
 
         try {
-            ids = client.getCluIdsFromCluSet(null, contextInfo);
-            assertTrue(false);
+            client.getCluIdsFromCluSet(null, contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("cluSetId can not be null", e.getMessage());
         }
 
         // getAllClusInCluSet
@@ -304,27 +315,30 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertEquals("CLU-1", clus.get(0).getId());
 
         try {
-            clus = client.getClusFromCluSet("CLUSETXXX-42", contextInfo);
-            assertTrue(false);
+            client.getClusFromCluSet("CLUSETXXX-42", contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (DoesNotExistException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("CLUSETXXX-42", e.getMessage());
         }
 
         try {
-            clus = client.getClusFromCluSet(null, contextInfo);
-            assertTrue(false);
+            client.getClusFromCluSet(null, contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("cluSetId can not be null", e.getMessage());
         }
 
         clus = client.getAllClusInCluSet("CLUSET-4", contextInfo);
         assertEquals(2, clus.size());
 
         try {
-            ids = client.getAllCluIdsInCluSet(null, contextInfo);
-            assertTrue(false);
+            client.getAllCluIdsInCluSet(null, contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("cluSetId can not be null", e.getMessage());
         }
 
         clus = client.getAllClusInCluSet("CLUSET-2", contextInfo);
@@ -344,16 +358,18 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertFalse(inSet);
 
         try {
-            inSet = client.isCluInCluSet(null, "CLUSET-4", contextInfo);
-            assertTrue(false);
+            client.isCluInCluSet(null, "CLUSET-4", contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("cluId can not be null", e.getMessage());
         }
         try {
-            inSet = client.isCluInCluSet("CLU-2", null, contextInfo);
-            assertTrue(false);
+            client.isCluInCluSet("CLU-2", null, contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("cluSetId can not be null", e.getMessage());
         }
     }
 
@@ -493,7 +509,8 @@ public class TestCluServiceImpl extends AbstractServiceTest {
             client.getCluSet(createdCluSet1.getId(), contextInfo);
             fail("Should have thrown DoesNotExistException");
         } catch (DoesNotExistException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals(createdCluSet1.getId(), e.getMessage());
         }
     }
 
@@ -512,10 +529,11 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertTrue(ccrs == null || ccrs.size() == 0);
 
         try {
-            ccrs = client.getCluCluRelationsByClu(null, contextInfo);
-            assertTrue(false);
+            client.getCluCluRelationsByClu(null, contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("cluId can not be null", e.getMessage());
         }
 
     }
@@ -618,7 +636,7 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertEquals("Clu Fee Record", createdClu.getFeeInfo().getCluFeeRecords().get(0).getDescr().getPlain());
         assertEquals(3, createdClu.getFeeInfo().getCluFeeRecords().get(0).getFeeAmounts().size());
         assertEquals(Integer.valueOf(200), createdClu.getFeeInfo().getCluFeeRecords().get(0).getFeeAmounts().get(0).getCurrencyQuantity());
-        assertEquals(0, createdClu.getFeeInfo().getCluFeeRecords().get(1).getFeeAmounts().size());
+        assertTrue(createdClu.getFeeInfo().getCluFeeRecords().get(1).getFeeAmounts().isEmpty());
 
         assertEquals(2, createdClu.getFeeInfo().getCluFeeRecords().get(0).getAffiliatedOrgs().size());
         assertEquals(35l, (long) createdClu.getFeeInfo().getCluFeeRecords().get(0).getAffiliatedOrgs().get(0).getPercentage());
@@ -871,7 +889,7 @@ public class TestCluServiceImpl extends AbstractServiceTest {
 
         createdClu.getStdDuration().setAtpDurationTypeKey(
                 "UPEXT-stdDuration-Id1");
-        createdClu.getStdDuration().setTimeQuantity(new Integer(97867));
+        createdClu.getStdDuration().setTimeQuantity(97867);
 
         createdClu.setTypeKey("luType.shell.program");
 
@@ -1086,18 +1104,14 @@ public class TestCluServiceImpl extends AbstractServiceTest {
 
         // Test Optimistic locking
         try {
-            updatedClu = client.updateClu(createdClu.getId(), createdClu, contextInfo);
+            client.updateClu(createdClu.getId(), createdClu, contextInfo);
             fail("Should have thrown VersionMismatchException");
         } catch (VersionMismatchException e) {
-
+            assertNotNull(e.getMessage());
+            assertEquals("Clu to be updated is not the current version", e.getMessage());
         }
 
-        // Test Delete
-        try {
-            client.getClu(createdClu.getId(), contextInfo);
-        } catch (DoesNotExistException e) {
-            fail("Should not have thrown DoesNotExistException");
-        }
+        client.getClu(createdClu.getId(), contextInfo);
 
         StatusInfo status = client.deleteClu(createdClu.getId(), contextInfo);
         assertTrue(status.getIsSuccess());
@@ -1106,7 +1120,8 @@ public class TestCluServiceImpl extends AbstractServiceTest {
             client.getClu(createdClu.getId(), contextInfo);
             fail("Should have thrown DoesNotExistException");
         } catch (DoesNotExistException e) {
-
+            assertNotNull(e.getMessage());
+            assertEquals(createdClu.getId(), e.getMessage());
         }
 
     }
@@ -1176,11 +1191,7 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertNotNull(created.getMeta().getVersionInd());
 
         // Test Delete
-        try {
-            client.getCluCluRelation(created.getId(), contextInfo);
-        } catch (DoesNotExistException e) {
-            fail("Should not have thrown DoesNotExistException");
-        }
+        client.getCluCluRelation(created.getId(), contextInfo);
 
         StatusInfo status = client.deleteCluCluRelation(created.getId(), contextInfo);
         assertTrue(status.getIsSuccess());
@@ -1189,7 +1200,8 @@ public class TestCluServiceImpl extends AbstractServiceTest {
             client.getCluCluRelation(created.getId(), contextInfo);
             fail("Should have thrown DoesNotExistException");
         } catch (DoesNotExistException e) {
-
+            assertNotNull(e.getMessage());
+            assertEquals(created.getId(), e.getMessage());
         }
 
         List<String> relatedCluIdsByCluId = client.getRelatedCluIdsByCluAndRelationType(
@@ -1636,7 +1648,8 @@ public class TestCluServiceImpl extends AbstractServiceTest {
                     reltnInfo, contextInfo);
             fail("Should have thrown DoesNotExistException");
         } catch (DoesNotExistException e) {
-
+            assertNotNull(e.getMessage());
+            assertEquals("MISSING CLU", e.getMessage());
         }
 
         CluLoRelationInfo gtReltnInfo = client.getCluLoRelation(crReltnInfo
@@ -1709,16 +1722,18 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertTrue(clus == null || clus.size() == 0);
 
         try {
-            clus = client.getClusByRelatedCluAndRelationType(null, "luLuType.type1XX", contextInfo);
-            assertTrue(false);
+            client.getClusByRelatedCluAndRelationType(null, "luLuType.type1XX", contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("relatedCluId can not be null", e.getMessage());
         }
         try {
-            clus = client.getClusByRelatedCluAndRelationType("CLU-2", null, contextInfo);
-            assertTrue(false);
+            client.getClusByRelatedCluAndRelationType("CLU-2", null, contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("luLuRelationTypeKey can not be null", e.getMessage());
         }
 
         List<String> ids = client.getCluIdsByRelatedCluAndRelationType("CLU-2", "luLuType.type1", contextInfo);
@@ -1732,16 +1747,18 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertTrue(null == ids || ids.size() == 0);
 
         try {
-            ids = client.getCluIdsByRelatedCluAndRelationType(null, "luLuType.type1XX", contextInfo);
-            assertTrue(false);
+            client.getCluIdsByRelatedCluAndRelationType(null, "luLuType.type1XX", contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("relatedCluId can not be null", e.getMessage());
         }
         try {
-            ids = client.getCluIdsByRelatedCluAndRelationType("CLU-2", null, contextInfo);
-            assertTrue(false);
+            client.getCluIdsByRelatedCluAndRelationType("CLU-2", null, contextInfo);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("cluCluRelationTypeKey can not be null", e.getMessage());
         }
     }
 
@@ -2044,7 +2061,7 @@ public class TestCluServiceImpl extends AbstractServiceTest {
 
         TimeAmountInfo stdDuration = new TimeAmountInfo();
         stdDuration.setAtpDurationTypeKey("EXTstdDurationId");
-        stdDuration.setTimeQuantity(new Integer(7867));
+        stdDuration.setTimeQuantity(7867);
         clu.setStdDuration(stdDuration);
 
         createCampusLocationList(clu);
@@ -2097,7 +2114,7 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         //CluInfo createdClu2 = atpService.createClu("luType.shell.course", clu2);
         //List<String> cluIdList = Arrays.asList(new String[] {createdClu1.getId(), createdClu2.getId()});
 
-        List<String> cluIdList = Arrays.asList(new String[]{"CLU-1", "CLU-2", "CLU-3", "CLU-4"});
+        List<String> cluIdList = Arrays.asList("CLU-1", "CLU-2", "CLU-3", "CLU-4");
 
         StatusInfo status = client.addClusToCluSet(cluIdList, createdCluSet.getId(), contextInfo);
         CluSetInfo getCluSetInfo = client.getCluSet(createdCluSet.getId(), contextInfo);
@@ -2113,13 +2130,14 @@ public class TestCluServiceImpl extends AbstractServiceTest {
     public void test29AddClusToCluSet_InvalidCluId() throws ParseException, AlreadyExistsException, DataValidationErrorException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, DoesNotExistException, UnsupportedActionException, ReadOnlyException {
         CluSetInfo createdCluSet = client.createCluSet("kuali.cluSet.type.CreditCourse", createCluSetInfo(), contextInfo);
 
-        List<String> cluIdList = Arrays.asList(new String[]{"CLU-1", "CLU-2", "CLU-INVALID-ID", "CLU-4"});
+        List<String> cluIdList = Arrays.asList("CLU-1", "CLU-2", "CLU-INVALID-ID", "CLU-4");
 
         try {
             client.addClusToCluSet(cluIdList, createdCluSet.getId(), contextInfo);
             fail("Adding a non-existent CLU (id='CLU-INVALID-ID') to CluSet should have failed");
         } catch (DoesNotExistException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("Could not get current clu version info by cluId", e.getMessage());
         }
     }
 
@@ -2127,7 +2145,7 @@ public class TestCluServiceImpl extends AbstractServiceTest {
     public void test30AddClusToCluSet_DuplicateCluId() throws ParseException, AlreadyExistsException, DataValidationErrorException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, DoesNotExistException, UnsupportedActionException, ReadOnlyException {
         CluSetInfo createdCluSet = client.createCluSet("kuali.cluSet.type.CreditCourse", createCluSetInfo(), contextInfo);
 
-        List<String> cluIdList = Arrays.asList(new String[]{"CLU-1", "CLU-2", "CLU-2", "CLU-4"});
+        List<String> cluIdList = Arrays.asList("CLU-1", "CLU-2", "CLU-2", "CLU-4");
 
         StatusInfo status = client.addClusToCluSet(cluIdList, createdCluSet.getId(), contextInfo);
         assertEquals("CluSet already contains Clu (id='CLU-2')", status.getMessage());
@@ -2135,13 +2153,14 @@ public class TestCluServiceImpl extends AbstractServiceTest {
 
     @Test
     public void test31AddClusToCluSet_InvalidCluSetId() throws ParseException, AlreadyExistsException, DataValidationErrorException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, DoesNotExistException, UnsupportedActionException {
-        List<String> cluIdList = Arrays.asList(new String[]{"CLU-1", "CLU-2", "CLU-3", "CLU-4"});
+        List<String> cluIdList = Arrays.asList("CLU-1", "CLU-2", "CLU-3", "CLU-4");
 
         try {
             client.addClusToCluSet(cluIdList, "CLUSET-INVALID-ID", contextInfo);
             fail("Adding CLUs to a non-existent CluSet (id='CLUSET-INVALID-ID') should have failed");
         } catch (DoesNotExistException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("CLUSET-INVALID-ID", e.getMessage());
         }
     }
 
@@ -2165,7 +2184,8 @@ public class TestCluServiceImpl extends AbstractServiceTest {
             client.addCluSetToCluSet(createdCluSet.getId(), createdCluSet.getId(), contextInfo);
             fail("Adding a CluSet to itself should have failed");
         } catch (CircularRelationshipException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("Cannot add a CluSet (id=" + createdCluSet.getId() + ") to ifself", e.getMessage());
         }
     }
 
@@ -2182,7 +2202,8 @@ public class TestCluServiceImpl extends AbstractServiceTest {
             client.addCluSetToCluSet(createdCluSet1.getId(), createdCluSet2.getId(), contextInfo);
             fail("Adding CluSet should have thrown a CircularRelationshipException");
         } catch (CircularRelationshipException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("CluSet (id=" + createdCluSet1.getId() + ") already contains this CluSet (id=" + createdCluSet1.getId() + ")", e.getMessage());
         }
     }
 
@@ -2198,7 +2219,8 @@ public class TestCluServiceImpl extends AbstractServiceTest {
             client.addCluSetToCluSet(createdCluSet.getId(), "CLUSET-1", contextInfo);
             fail("Adding a duplicate CluSet (id='CLUSET-1') to CluSet should have failed");
         } catch (OperationFailedException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("CluSet (id=" + createdCluSet.getId() + ") already contains CluSet (id='CLUSET-1')", e.getMessage());
         }
     }
 
@@ -2211,7 +2233,8 @@ public class TestCluServiceImpl extends AbstractServiceTest {
             client.addCluSetToCluSet(createdCluSet.getId(), "CLUSET-INVALID-ID", contextInfo);
             fail("Adding a non-existent CluSet (id='CLUSET-INVALID-ID') to CluSet should have failed");
         } catch (DoesNotExistException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("CLUSET-INVALID-ID", e.getMessage());
         }
     }
 
@@ -2220,7 +2243,7 @@ public class TestCluServiceImpl extends AbstractServiceTest {
 
         CluSetInfo createdCluSet = client.createCluSet("kuali.cluSet.type.CreditCourse", createCluSetInfo(), contextInfo);
 
-        List<String> cluIdList = Arrays.asList(new String[]{"CLUSET-1", "CLUSET-2", "CLUSET-3", "CLUSET-4"});
+        List<String> cluIdList = Arrays.asList("CLUSET-1", "CLUSET-2", "CLUSET-3", "CLUSET-4");
 
         StatusInfo status = client.addCluSetsToCluSet(createdCluSet.getId(), cluIdList, contextInfo);
         CluSetInfo getCluSetInfo = client.getCluSet(createdCluSet.getId(), contextInfo);
@@ -2238,13 +2261,14 @@ public class TestCluServiceImpl extends AbstractServiceTest {
 
         CluSetInfo createdCluSet = client.createCluSet("kuali.cluSet.type.CreditCourse", createCluSetInfo(), contextInfo);
 
-        List<String> cluIdList = Arrays.asList(new String[]{"CLUSET-1", "CLUSET-INVALID-ID", "CLUSET-3", "CLUSET-4"});
+        List<String> cluIdList = Arrays.asList("CLUSET-1", "CLUSET-INVALID-ID", "CLUSET-3", "CLUSET-4");
 
         try {
             client.addCluSetsToCluSet(createdCluSet.getId(), cluIdList, contextInfo);
             fail("Adding a non-existent CluSet (id='CLUSET-INVALID-ID') to CluSet should have failed");
         } catch (DoesNotExistException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("CLUSET-INVALID-ID", e.getMessage());
         }
     }
 
@@ -2253,13 +2277,14 @@ public class TestCluServiceImpl extends AbstractServiceTest {
 
         CluSetInfo createdCluSet = client.createCluSet("kuali.cluSet.type.CreditCourse", createCluSetInfo(), contextInfo);
 
-        List<String> cluIdList = Arrays.asList(new String[]{"CLUSET-1", "CLUSET-2", "CLUSET-3", "CLUSET-2"});
+        List<String> cluIdList = Arrays.asList("CLUSET-1", "CLUSET-2", "CLUSET-3", "CLUSET-2");
 
         try {
             client.addCluSetsToCluSet(createdCluSet.getId(), cluIdList, contextInfo);
             fail("Adding a duplicate CluSet (id='CLUSET-2') to CluSet should have failed");
         } catch (OperationFailedException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("CluSet (id=" + createdCluSet.getId() + ") already contains CluSet (id='CLUSET-2')", e.getMessage());
         }
     }
 
@@ -2268,13 +2293,14 @@ public class TestCluServiceImpl extends AbstractServiceTest {
 
         CluSetInfo createdCluSet = client.createCluSet("kuali.cluSet.type.CreditCourse", createCluSetInfo(), contextInfo);
         // Adding createdCluSet to itself
-        List<String> cluIdList = Arrays.asList(new String[]{"CLUSET-1", "CLUSET-2", createdCluSet.getId(), "CLUSET-4"});
+        List<String> cluIdList = Arrays.asList("CLUSET-1", "CLUSET-2", createdCluSet.getId(), "CLUSET-4");
 
         try {
             client.addCluSetsToCluSet(createdCluSet.getId(), cluIdList, contextInfo);
             fail("Adding a CluSet to itself should have failed");
         } catch (CircularRelationshipException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("Cannot add a CluSet (id=" + createdCluSet.getId() + ") to ifself", e.getMessage());
         }
     }
 
@@ -2285,19 +2311,20 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         CluSetInfo createdCluSet2 = client.createCluSet("kuali.cluSet.type.CreditCourse", createCluSetInfo(), contextInfo);
         CluSetInfo createdCluSet3 = client.createCluSet("kuali.cluSet.type.CreditCourse", createCluSetInfo(), contextInfo);
 
-        List<String> cluIdList1 = Arrays.asList(new String[]{"CLUSET-1", "CLUSET-2", createdCluSet1.getId()});
+        List<String> cluIdList1 = Arrays.asList("CLUSET-1", "CLUSET-2", createdCluSet1.getId());
         client.addCluSetsToCluSet(createdCluSet3.getId(), cluIdList1, contextInfo);
 
         // Adding createdCluSet to itself
-        List<String> cluIdList2 = Arrays.asList(new String[]{"CLUSET-1", createdCluSet3.getId()});
+        List<String> cluIdList2 = Arrays.asList("CLUSET-1", createdCluSet3.getId());
         client.addCluSetsToCluSet(createdCluSet2.getId(), cluIdList2, contextInfo);
 
         try {
-            List<String> cluIdList3 = Arrays.asList(new String[]{createdCluSet2.getId(),});
+            List<String> cluIdList3 = Arrays.asList(createdCluSet2.getId());
             client.addCluSetsToCluSet(createdCluSet1.getId(), cluIdList3, contextInfo);
             fail("Adding CluSet should have thrown a CircularRelationshipException");
         } catch (CircularRelationshipException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("CluSet (id=" + createdCluSet1.getId() + ") already contains this CluSet (id=" + createdCluSet1.getId() + ")", e.getMessage());
         }
     }
 
@@ -2390,7 +2417,8 @@ public class TestCluServiceImpl extends AbstractServiceTest {
             client.createCluSet("kuali.cluSet.type.CreditCourse", cluSet, contextInfo);
             fail("Creating CluSet should have thrown an UnsupportedActionException. Cannot add CLUs and Dynamic CluSets into one CluSet");
         } catch (UnsupportedActionException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("Dynamic CluSet cannot contain Clus and/or CluSets. CluSet id=null", e.getMessage());
         }
 
     }
@@ -2410,7 +2438,8 @@ public class TestCluServiceImpl extends AbstractServiceTest {
             client.createCluSet("kuali.cluSet.type.CreditCourse", cluSet, contextInfo);
             fail("Creating CluSet should have thrown an UnsupportedActionException. Cannot add CluSets and Dynamic CluSets into one CluSet");
         } catch (UnsupportedActionException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("Dynamic CluSet cannot contain Clus and/or CluSets. CluSet id=null", e.getMessage());
         }
 
     }
@@ -2426,7 +2455,8 @@ public class TestCluServiceImpl extends AbstractServiceTest {
             client.createCluSet("kuali.cluSet.type.CreditCourse", cluSet, contextInfo);
             fail("Creating CluSet should have thrown an UnsupportedActionException. Cannot add CLUs and CluSets into one CluSet");
         } catch (UnsupportedActionException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("CluSet cannot contain both Clus and CluSets. CluSet id=null", e.getMessage());
         }
 
     }
@@ -2518,9 +2548,10 @@ public class TestCluServiceImpl extends AbstractServiceTest {
 
         try {
             client.getCluSetTreeView("CLUSET-XX", contextInfo);
-            assertTrue(false);
+            fail("DoesNotExistException should have been thrown");
         } catch (DoesNotExistException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("CLUSET-XX", e.getMessage());
         }
     }
 
@@ -2531,9 +2562,10 @@ public class TestCluServiceImpl extends AbstractServiceTest {
 
         try {
             client.getCluSetTreeView(null, contextInfo);
-            assertTrue(false);
+            fail("MissingParameterException should have been thrown");
         } catch (MissingParameterException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("cluSetId can not be null", e.getMessage());
         }
     }
 
@@ -2586,7 +2618,8 @@ public class TestCluServiceImpl extends AbstractServiceTest {
             client.updateCluSet(updatedCluSet1.getId(), createdCluSet1, contextInfo);
             fail("Should have thrown VersionMismatchException.");
         } catch (VersionMismatchException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("CluSet (id=" + updatedCluSet1.getId() + ") to be updated is not the current version (version=0), current version=2", e.getMessage());
         }
     }
 
@@ -2604,10 +2637,10 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         createdCluSet1.getCluSetIds().clear();
 
         CluSetInfo updatedCluSet1 = client.updateCluSet(createdCluSet1.getId(), createdCluSet1, contextInfo);
-        assertEquals(0, updatedCluSet1.getCluSetIds().size());
+        assertTrue(updatedCluSet1.getCluSetIds().isEmpty());
 
         CluSetInfo getCluSet1 = client.getCluSet(updatedCluSet1.getId(), contextInfo);
-        assertEquals(0, getCluSet1.getCluSetIds().size());
+        assertTrue(getCluSet1.getCluSetIds().isEmpty());
     }
 
     @Test
@@ -2616,7 +2649,7 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         CluSetInfo createCluSet = createCluSetInfo();
 
         CluSetInfo createdCluSet1 = client.createCluSet("kuali.cluSet.type.CreditCourse", createCluSet, contextInfo);
-        assertEquals(0, createdCluSet1.getCluSetIds().size());
+        assertTrue(createdCluSet1.getCluSetIds().isEmpty());
 
         createdCluSet1.getCluSetIds().add("CLUSET-1");
         createdCluSet1.getCluSetIds().add("CLUSET-2");
@@ -2674,13 +2707,13 @@ public class TestCluServiceImpl extends AbstractServiceTest {
 
         assertNotNull(updatedCluSet1);
         assertNotNull(updatedCluSet1.getCluIds());
-        assertEquals(0, updatedCluSet1.getCluIds().size());
+        assertTrue(updatedCluSet1.getCluIds().isEmpty());
 
         CluSetInfo getCluSet1 = client.getCluSet(updatedCluSet1.getId(), contextInfo);
 
         assertNotNull(getCluSet1);
         assertNotNull(getCluSet1.getCluIds());
-        assertEquals(0, getCluSet1.getCluIds().size());
+        assertTrue(getCluSet1.getCluIds().isEmpty());
     }
 
     @Test
@@ -2874,8 +2907,10 @@ public class TestCluServiceImpl extends AbstractServiceTest {
             //Try to set the start date in the past
             client.setCurrentCluVersion(cluV1.getId(),
                     DateFormatters.YEAR_MONTH_DAY_CONCAT_DATE_FORMATTER.parse("19000101"), contextInfo);
-            assertTrue(false);
-        } catch (Exception e) {
+            fail("InvalidParameterException should have been thrown");
+        } catch (InvalidParameterException ipe) {
+            assertNotNull(ipe.getMessage());
+            assertEquals("currentVersionStart must be in the future.", ipe.getMessage());
         }
 
 
@@ -3139,7 +3174,7 @@ public class TestCluServiceImpl extends AbstractServiceTest {
 
         TimeAmountInfo stdDuration = new TimeAmountInfo();
         stdDuration.setAtpDurationTypeKey("EXT-stdDuration-Id1");
-        stdDuration.setTimeQuantity(new Integer(7867));
+        stdDuration.setTimeQuantity(7867);
         clu.setStdDuration(stdDuration);
 
         clu.setTypeKey("kuali.SomeKindOfClu");
@@ -3436,7 +3471,7 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         searchRequest.setParams(queryParamValueList);
         SearchResultInfo cluSets = client.search(searchRequest, ContextInfoTestUtility.getEnglishContextInfo());
 
-        Assert.assertEquals(0, cluSets.getRows().size());
+        assertTrue(cluSets.getRows().isEmpty());
     }
 
     @Test
@@ -3453,7 +3488,7 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         searchRequest.setParams(queryParamValueList);
         SearchResultInfo clus = client.search(searchRequest, ContextInfoTestUtility.getEnglishContextInfo());
 
-        Assert.assertEquals(2, clus.getRows().size());
+        assertEquals(2, clus.getRows().size());
     }
 
     @Test
@@ -3470,7 +3505,7 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         searchRequest.setParams(queryParamValueList);
         SearchResultInfo clus = client.search(searchRequest, ContextInfoTestUtility.getEnglishContextInfo());
 
-        Assert.assertEquals(0, clus.getRows().size());
+        assertTrue(clus.getRows().isEmpty());
     }
 
     @Test
@@ -3578,9 +3613,10 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         //Test version mismatch
         try {
             client.updateCluPublication(createdCluPub2.getId(), createdCluPub2, contextInfo);
-            assertTrue(false);
+            fail("VersionMismatchException should have been thrown");
         } catch (VersionMismatchException e) {
-            assertTrue(true);
+            assertNotNull(e.getMessage());
+            assertEquals("CluPublication to be updated is not the current version", e.getMessage());
         }
 
 
@@ -3603,11 +3639,7 @@ public class TestCluServiceImpl extends AbstractServiceTest {
     }
 
     @Test
-    public void SearchForClus() throws AlreadyExistsException,
-            DataValidationErrorException, DoesNotExistException,
-            InvalidParameterException, MissingParameterException,
-            OperationFailedException, PermissionDeniedException,
-            ParseException, VersionMismatchException {
+    public void SearchForClus() throws Exception {
 
         String id ="83e46ae9-875e-4970-811f-0719a6b260a2";
 
@@ -3628,12 +3660,8 @@ public class TestCluServiceImpl extends AbstractServiceTest {
         assertEquals(37, cluInfos.size());
     }
 
-    private List<CluInfo> searchForClus(QueryByCriteria qbc) {
-        try {
-            return client.searchForClus(qbc, ContextUtils.getContextInfo());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    private List<CluInfo> searchForClus(QueryByCriteria qbc) throws Exception {
+        return client.searchForClus(qbc, ContextUtils.getContextInfo());
     }
 
 

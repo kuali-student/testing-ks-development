@@ -15,44 +15,173 @@
   limitations under the License.
 -->
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:p="http://www.springframework.org/schema/p"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--
+        The data dictionary for the CourseInfoWrapper class.
+    -->
+    <bean id="CourseInfoWrapper" parent="CourseInfoWrapper-parentBean" />
+    <bean id="CourseInfoWrapper-parentBean" abstract="true" parent="DataObjectEntry">
+        <property name="dataObjectClass" value="org.kuali.student.cm.course.form.CourseInfoWrapper"/>
+        <property name="titleAttribute" value="courseInfo.id"/>
+        <property name="attributes">
+            <list />
+        </property>
+        <property name="objectLabel" value="CourseInfo Wrapper"/>
+        <property name="primaryKeys">
+            <list>
+                <value>courseInfo.id</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--
+        Data dictionary overrides for validation.
+    -->
+
+    <!-- Common beans -->
+
+    <!-- Override simpleConstraint.states with workflow doc state R (Enroute) and beyond -->
+    <bean id="DDValueReplacer-Enroute" parent="FieldOverrideForValueReplace" abstract="true" >
+        <property name="propertyName" value="simpleConstraint.states" />
+        <property name="value">
+            <list>
+                <value>R+</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Override simpleConstraint.states with workflow doc state P (Processed) -->
+    <bean id="DDValueReplacer-Processed" parent="FieldOverrideForValueReplace" abstract="true" >
+        <property name="propertyName" value="simpleConstraint.states" />
+        <property name="value">
+            <list>
+                <value>P</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--
+        Per property overrides for workflow doc state R (Enroute).
+    -->
+    <bean id="CourseInfo.subjectArea-override" parent="DataDictionaryBeanOverride">
+        <property name="beanName" value="CourseInfo.subjectArea" />
+        <property name="fieldOverrides">
+            <bean parent="DDValueReplacer-Enroute" />
+        </property>
+    </bean>
+
+    <bean id="CourseInfo.descr.plain-override" parent="DataDictionaryBeanOverride">
+	    <property name="beanName" value="CourseInfo.descr.plain" />
+        <property name="fieldOverrides">
+            <bean parent="DDValueReplacer-Enroute" />
+        </property>
+	</bean>
+
+    <bean id="ProposalInfo.rationale.plain-override" parent="DataDictionaryBeanOverride">
+        <property name="beanName" value="ProposalInfo.rationale.plain" />
+        <property name="fieldOverrides">
+            <bean parent="DDValueReplacer-Enroute" />
+        </property>
+    </bean>
+
+    <!--
+        Per property overrides for workflow doc state P (Processed).
+
+    <bean id="CourseInfo.courseNumberSuffix.override" parent="DataDictionaryBeanOverride">
+        <property name="beanName" value="CourseInfo.courseNumberSuffix" />
+        <property name="fieldOverrides">
+            <bean parent="DDValueReplacer-Processed" />
+        </property>
+    </bean>
+     -->
+    <!-- Explicitly set a simple constraint with required=false so that the requiredness message will behave -->
+    <bean id="CourseInfo.courseNumberSuffix.override-required-bug" parent="DataDictionaryBeanOverride">
+        <property name="beanName" value="CourseInfo.courseNumberSuffix" />
+        <property name="fieldOverrides">
+            <bean parent="FieldOverrideForValueReplace" >
+                <property name="propertyName" value="simpleConstraint" />
+                <property name="value">
+                    <bean parent="SimpleConstraint">
+                        <property name="maxLength" value="3" />
+                        <property name="required" value="false" />
+                        <property name="states">
+                            <list>
+                                <value>I,S,R</value>
+                            </list>
+                        </property>
+                        <property name="constraintStateOverrides">
+                            <list>
+                                <bean parent="RequiredConstraint">
+                                    <property name="maxLength" value="3" />
+                                    <property name="states">
+                                        <list>
+                                            <value>P</value>
+                                        </list>
+                                    </property>
+                                </bean>
+                            </list>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
 
     <!-- Controller Class: CourseController.java View Helper Class: CourseViewHelperServiceImpl.java UX : http://ux.ks.kuali.org.s3.amazonaws.com/wireframes/ENR/Scheduling_Interface/v3/start.html 
         This view has couple of pages (edit and copy) with all the beans defined at 1. CourseViewCourseInfoPage.xml -->
 
     <bean id="KS-CourseView" parent="KS-Uif-MaintenanceView">
-        <property name="defaultBindingObjectPath" value="document.newMaintainableObject" />
-        <property name="formClass" value="org.kuali.student.cm.course.form.CreateCourseForm"/>
-        <property name="dataObjectClassName" value="org.kuali.student.r2.lum.course.dto.CourseInfo"/>
+        <property name="dataObjectClassName" value="org.kuali.student.cm.course.form.CourseInfoWrapper"/>
         <!-- New Course header requires static string therefore below string construction is not required.
         commenting below code in case required in future.
          @{!#empty(document.newMaintainableObject.proposal.name) ? document.newMaintainableObject.proposal.name + ' (Proposal)': 'New Course (Proposal)'} -->
         <!--<property name="headerText" value="@{(document.newMaintainableObject.proposal != null and !#empty(document.newMaintainableObject.proposal.name)) ? document.newMaintainableObject.proposal.name + ' (Proposal)': 'New Course (Proposal)'}" />-->
-        <property name="header.render" value="false" />
-        <property name="entryPageId" value="KS-CourseView-createCourseInitialPage" />
+        <property name="headerText" value="@{(#uiHelper.headerText eq null or #uiHelper.headerText.length() lt 1) ? 'Create Course': #uiHelper.headerText }" />
         <property name="singlePageView" value="false"/><!-- Override the default to allow for navigation -->
         <property name="viewHelperServiceClass" value="org.kuali.student.cm.course.service.impl.CourseInfoMaintainableImpl" />
+        <property name="applyDirtyCheck" value="true" />
         <property name="breadcrumbOptions.homewardPathBreadcrumbs">
             <list>
                 <ref bean="KS-HomewardPathBreadcrumbs-Home"/>
-                <ref bean="KS-HomewardPathBreadcrumbs-CMKRAD"/>
+                <ref bean="KS-HomewardPathBreadcrumbs-CurriculumManagement"/>
             </list>
         </property>
+        <property name="header.id" value="KS-CourseView-Header"/>
+        <property name="header.lowerGroup" >
+            <bean id="KS-CourseView-LinkGroup" parent="Uif-LinkGroup" p:linkSeparator="|" p:render="@{#form.pageId eq 'KS-CourseView-CoursePage'}">
+                <property name="items">
+                    <list>
+                        <bean parent="Uif-DataField" p:label="Proposal Status"
+                              p:shortLabel="Status" p:labelPlacement="LEFT" p:propertyName="proposalInfo.stateKey" />
+                        <bean parent="Uif-ActionLink" p:actionLabel="Comments"
+                              p:methodToCall="showComment" />
+                        <bean parent="Uif-ActionLink" p:actionLabel="Decisions"
+                              p:methodToCall="showDecisions" />
+                        <bean parent="Uif-Space" />
+                        <bean parent="Uif-DataField" p:label="Last Updated"
+                              p:shortLabel="Updated" p:labelPlacement="LEFT" p:propertyName="lastUpdated" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+
         <property name="stateMapping">
             <bean parent="WorkflowStateMapping">
                 <property name="customClientSideValidationStates">
                     <map>
-                        <entry key="I" value="A"/>
+                        <entry key="I" value="S" />
+                        <entry key="S" value="S" />
+                        <entry key="R" value="S" />
+                        <entry key="P" value="S" />
                     </map>
                 </property>
             </bean>
         </property>
-        <property name="navigation">
-            <ref bean="KS-CourseNavigation-Menu" />
-        </property>
-        <property name="onDocumentReadyScript" value="onCourseLoad();"/>
+
         <property name="dialogs">
             <list>
                 <ref bean="commentsLightBox" />
@@ -60,14 +189,16 @@
                 <!-- <bean id="compareRuleLightBox" parent="KS-KRMS-CompareRule">
                     <property name="headerText" value="Compare Catalog and Course Offering Rules"/>
                 </bean> -->
-                <bean id="courseRangeLookup" parent="KRMS-CourseRangeResult-Lookup-CM" p:fieldBindingObjectPath="document.newMaintainableObject.courseRuleManagementWrapper"/>
-                <bean id="warningMessagedYesNo" parent="KRMS-WarningMessagedYesNo" p:fieldBindingObjectPath="document.newMaintainableObject.courseRuleManagementWrapper"/>
+                <bean id="courseRangeLookup" parent="KRMS-CourseRangeResult-Lookup-CM"
+                      p:fieldBindingObjectPath="document.newMaintainableObject.dataObject.courseRuleManagementWrapper"/>
+                <bean id="warningMessagedYesNo" parent="KRMS-WarningMessagedYesNo"
+                      p:fieldBindingObjectPath="document.newMaintainableObject.dataObject.courseRuleManagementWrapper"/>
             </list>
         </property>
         <property name="items">
             <list>
-                <ref bean="KS-CourseView-createCourseInitialPage" />
                 <ref bean="KS-CourseView-CoursePage"/>
+                <ref bean="KS-CourseView-ReviewProposalPage" />
                 <ref bean="KS-RuleMaintenance-Page-Parent" />
             </list>
         </property>
@@ -76,7 +207,6 @@
                 <value>ks-cm-krad/scripts/jquery.jqEasyCharCounter.custom.js</value>
                 <value>ks-cm-krad/scripts/common.js</value>
                 <value>themes/ksboot/scripts/ruleMaintenance.js</value>
-                <value>themes/ksboot/scripts/toolbar.js</value>
             </list>
         </property>
         <property name="additionalCssFiles">
@@ -85,88 +215,170 @@
                 <value>themes/ksboot/stylesheets/krms.css</value>
             </list>
         </property>
+        <property name="expressionVariables">
+            <map merge="true">
+                <entry key="dataObject" value="document.newMaintainableObject.dataObject"/>
+                <entry key="uiHelper" value="document.newMaintainableObject.dataObject.uiHelper"/>
+                <entry key="workflowDoc" value="document.documentHeader.workflowDocument"/>
+            </map>
+        </property>
     </bean>
-    
-    <bean id="CourseInfoMaintenanceDocument" parent="uifMaintenanceDocumentEntry">
-        <property name="dataObjectClass" value="org.kuali.student.r2.lum.course.dto.CourseInfo" />
-        <property name="maintainableClass" value="org.kuali.student.cm.course.service.impl.CourseInfoMaintainableImpl"/>
-        <property name="documentTypeName" value="kuali.proposal.type.course.create"/>
-        <property name="documentAuthorizerClass" value="org.kuali.student.cm.course.auth.CMMaintenanceDocumentAuthorizer"/>
-        <property name="lockingKeys">
-            <list>
-                <value>id</value>
+
+
+    <!--
+        An extended Uif-RequiredMessage which conditionally replaces the message text based on workflow state.
+        This can be used for any input (not just required ones) because it doesn't get displayed unless requiredness
+        in simpleConstraint is turned on for the field.
+    -->
+    <bean id="CM-StateAware-RequiredMessage" parent="CM-StateAware-RequiredMessage-parent" abstract="true" />
+    <bean id="CM-StateAware-RequiredMessage-parent" parent="Uif-RequiredMessage"  abstract="true">
+        <property name="messageText" value="" />
+        <property name="cssClasses">
+            <list merge="true">
+                <value>cm-requiredMessage-text</value>
             </list>
         </property>
-    </bean>  
+        <property name="propertyReplacers">
+            <list>
+                <bean parent="Uif-ConditionalBeanPropertyReplacer"
+                    p:propertyName="messageText"
+                    p:condition="@{#workflowDoc.saved}" >
+                    <property name="replacement">
+                        <!-- This should be read from the message service -->
+                        <value>Required for Submit</value>
+                    </property>
+                </bean>
+                <bean parent="Uif-ConditionalBeanPropertyReplacer"
+                     p:propertyName="messageText"
+                     p:condition="@{#workflowDoc.enroute}" >
+                    <property name="replacement">
+                        <!-- This should be read from the message service -->
+                        <value>Required for Approval</value>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
 
-    <bean id="KS-CourseView-BasePage" parent="Uif-MaintenancePage" p:disclosure.render="false"/>
+
+    <bean id="CourseInfoMaintenanceDocument" parent="uifMaintenanceDocumentEntry">
+        <property name="dataObjectClass" value="org.kuali.student.cm.course.form.CourseInfoWrapper" />
+        <property name="maintainableClass" value="org.kuali.student.cm.course.service.impl.CourseInfoMaintainableImpl"/>
+        <property name="documentTypeName" value="kuali.proposal.type.course.create"/>
+        <property name="documentClass" value="org.kuali.student.cm.maintenance.CMMaintenanceDocument"/>
+        <property name="documentAuthorizerClass" value="org.kuali.student.cm.course.auth.CMMaintenanceDocumentAuthorizer"/>
+        <property name="businessRulesClass" value="org.kuali.student.cm.course.rule.CourseRule"/>
+        <property name="lockingKeys">
+            <list>
+                <value>courseInfo.id</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="CourseInfoAdminMaintenanceDocument" parent="uifMaintenanceDocumentEntry">
+        <property name="dataObjectClass" value="org.kuali.student.cm.course.form.CourseInfoWrapper" />
+        <property name="maintainableClass" value="org.kuali.student.cm.course.service.impl.CourseInfoMaintainableImpl"/>
+        <property name="documentClass" value="org.kuali.student.cm.maintenance.CMMaintenanceDocument"/>
+        <property name="documentTypeName" value="kuali.proposal.type.course.create.admin"/>
+        <property name="documentAuthorizerClass" value="org.kuali.student.cm.course.auth.CMMaintenanceDocumentAuthorizer"/>
+        <property name="businessRulesClass" value="org.kuali.student.cm.course.rule.CourseRule"/>
+        <property name="lockingKeys">
+            <list>
+                <value>courseInfo.id</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--
+        Each course details tab/section extends this
+    -->
+    <bean id="KS-CourseView-VerticalBoxSection" parent="Uif-VerticalBoxSection" abstract="true">
+        <property name="cssClasses">
+            <list merge="true">
+                <value>course_details_tab_section</value>
+            </list>
+        </property>
+        <property name="header">
+            <bean parent="Uif-HeaderTwo" />
+        </property>
+        <!--  Turn off validation messages for the tab sections -->
+        <property name="validationMessages.displayMessages" value="false" />
+    </bean>
+
+    <bean id="KS-CourseView-HorizontalBoxSection" parent="Uif-HorizontalBoxSection" abstract="true" />
 
     <bean id="KS-CourseView-CoursePage" parent="Uif-MaintenancePage" p:disclosure.render="false">
         <property name="header" ref="KS-CourseView-Header" />
-        <property name="footer">
-            <bean parent="KS-CourseView-Footer-Fred"/>
+        <property name="headerText" value="Create Course"/>
+        <property name="footer.items">
+            <list>
+                <bean parent="KS-CourseView-Footer" p:render="@{!#uiHelper.curriculumSpecialistUser}"/>
+                <bean parent="KS-CourseView-CurriculumSpecialistFooter" p:render="@{#uiHelper.curriculumSpecialistUser}"/>
+            </list>
         </property>
-        <property name="propertyReplacers">
-          <list>
-            <bean parent="Uif-ConditionalBeanPropertyReplacer" p:propertyName="footer" p:condition="#hasPerm('KS-SYS', 'Create Course By Admin Proposal')">
-              <property name="replacement">
-                  <bean parent="KS-CourseView-Footer-Admin"/>
-              </property>
-            </bean>
-          </list>
-        </property>
+        <property name="onDocumentReadyScript" value="onCourseLoad(@{#uiHelper.curriculumSpecialistUser}, '@{#uiHelper.selectedSection.sectionId}')"/>
         <property name="items">
             <list>
-                <bean parent="Uif-TabGroup" p:id="course_tabs" p:render="@{#hasPerm('KS-SYS', 'Create Course By Admin Proposal') eq false}">
+                <bean parent="Uif-TabGroup" p:id="course_tabs">
+                    <property name="validationMessages.displayMessages" value="false" />
                     <property name="items">
                         <list>
-                            <ref bean="KS-CourseView-CourseInfoPage-Widgets"/>
-                            <ref bean="KS-CourseView-GovernancePage-Widgets"/>
-                            <ref bean="KS-CourseView-Logistics-Widgets"/>
-                            <ref bean="KS-CourseView-LearningObjectivesPage-Widgets" />
-                            <ref bean="KS-CourseView-CourseRequisites-Widgets"/>
-                            <ref bean="KS-CourseView-ActiveDatesPage-Widgets"/>
-                            <ref bean="KS-CourseView-Financials"/>
-                            <ref bean="KS-CourseView-AuthorsAndCollaboratorsPage-Widgets"/>
-                            <ref bean="KS-CourseView-SupportingDocumentsPage-Widgets" />
-                            <ref bean="KS-CourseView-ReviewProposalPage-Widgets"/>
+                            <ref bean="KS-CourseView-CourseInfo-Section"/>
+                            <ref bean="KS-CourseView-Governance-Section"/>
+                            <ref bean="KS-CourseView-Logistics-Section"/>
+                            <ref bean="KS-CourseView-LearningObjectives-Section" />
+                            <ref bean="KS-CourseView-CourseRequisites-Section"/>
+                            <ref bean="KS-CourseView-ActiveDates-Section"/>
+                            <ref bean="KS-CourseView-Financials-Section"/>
+                            <ref bean="KS-CourseView-AuthorsAndCollaborators-Section"/>
+                            <ref bean="KS-CourseView-SupportingDocuments-Section" />
                         </list>
                     </property>
                     <property name="tabsWidget.templateOptionsJSString">
                         <value>
-                            { selected: @{selectedTabIndex} }
+                            { selected: @{#uiHelper.selectedSection.ordinal() - 1} }
                         </value>
                     </property>
                     <property name="tabsWidget.position" value="LEFT"/>
                 </bean>
-                <bean id="courseInfoSection" parent="KS-CourseView-CourseInfoPage-Widgets"  p:render="@{#hasPerm('KS-SYS', 'Create Course By Admin Proposal')}"/>
-                <bean id="governanceSetion" parent="KS-CourseView-GovernancePage-Widgets" p:render="@{#hasPerm('KS-SYS', 'Create Course By Admin Proposal')}"/>
-                <bean id="logisticsSection" parent="KS-CourseView-Logistics-Widgets" p:render="@{#hasPerm('KS-SYS', 'Create Course By Admin Proposal')}"/>
-                <bean id="learningObjectivesSection" parent="KS-CourseView-LearningObjectivesPage-Widgets" p:render="@{#hasPerm('KS-SYS', 'Create Course By Admin Proposal')}"/>
-                <bean id="requisitesSection" parent="KS-CourseView-CourseRequisites-Widgets" p:render="@{#hasPerm('KS-SYS', 'Create Course By Admin Proposal')}"/>
-                <bean id="activeDatesSection" parent="KS-CourseView-ActiveDatesPage-Widgets" p:render="@{#hasPerm('KS-SYS', 'Create Course By Admin Proposal')}"/>
-                <bean id="financialsSection" parent="KS-CourseView-Financials" p:render="@{#hasPerm('KS-SYS', 'Create Course By Admin Proposal')}"/>
-                <bean id="authorsAndCollaboratorsSection" parent="KS-CourseView-AuthorsAndCollaboratorsPage-Widgets" p:render="@{#hasPerm('KS-SYS', 'Create Course By Admin Proposal')}"/>
-                <bean id="supportingDocumentsSection" parent="KS-CourseView-SupportingDocumentsPage-Widgets" p:render="@{#hasPerm('KS-SYS', 'Create Course By Admin Proposal')}"/>
-                <bean id="reviewProposalSection" parent="KS-CourseView-ReviewProposalPage-Widgets" p:render="@{#hasPerm('KS-SYS', 'Create Course By Admin Proposal')}"/>
 
-            </list>
-        </property>
-    </bean>
+                <!-- The text above the tab panel. This gets fixed positioning via JS. -->
+                <bean id="course_tabs_header" parent="Uif-VerticalBoxGroup" p:render="@{!#uiHelper.curriculumSpecialistUser or #uiHelper.useReviewProcess}">
+                    <property name="header">
+                        <bean parent="Uif-HeaderFour">
+                            <property name="cssClasses">
+                                <list merge="true">
+                                    <value>course_tabs_header_text</value>
+                                </list>
+                            </property>
+                            <property name="headerText" value="1. Define Course" />
+                        </bean>
+                    </property>
+                </bean>
 
-    <bean id="KS-CourseView-ReviewLink" parent="Uif-VerticalBoxGroup">
-        <property name="cssClasses">
-            <list merge="true">
-                <value>ks-header</value>
+                <!-- The text and link below the tab panel. This gets fixed positioning via JS. -->
+                <bean id="KS-CourseView-ReviewProposalLink" parent="Uif-VerticalBoxGroup" p:render="@{!#uiHelper.curriculumSpecialistUser or #uiHelper.useReviewProcess}">
+                    <property name="header">
+                        <bean id="course_tabs_footer_header" parent="Uif-HeaderFour">
+                            <property name="cssClasses">
+                                <list merge="true">
+                                    <value>course_tabs_header_text</value>
+                                </list>
+                            </property>
+                            <property name="headerText" value="2. Review and Submit" />
+                        </bean>
+                    </property>
+                    <property name="items">
+                        <list>
+                            <bean parent="Uif-ActionLink"
+                                  p:methodToCall="reviewCourseProposal"
+                                  p:actionLabel="Review Proposal"
+                                  p:performDirtyValidation="true"
+                                  p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_EDIT]}" />
+                        </list>
+                    </property>
+                </bean>
             </list>
-        </property>
-        <property name="items">
-            <list>
-                <bean parent="Uif-PrimaryActionButton" 
-                      p:ajaxSubmit="false" 
-                      p:methodToCall="navigate&amp;pageId=KS-CourseView-CourseInfoPage" 
-                      p:actionLabel="Edit"/>
-            </list> 
         </property>
     </bean>
 
@@ -177,63 +389,27 @@
             </list>
         </property>
     </bean>
-          
+
     <bean id="KS-CourseView-Header" parent="Uif-HeaderTwo">
         <property name="lowerGroup">
             <ref bean="Uif-HeaderLowerGroup"/>
         </property>
         <property name="upperGroup">
-            <bean parent="Uif-VerticalBoxGroup">
+            <bean id="KS-CourseView-AdminMessageGroup" parent="Uif-VerticalBoxGroup">
                 <property name="items">
                     <list>
-                        <bean parent="Uif-VerticalBoxGroup">
-                            <property name="cssClasses">
-                                <list merge="true">
-                                    <value>ks-cm-page-header</value>
-                                </list>
-                            </property>
+                        <bean id="KS-CourseView-Admin-Message-TreeExpandCollapse" parent="Uif-HorizontalFieldGroup"
+                              p:showLabel="false" p:render="@{#uiHelper.curriculumSpecialistUser}"
+                              p:additionalCssClasses="uif-validationMessages,uif-groupValidationMessages,uif-pageValidationMessages-warning,ks-subSection">
                             <property name="items">
                                 <list>
-                                    <bean parent="Uif-HeaderTwo">
-                                        <property name="headerText" value="@{!#empty(document.newMaintainableObject.proposal.name) ? document.newMaintainableObject.proposal.name + ' (Proposal)': 'New Course (Proposal)'}" />
-                                        <property name="cssClasses">
-                                            <list merge="true">
-                                                <value>ks-header</value>
-                                            </list>
-                                        </property>
+                                    <bean parent="Uif-Message" p:id="Create-CourseView-Admin-Message"
+                                          p:messageText="Showing required and optional fields."
+                                          p:style="margin-right: 0pt; margin-top: 5px;">
                                     </bean>
-                                    <bean parent="Uif-LinkGroup" p:linkSeparator="|">
-                                        <property name="items">
-                                            <list>
-                                                <bean parent="KS-Uif-DataField-LabelLeft" p:label="Proposal Status"
-                                                      p:shortLabel="Status" p:propertyName="course.stateKey" />
-                                                <bean parent="Uif-ActionLink" p:actionLabel="Comments"
-                                                      p:methodToCall="showComment" />
-                                                <bean parent="Uif-ActionLink" p:actionLabel="Decisions"
-                                                      p:methodToCall="showDecisions" />
-                                                <bean parent="Uif-Space" />
-                                                <bean parent="KS-Uif-DataField-LabelLeft" p:label="Last Updated"
-                                                      p:shortLabel="Updated" p:propertyName="lastUpdated" />
-                                            </list>
-                                        </property>
-                                    </bean>
-                                </list>
-                            </property>
-                        </bean>
-                        <bean parent="Uif-VerticalBoxGroup" p:render="@{#hasPerm('KS-SYS', 'Create Course By Admin Proposal')}">
-                            <property name="items">
-                                <list>
-                                    <bean parent="Uif-Message">
-                                        <property name="cssClasses">
-                                            <list merge="true">
-                                                <value>uif-validationMessages</value>
-                                                <value>uif-groupValidationMessages</value> 
-                                                <value>uif-pageValidationMessages</value>
-                                                <value>uif-pageValidationMessages-warning</value>
-                                            </list>
-                                        </property>
-                                        <property name="messageText"
-                                                  value="Showing required and optional fields. Show only required fields" />
+                                    <bean parent="KS-Uif-ActionLink" p:id="Create-CourseView-Admin-Message-expand-optional-link"
+                                          p:actionScript="showHideCreateCourseOptionalElements();"
+                                          p:actionLabel="Show only required fields" p:style="margin-right: 15pt; margin-top: 0px;">
                                     </bean>
                                 </list>
                             </property>
@@ -244,7 +420,7 @@
         </property>
     </bean>
     
-    <bean id="KS-CourseView-Footer-Admin" parent="Uif-FooterBase">
+    <bean id="KS-CourseView-CurriculumSpecialistFooter" parent="Uif-FooterBase">
         <property name="items">
             <list>
                 <!--<bean parent="Uif-PrimaryActionButton"
@@ -258,37 +434,33 @@
                       p:actionLabel="Send Adhoc"
                       p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_SEND_ADHOC_REQUESTS]}"/>-->
                 <bean parent="Uif-PrimaryActionButton"
+                      p:ajaxSubmit="false"
+                      p:methodToCall="blanketApprove"
+                      p:actionLabel="Approve and Activate"
+                      p:performClientSideValidation="true"
+                      p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_BLANKET_APPROVE]}"/>
+                <bean parent="Uif-PrimaryActionButton"
                       p:ajaxSubmit="false" 
                       p:methodToCall="route"
                       p:actionLabel="Submit" 
                       p:performClientSideValidation="true"
                       p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_ROUTE] and #form.pageId eq 'KS-CourseView-ReviewProposalPage'}"/>
-                <bean parent="Uif-SaveAction" 
-                      p:ajaxSubmit="false" 
+                <bean parent="Uif-SecondaryActionButton"
+                      p:ajaxSubmit="false"
                       p:methodToCall="saveProposal"
-                      p:actionLabel="Save and Continue"
-                      p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_SAVE]}">
-                      <property name="actionParameters">
-                          <map>
-                            <entry key="displayPage" value="NEXT"/>
-                          </map>
-                      </property>
+                      p:performClientSideValidation="true"
+                      p:actionLabel="Save Progress"
+                      p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_SAVE]}"
+                      p:jumpToIdAfterSubmit="TOP">
                 </bean>
                 <!--<bean parent="Uif-PrimaryActionButton"
                       p:ajaxSubmit="false" 
                       p:methodToCall="reload" 
                       p:actionLabel="Reload"
                       p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_RELOAD]}"/> -->
-                <bean parent="Uif-PrimaryActionButton"
-                      p:ajaxSubmit="false"
-                      p:methodToCall="blanketApprove"
-                      p:actionLabel="Approve and Activate"
-                      p:performClientSideValidation="true"
-                      p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_BLANKET_APPROVE]}"/>
-                <bean parent="Uif-ActionLink"
-                      p:ajaxSubmit="false"
-                      p:methodToCall="back"
+                <bean parent="Uif-ActionLink" p:id="ucancel"
                       p:actionLabel="Cancel"
+                      p:methodToCall="back"
                       p:style="margin-top:5px;"
                       p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_CLOSE]}"/>
                 <!--<bean parent="Uif-PrimaryActionButton"
@@ -328,21 +500,9 @@
         </property>
     </bean>
 
-    <bean id="KS-CourseView-Footer-Fred" parent="Uif-FooterBase" p:layoutManager.style="float:none;">
+    <bean id="KS-CourseView-Footer" parent="Uif-FooterBase">
         <property name="items">
             <list>
-                <bean parent="Uif-HorizontalBoxGroup" p:style="float:left;">
-                    <property name="items">
-                        <list>
-                            <bean parent="Uif-SecondaryActionButton"
-                                  p:ajaxSubmit="false"
-                                  p:methodToCall="previousPage"
-                                  p:actionLabel="&lt; Back"
-                                  p:performClientSideValidation="true"
-                                  p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_SAVE] and #form.pageId ne 'KS-CourseView-CourseInfoPage'}"/>
-                        </list>
-                    </property>
-                </bean>
                 <bean parent="Uif-HorizontalBoxGroup">
                     <property name="items">
                         <list>
@@ -365,10 +525,9 @@
                                   p:performClientSideValidation="true"
                                   p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_SAVE]}">
                             </bean>
-                            <bean parent="Uif-ActionLink"
-                                  p:ajaxSubmit="false"
-                                  p:methodToCall="back"
+                            <bean parent="Uif-ActionLink" p:id="ucancel"
                                   p:actionLabel="Cancel"
+                                  p:methodToCall="back"
                                   p:style="margin-top:5px;"
                                   p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_CLOSE]}"/>
                         </list>
@@ -378,55 +537,6 @@
         </property>
     </bean>
 
-    <bean id="KS-CourseNavigation-Menu" parent="Uif-MenuNavigationGroup" p:render="@{#hasPerm('KS-SYS', 'Create Course By Admin Proposal') and #form.renderNavigationPanel}">
-            <property name="items">
-                <list>
-                    <bean parent="Uif-NavigationActionLink" p:actionScript="scrollToCourseSection('courseInfoSection');" p:actionLabel="Course" />
-                    <bean parent="Uif-NavigationActionLink" p:actionScript="scrollToCourseSection('governanceSetion');" p:actionLabel="Governance" />
-                    <bean parent="Uif-NavigationActionLink" p:actionScript="scrollToCourseSection('logisticsSection');" p:actionLabel="Logistics" />
-                    <bean parent="Uif-NavigationActionLink" p:actionScript="scrollToCourseSection('learningObjectivesSection');" p:actionLabel="LearningObjective" />
-                    <bean parent="Uif-NavigationActionLink" p:actionScript="scrollToCourseSection('requisitesSection');" p:actionLabel="Course Requisites" />
-                    <bean parent="Uif-NavigationActionLink" p:actionScript="scrollToCourseSection('ruleSection');" p:actionLabel="Rule" />
-                    <bean parent="Uif-NavigationActionLink" p:actionScript="scrollToCourseSection('activeDatesSection');" p:actionLabel="ActiveDates" />
-                    <bean parent="Uif-NavigationActionLink" p:actionScript="scrollToCourseSection('financialsSection');" p:actionLabel="Financials" />
-                    <bean parent="Uif-NavigationActionLink" p:actionScript="scrollToCourseSection('authorsAndCollaboratorsSection');" p:actionLabel="Authors &amp; Collaborators" />
-                    <bean parent="Uif-NavigationActionLink" p:actionScript="scrollToCourseSection('supportingDocumentsSection');" p:actionLabel="Supporting Documents" />
-                    <bean parent="Uif-NavigationActionLink" p:actionScript="scrollToCourseSection('reviewProposalSection');" p:actionLabel="Review Proposal" />
-                </list>
-            </property>
-    </bean>
-
-    <!--<bean id="KS-CourseNavigation-Menu" parent="Uif-MenuNavigationGroup"
-          p:render="@{#form.renderNavigationPanel}">
-        <property name="items">
-            <list>
-                <bean parent="Uif-HeaderTwo" p:headerText="Course Sections" />
-                <bean id="KS-CourseViewCreateCourse-ActionLink" parent="Uif-NavigationActionLink" p:navigateToPageId="KS-CourseView-createCourseInitialPage"
-                      p:actionLabel="Create Course" p:render="@{!#form.renderNavigationPanel}" p:performClientSideValidation="true"/>
-                <bean id="KS-CourseViewCourseInfo-ActionLink" parent="Uif-NavigationActionLink" p:navigateToPageId="KS-CourseView-CourseInfoPage"
-                      p:actionLabel="Course Information"  p:performClientSideValidation="true"/>
-                <bean id="KS-CourseViewGovernance-ActionLink" parent="Uif-NavigationActionLink" p:navigateToPageId="KS-CourseView-GovernancePage"
-                      p:actionLabel="Governance"  p:performClientSideValidation="true"/>
-                <bean id="KS-CourseViewCourseLogistics-ActionLink" parent="Uif-NavigationActionLink"
-                      p:navigateToPageId="KS-CourseView-CourseLogisticsPage" p:actionLabel="Course Logistics" p:performClientSideValidation="true"/>
-                <bean id="KS-CourseViewLearningObjectives-ActionLink" parent="Uif-NavigationActionLink"
-                      p:navigateToPageId="KS-CourseView-LearningObjectivesPage" p:actionLabel="Learning Objectives"  p:performClientSideValidation="true"/>
-                <bean id="KS-CourseViewCourseRequisites-ActionLink" parent="Uif-NavigationActionLink"
-                      p:navigateToPageId="KS-CourseView-CourseRequisitesPage" p:actionLabel="Course Requisites" p:performClientSideValidation="true" />
-                <bean id="KS-CourseViewActiveDates-ActionLink" parent="Uif-NavigationActionLink"
-                      p:navigateToPageId="KS-CourseView-ActiveDatesPage" p:actionLabel="Active Dates" p:performClientSideValidation="true" />
-                <bean id="KS-CourseViewFinancials-ActionLink" parent="Uif-NavigationActionLink" p:navigateToPageId="KS-CourseView-FinancialsPage"
-                      p:actionLabel="Financials" p:performClientSideValidation="true"/>
-                <bean id="KS-CourseViewAuthorsAndCollaborators-ActionLink" parent="Uif-NavigationActionLink"
-                      p:navigateToPageId="KS-CourseView-AuthorsAndCollaboratorsPage" p:actionLabel="Authors &amp; Collaborators" p:disabled="false" p:performClientSideValidation="true"/>
-                <bean id="KS-CourseViewSupportingDocuments-ActionLink" parent="Uif-NavigationActionLink"
-                      p:navigateToPageId="KS-CourseView-SupportingDocumentsPage" p:actionLabel="Supporting Documents" p:performClientSideValidation="true"/>
-                <bean id="KS-CourseViewReviewProposal-ActionLink" parent="Uif-NavigationActionLink"
-                      p:navigateToPageId="KS-CourseView-ReviewProposalPage" p:actionLabel="Review Proposal" p:performClientSideValidation="true"/>
-            </list>
-        </property>
-    </bean>-->
-    
     <!-- Dialogs -->
 
     <bean id="commentsLightBox" parent="Uif-VerticalBoxSection">
@@ -435,16 +545,16 @@
         <property name="items">
             <list>
                 <!--"propsalCommentSection" -->
-                <bean parent="Uif-DataField" p:propertyName="proposal.name" />
+                <bean parent="Uif-DataField" p:propertyName="proposalInfo.name" />
                 <bean parent="Uif-Message"
                       p:messageText="All comments posted here will be visible to authors, and to reviewers after you submit the proposal" />
 
                 <!--"commentTableSection" -->
-                <bean parent="Uif-MessageField" p:messageText="Logged in as: @{document.newMaintainableObject.userId}" />
+                <bean parent="Uif-MessageField" p:messageText="Logged in as: @{document.newMaintainableObject.dataObject.userId}" />
                 <bean parent="Uif-TableCollectionSection" lazy-init="false">
                     <property name="headerText" value="Leave a Comment" />
                     <property name="collectionObjectClass" value="org.kuali.student.r2.core.comment.dto.CommentInfo" />
-                    
+
                     <property name="propertyName" value="commentInfos" />
                     <property name="layoutManager.separateAddLine" value="true" />
                     <property name="addLineLabel.messageText" value=" " />
@@ -489,5 +599,13 @@
             </list>
         </property>
     </bean>
-    
+
+    <bean id="KS-HomewardPathBreadcrumbs-NewCourse-information" parent="Uif-BreadcrumbItem">
+        <property name="label" value="Course Information"></property>
+    </bean>
+    <bean id="KS-HomewardPathBreadcrumbs-NewCourse" parent="Uif-BreadcrumbItem">
+        <property name="label" value=" @{(#form.pageId eq 'KS-CourseView-CoursePage') ? #uiHelper.headerText : 'Create Course'}" />
+        <property name="url.baseUrl" value="cmHome"/>
+        <property name="url.viewId" value="curriculumHomeView"/>
+    </bean>
 </beans>

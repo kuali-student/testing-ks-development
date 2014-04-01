@@ -55,7 +55,7 @@ import org.kuali.student.lum.lu.ui.krms.util.CluSearchUtil;
 import org.kuali.student.lum.lu.ui.krms.util.LUKRMSConstants;
 import org.kuali.student.r1.common.rice.StudentIdentityConstants;
 import org.kuali.student.r2.common.dto.ContextInfo;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.core.constants.KSKRMSServiceConstants;
 import org.kuali.student.r2.core.constants.OrganizationServiceConstants;
 import org.kuali.student.r2.core.organization.service.OrganizationService;
@@ -214,7 +214,7 @@ public class LURuleViewHelperServiceImpl extends RuleViewHelperServiceImpl {
                 if(enrolOriginal.getCluSet().getParent() == null) {
                     TermEditor term = new TermEditor(PropositionTreeUtil.getTermParameter(compare.getParameters()).getTermValue());
                     for(TermParameterEditor termParameterEditor : term.getEditorParameters()) {
-                        if(termParameterEditor.getName().equals(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_CLUSET_KEY)) {
+                        if(termParameterEditor.getName().equals(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_COURSE_CLUSET_KEY)) {
                             enrolOriginal.getCluSet().setParent(this.getCluInfoHelper().getCluSetInformation(termParameterEditor.getValue()));
                             break;
                         }
@@ -238,7 +238,7 @@ public class LURuleViewHelperServiceImpl extends RuleViewHelperServiceImpl {
                 if(enrolOriginal.getProgCluSet().getParent() == null) {
                     TermEditor term = new TermEditor(PropositionTreeUtil.getTermParameter(compare.getParameters()).getTermValue());
                     for(TermParameterEditor termParameterEditor : term.getEditorParameters()) {
-                        if(termParameterEditor.getName().equals(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_CLUSET_KEY)) {
+                        if(termParameterEditor.getName().equals(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_COURSE_CLUSET_KEY)) {
                             enrolOriginal.getProgCluSet().setParent(this.getCluInfoHelper().getCluSetInformation(termParameterEditor.getValue()));
                             break;
                         }

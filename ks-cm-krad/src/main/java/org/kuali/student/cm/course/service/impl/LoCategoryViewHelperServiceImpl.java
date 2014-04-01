@@ -8,13 +8,14 @@ import org.kuali.rice.krad.uif.service.impl.ViewHelperServiceImpl;
 import org.kuali.rice.krad.uif.util.ObjectPropertyUtils;
 import org.kuali.rice.krad.uif.view.ViewModel;
 import org.kuali.rice.krad.util.GlobalVariables;
-import org.kuali.student.logging.FormattedLogger;
-import org.kuali.student.lum.lu.util.CurriculumManagementConstants;
+import org.kuali.student.cm.common.util.CurriculumManagementConstants;
 import org.kuali.student.r2.common.exceptions.DataValidationErrorException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.common.util.constants.LearningObjectiveServiceConstants;
 import org.kuali.student.r2.lum.lo.dto.LoCategoryInfo;
 import org.kuali.student.r2.lum.lo.service.LearningObjectiveService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import java.util.Collection;
@@ -22,11 +23,9 @@ import java.util.List;
 
 public class LoCategoryViewHelperServiceImpl extends ViewHelperServiceImpl {
 
+    private static final Logger LOG = LoggerFactory.getLogger(LoCategoryViewHelperServiceImpl.class);
     private transient LearningObjectiveService loService;
     public final String ACTIVE = "Active";
-    public final String KS_LO_CAT_TABLE = "KS-LoCatTable";
-    public final String ERROR_CM_KRAD_LOCAT_DUPLICATE = "error.cmkrad.locat.duplicate";
-
 
     @Override
     public void processBeforeAddLine(ViewModel model, Object addLine, String collectionId, String collectionPath) {
@@ -38,10 +37,9 @@ public class LoCategoryViewHelperServiceImpl extends ViewHelperServiceImpl {
                     ContextUtils.getContextInfo());
             BeanUtils.copyProperties(loCategory, savedLoCat);
         } catch (DataValidationErrorException e) {
-            GlobalVariables.getMessageMap().putErrorForSectionId(KS_LO_CAT_TABLE, ERROR_CM_KRAD_LOCAT_DUPLICATE);
+            GlobalVariables.getMessageMap().putErrorForSectionId(CurriculumManagementConstants.KS_LO_CAT_TABLE, CurriculumManagementConstants.MessageKeys.ERROR_LO_CATEGORY_DUPLICATE);
         } catch (Exception e) {
-            FormattedLogger.error(CurriculumManagementConstants.ConfigProperties.ERROR_CREATE_NEW_LEARNING_OBJECTIVE_CATEGORY,
-                    e.getMessage());
+            LOG.error("An error occurred while trying to create a new Learning Objective Category", e);
         }
     }
 
@@ -55,10 +53,9 @@ public class LoCategoryViewHelperServiceImpl extends ViewHelperServiceImpl {
                     ContextUtils.getContextInfo());
             BeanUtils.copyProperties(loCategory, updatedLoCat);
         } catch (DataValidationErrorException e) {
-            GlobalVariables.getMessageMap().putErrorForSectionId( KS_LO_CAT_TABLE , ERROR_CM_KRAD_LOCAT_DUPLICATE);
+            GlobalVariables.getMessageMap().putErrorForSectionId(CurriculumManagementConstants.KS_LO_CAT_TABLE, CurriculumManagementConstants.MessageKeys.ERROR_LO_CATEGORY_DUPLICATE);
         } catch (Exception e) {
-            FormattedLogger.error(CurriculumManagementConstants.ConfigProperties.ERROR_UPDATING_LEARNING_OBJECTIVE_CATEGORY,
-                    e.getMessage());
+            LOG.error("An error occurred while updating the Learning Objective Category", e);
         }
     }
 
@@ -75,16 +72,16 @@ public class LoCategoryViewHelperServiceImpl extends ViewHelperServiceImpl {
         // get the collection group from the view
         CollectionGroup collectionGroup = model.getView().getViewIndex().getCollectionGroupByPath(collectionPath);
         if (collectionGroup == null) {
-            logAndThrowRuntime(CurriculumManagementConstants.ConfigProperties.UNABLE_TO_GET_COLLECTION_GROUP + collectionPath);
+            logAndThrowRuntime(CurriculumManagementConstants.MessageKeys.ERROR_UNABLE_TO_GET_COLLECTION_GROUP + collectionPath);
         }
 
         // get the collection instance for adding the new line
         Collection<Object> collection = ObjectPropertyUtils.getPropertyValue(model, collectionPath);
         if (collection == null) {
-            logAndThrowRuntime(CurriculumManagementConstants.ConfigProperties.UNABLE_TO_GET_COLLECTION_PROPERTY + collectionPath);
+            logAndThrowRuntime(CurriculumManagementConstants.MessageKeys.ERROR_UNABLE_TO_GET_COLLECTION_PROPERTY + collectionPath);
         }
 
-        // TODO: look into other ways of identifying a line so we can deal with
+        // TODO KSCM-1736: look into other ways of identifying a line so we can deal with
         // unordered collections
         if (collection instanceof List) {
             Object deleteLine = ((List<Object>) collection).get(lineIndex);
@@ -97,14 +94,13 @@ public class LoCategoryViewHelperServiceImpl extends ViewHelperServiceImpl {
                 try {
                     getLoService().deleteLoCategory(loCategory.getId(), ContextUtils.getContextInfo());
                 } catch (Exception e) {
-                    FormattedLogger.error(CurriculumManagementConstants.ConfigProperties.ERROR_DELETE_LEARNING_OBJECTIVE_CATEGORY,
-                            e.getMessage());
+                    LOG.error("An error occurred while trying to delete a Learning Objective Category", e);
                 }
                 ((List<Object>) collection).remove(lineIndex);
                 processAfterDeleteLine(model, collectionId, collectionPath, lineIndex);
             }
         } else {
-            logAndThrowRuntime(CurriculumManagementConstants.ConfigProperties.LIST_COLLECTION_IMPLEMENTATIONS_SUPPORTED_FOR_DELETE_INDEX);
+            logAndThrowRuntime(CurriculumManagementConstants.MessageKeys.ERROR_LIST_COLLECTION_IMPLEMENTATIONS_SUPPORTED_FOR_DELETE_INDEX);
         }
     }
 
