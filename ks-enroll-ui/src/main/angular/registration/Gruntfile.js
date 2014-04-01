@@ -53,7 +53,7 @@ module.exports = function (grunt) {
                 tasks:['newer:jshint:test', 'karma']
             },
             styles:{
-                files:['<%= yeoman.app %>/styles/{,*/}*.less'],
+                files:['<%= yeoman.app %>/styles/**/*.less'],
                 tasks:['less', 'newer:copy:styles'],
                 options:{
                     nospawn:true,
@@ -89,7 +89,27 @@ module.exports = function (grunt) {
                     base:[
                         '.tmp',
                         '<%= yeoman.app %>'
-                    ]
+                    ],
+                    middleware: function (connect, options) {
+                        if (!Array.isArray(options.base)) {
+                            options.base = [options.base];
+                        }
+
+                        // Setup the proxy
+                        var middlewares = [require('grunt-connect-proxy/lib/utils').proxyRequest];
+
+                        // Serve static files.
+                        options.base.forEach(function(base) {
+                            middlewares.push(connect.static(base));
+                        });
+
+                        // Make directory browse-able.
+                        var directory = options.directory || options.base[options.base.length - 1];
+                        middlewares.push(connect.directory(directory));
+
+                        return middlewares;
+                    }
+
                 }
             },
             test:{
@@ -106,6 +126,21 @@ module.exports = function (grunt) {
                 options:{
                     base:'<%= yeoman.dist %>'
                 }
+            },
+            server: {
+                proxies: [
+                    {
+                        context: '/ks-with-rice-bundled-dev',
+                        host: 'localhost',
+                        port: '8081',
+                        changeOrigin: true,
+                        headers: {
+                            'Access-Control-Allow-Origin':'http://127.0.0.1:9000',
+                            'Access-Control-Allow-Methods':'POST, GET, OPTIONS, DELETE, PUT',
+                            'Access-Control-Allow-Header':'Content-Type'
+                        }
+                    }
+                ]
             }
         },
 
@@ -141,7 +176,13 @@ module.exports = function (grunt) {
                     }
                 ]
             },
-            server:'.tmp'
+            server:'.tmp',
+            deploy:{
+                src:'../../../../../../ks-core/ks-common/ks-common-web/src/main/webapp/registration/',
+                options:{
+                    force:true
+                }
+            }
         },
 
         // Add vendor prefixed styles
@@ -199,7 +240,7 @@ module.exports = function (grunt) {
             html:['<%= yeoman.dist %>/{,*/}*.html'],
             css:['<%= yeoman.dist %>/styles/{,*/}*.css'],
             options:{
-                assetsDirs:['<%= yeoman.dist %>']
+                assetsDirs:['<%= yeoman.dist %>', '<%= yeoman.dist%>/images']
             }
         },
 
@@ -307,6 +348,13 @@ module.exports = function (grunt) {
                 cwd:'<%= yeoman.app %>/styles',
                 dest:'.tmp/styles/',
                 src:'{,*/}*.css'
+            },
+            deploy:{
+                expand:true,
+                cwd:'<%= yeoman.dist %>',
+                src:['**/*','!bower_components/**','!index.html'],
+                dest:'../../../../../../ks-core/ks-common/ks-common-web/src/main/webapp/registration/'
+
             }
         },
 
@@ -360,28 +408,25 @@ module.exports = function (grunt) {
         },
 
         dom_munger: {
-            create_jsp: {
+            createJsp: {
                 options: {
                     append: {selector:'body',html:
                         '<script>' +
-                        "'use strict'; " +
-                        "angular.module('kscrPocApp')" +
-                        ".value('configServer', {" +
-                        "apiBase: '${ConfigProperties.application.url}/services/'" +
-                        "});" +
-                        "angular.module('configuration', [])" +
-                        ".constant('APP_URL','${ConfigProperties.application.url}/services/');" +
-                        "</script>\n"
+                        '\'use strict\'; ' +
+                        'angular.module(\'configuration\', [])' +
+                        '.value(\'APP_URL\',\'${ConfigProperties.application.url}/services/\');' +
+                        '</script>\n'
                     }
                 },
-                src: 'app/index.html',
-                dest: '.tmp/index.jsp'
+                src: '<%= yeoman.dist %>/index.html',
+                dest: '<%= yeoman.dist %>/index.jsp'
             }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-dom-munger');
+    grunt.loadNpmTasks('grunt-connect-proxy');
 
     grunt.registerTask('serve', function (target) {
         if (target === 'dist') {
@@ -394,6 +439,7 @@ module.exports = function (grunt) {
             'less',
             'concurrent:server',
             'autoprefixer',
+            'configureProxies:server',
             'connect:livereload',
             'watch'
         ]);
@@ -417,7 +463,6 @@ module.exports = function (grunt) {
         'bower-install',
         'less',
         'useminPrepare',
-        'dom_munger',
         'concurrent:dist',
         'autoprefixer',
         'concat',
@@ -428,7 +473,10 @@ module.exports = function (grunt) {
         'uglify',
         'rev',
         'usemin',
-        'htmlmin'
+        'htmlmin',
+        'dom_munger',
+        'clean:deploy',
+        'copy:deploy'
     ]);
 
     grunt.registerTask('default', [

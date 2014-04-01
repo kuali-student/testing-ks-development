@@ -20,6 +20,7 @@ import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.web.form.MaintenanceDocumentForm;
 import org.kuali.student.common.collection.KSCollectionUtils;
 import org.kuali.student.common.uif.service.impl.KSMaintainableImpl;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.enrollment.class2.courseoffering.dto.ActivityOfferingWrapper;
 import org.kuali.student.enrollment.class2.courseoffering.dto.ColocatedActivity;
 import org.kuali.student.enrollment.class2.courseoffering.dto.CourseOfferingContextBar;
@@ -43,7 +44,7 @@ import org.kuali.student.enrollment.courseoffering.dto.SeatPoolDefinitionInfo;
 import org.kuali.student.enrollment.courseofferingset.dto.SocInfo;
 import org.kuali.student.enrollment.coursewaitlist.dto.CourseWaitListInfo;
 import org.kuali.student.r2.common.dto.ContextInfo;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.r2.common.exceptions.DoesNotExistException;
 import org.kuali.student.r2.common.util.constants.CourseOfferingServiceConstants;
 import org.kuali.student.r2.common.util.constants.CourseWaitListServiceConstants;
 import org.kuali.student.r2.common.util.constants.LprServiceConstants;
@@ -68,6 +69,8 @@ import org.kuali.student.r2.core.search.dto.SearchResultCellInfo;
 import org.kuali.student.r2.core.search.dto.SearchResultInfo;
 import org.kuali.student.r2.core.search.dto.SearchResultRowInfo;
 import org.kuali.student.r2.lum.course.dto.CourseInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -85,6 +88,7 @@ import java.util.Map;
 public class ActivityOfferingMaintainableImpl extends KSMaintainableImpl implements ActivityOfferingMaintainable {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActivityOfferingMaintainableImpl.class);
 
     @Override
     public void saveDataObject() {
@@ -96,6 +100,7 @@ public class ActivityOfferingMaintainableImpl extends KSMaintainableImpl impleme
             disassembleInstructorsWrapper(activityOfferingWrapper.getInstructors(), activityOfferingWrapper.getAoInfo());
             List<SeatPoolDefinitionInfo> seatPools = this.getSeatPoolDefinitions(activityOfferingWrapper.getSeatpools());
             CourseOfferingManagementUtil.getSeatPoolUtilityService().updateSeatPoolDefinitionList(seatPools, activityOfferingWrapper.getAoInfo().getId(), contextInfo);
+
 
             processEnrollmentDetail(activityOfferingWrapper);
 
@@ -202,6 +207,29 @@ public class ActivityOfferingMaintainableImpl extends KSMaintainableImpl impleme
                             activityOfferingWrapper.getWaitListType(), activityOfferingWrapper.isHasWaitlist(), activityOfferingWrapper.isLimitWaitlistSize(),
                             activityOfferingWrapper.isColocatedAO(), activityOfferingWrapper.isMaxEnrollmentShared(), aoIdfoIdMap, contextInfo);
                     activityOfferingWrapper.setCourseWaitListInfo(courseWaitListInfo);
+                }
+
+                //To retrieve the ExamPeriodId that is on CourseOffering
+                String examPeriodId = null;
+                try {
+                    examPeriodId = CourseOfferingManagementUtil.getExamOfferingServiceFacade().getExamPeriodId(activityOfferingInfo.getTermId(), contextInfo);
+                } catch (DoesNotExistException e) {
+                    LOGGER.info("The term {} doesn't have an exam period.", activityOfferingInfo.getTermId());
+                }
+
+                // generate exam offerings if exam period exists
+                if (!StringUtils.isEmpty(examPeriodId) ) {
+                    if ( !activityOfferingWrapper.isColocatedAO() ) {
+                        CourseOfferingManagementUtil.getExamOfferingServiceFacade().generateFinalExamOfferingForAO(activityOfferingWrapper.getAoInfo(),
+                            activityOfferingWrapper.getAoInfo().getTermId(), examPeriodId, new ArrayList<String>(), contextInfo);
+                    } else {  //Co-located > generate if the AO does not have an EO
+                        List <String> eoRels =  CourseOfferingManagementUtil.getExamOfferingService().getExamOfferingRelationIdsByActivityOffering(
+                                                                                           activityOfferingWrapper.getAoInfo().getId(), contextInfo);
+                        if (eoRels == null || eoRels.size() < 1 ) {
+                            CourseOfferingManagementUtil.getExamOfferingServiceFacade().generateFinalExamOfferingForAO(activityOfferingWrapper.getAoInfo(),
+                                activityOfferingWrapper.getAoInfo().getTermId(), examPeriodId, new ArrayList<String>(), contextInfo);
+                        }
+                    }
                 }
             } catch (Exception e) {
                 throw convertServiceExceptionsToUI(e);

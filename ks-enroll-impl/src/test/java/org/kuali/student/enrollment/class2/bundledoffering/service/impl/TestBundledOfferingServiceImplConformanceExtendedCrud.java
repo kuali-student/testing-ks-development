@@ -16,45 +16,24 @@
 package org.kuali.student.enrollment.class2.bundledoffering.service.impl;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.annotation.Resource;
-
 import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.kuali.student.common.test.util.IdEntityTester;
-import org.kuali.student.common.test.util.KeyEntityTester;
 import org.kuali.student.common.test.util.RichTextTester;
 import org.kuali.student.enrollment.bundledoffering.dto.BundledOfferingInfo;
-import org.kuali.student.enrollment.bundledoffering.service.BundledOfferingService;
-import org.kuali.student.r2.common.dto.ContextInfo;
-import org.kuali.student.r2.common.dto.IdEntityInfo;
-import org.kuali.student.r2.common.dto.StatusInfo;
-import org.kuali.student.r2.common.dto.TypeStateEntityInfo;
-import org.kuali.student.r2.common.exceptions.DataValidationErrorException;
-import org.kuali.student.r2.common.exceptions.DependentObjectsExistException;
 import org.kuali.student.r2.common.exceptions.DoesNotExistException;
 import org.kuali.student.r2.common.exceptions.InvalidParameterException;
 import org.kuali.student.r2.common.exceptions.MissingParameterException;
 import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
-import org.kuali.student.r2.common.exceptions.ReadOnlyException;
-import org.kuali.student.r2.common.exceptions.VersionMismatchException;
 import org.kuali.student.r2.common.util.RichTextHelper;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @Transactional
 public abstract class TestBundledOfferingServiceImplConformanceExtendedCrud extends TestBundledOfferingServiceImplConformanceBaseCrud
@@ -90,9 +69,9 @@ public abstract class TestBundledOfferingServiceImplConformanceExtendedCrud exte
 		expected.setBundledOfferingCode("bundledOfferingCode01");
 		expected.setSubjectAreaOrgId("subjectAreaOrgId01");
 		expected.setBundledOfferingCodeSuffix("bundledOfferingCodeSuffix01");
-        expected.setAdminOrgIds(Arrays.asList(new String[]{"1", "2", "3", "4", "5", "6"}));
-        expected.setFormatOfferingIds(Arrays.asList(new String[] {"A", "B", "C"}));
-        expected.setRegistrationGroupIds(Arrays.asList(new String[] {"D"}));
+        expected.setAdminOrgIds(Arrays.asList("1", "2", "3", "4", "5", "6"));
+        expected.setFormatOfferingIds(Arrays.asList("A", "B", "C"));
+        expected.setRegistrationGroupIds(Arrays.asList("D"));
 	}
 	
 	/*
@@ -140,8 +119,8 @@ public abstract class TestBundledOfferingServiceImplConformanceExtendedCrud exte
 		expected.setBundledOfferingCode("bundledOfferingCode_Updated");
 		expected.setSubjectAreaOrgId("subjectAreaOrgId_Updated");
 		expected.setBundledOfferingCodeSuffix("bundledOfferingCodeSuffix_Updated");
-        expected.setAdminOrgIds(Arrays.asList(new String[]{"UPDATED"}));
-        expected.setFormatOfferingIds(Arrays.asList(new String[] {"Q"}));
+        expected.setAdminOrgIds(Arrays.asList("UPDATED"));
+        expected.setFormatOfferingIds(Arrays.asList("Q"));
         expected.setRegistrationGroupIds(Arrays.asList(new String[] {}));
 	}
 	
@@ -187,9 +166,9 @@ public abstract class TestBundledOfferingServiceImplConformanceExtendedCrud exte
 		expected.setBundledOfferingCode("bundledOfferingCode_Updated");
 		expected.setSubjectAreaOrgId("subjectAreaOrgId_Updated");
 		expected.setBundledOfferingCodeSuffix("bundledOfferingCodeSuffix_Updated");
-        expected.setAdminOrgIds(Arrays.asList(new String[]{"1"}));
-        expected.setFormatOfferingIds(Arrays.asList(new String[] {"2"}));
-        expected.setRegistrationGroupIds(Arrays.asList(new String[] {"3"}));
+        expected.setAdminOrgIds(Arrays.asList("1"));
+        expected.setFormatOfferingIds(Arrays.asList("2"));
+        expected.setRegistrationGroupIds(Arrays.asList("3"));
 	}
 	
 	
@@ -199,8 +178,7 @@ public abstract class TestBundledOfferingServiceImplConformanceExtendedCrud exte
 	
 	/* Method Name: getBundledOfferingsByCourseBundle */
 	@Test
-	public void test_getBundledOfferingsByCourseBundle() 
-	throws 	InvalidParameterException	,MissingParameterException	,OperationFailedException	,PermissionDeniedException	{
+	public void test_getBundledOfferingsByCourseBundle() throws Exception {
         loadData();
         List<BundledOfferingInfo> infos = getBundledOfferingService().getBundledOfferingsByCourseBundle("COURSE_BUNDLE0", contextInfo);
         assertEquals(1, infos.size());
@@ -208,13 +186,12 @@ public abstract class TestBundledOfferingServiceImplConformanceExtendedCrud exte
         assertEquals(infos.get(0).getName(), "NAME0");
 
         infos = getBundledOfferingService().getBundledOfferingsByCourseBundle("COURSE_BUNDLEXXX", contextInfo);
-        assertEquals(0, infos.size());
+        assertTrue(infos.isEmpty());
 	}
 	
 	/* Method Name: getBundledOfferingsByTerm */
 	@Test
-	public void test_getBundledOfferingsByTerm() 
-	throws 	InvalidParameterException	,MissingParameterException	,OperationFailedException	,PermissionDeniedException	{
+	public void test_getBundledOfferingsByTerm() throws Exception {
         loadData();
         List<BundledOfferingInfo> infos = getBundledOfferingService().getBundledOfferingsByTerm("1", contextInfo);
         assertEquals(1, infos.size());
@@ -222,13 +199,12 @@ public abstract class TestBundledOfferingServiceImplConformanceExtendedCrud exte
         assertEquals(infos.get(0).getName(), "NAME1");
 
         infos = getBundledOfferingService().getBundledOfferingsByTerm("BAD_ID", contextInfo);
-        assertEquals(0, infos.size());
-	}
+        assertTrue(infos.isEmpty());
+    }
 	
 	/* Method Name: getBundledOfferingsByCourseBundleAndTerm */
 	@Test
-	public void test_getBundledOfferingsByCourseBundleAndTerm() 
-	throws 	InvalidParameterException	,MissingParameterException	,OperationFailedException	,PermissionDeniedException	{
+	public void test_getBundledOfferingsByCourseBundleAndTerm() throws Exception {
         loadData();
 
         List<BundledOfferingInfo> infos = getBundledOfferingService().getBundledOfferingsByCourseBundleAndTerm("COURSE_BUNDLE1", "1", contextInfo);
@@ -238,22 +214,21 @@ public abstract class TestBundledOfferingServiceImplConformanceExtendedCrud exte
         assertEquals(infos.get(0).getName(), "NAME1");
 
         infos = getBundledOfferingService().getBundledOfferingsByCourseBundleAndTerm("BAD_ID1", "BAD_ID2", contextInfo);
-        assertEquals(0, infos.size());
+        assertTrue(infos.isEmpty());
 
         infos = getBundledOfferingService().getBundledOfferingsByCourseBundleAndTerm("BAD_ID1", "1", contextInfo);
-        assertEquals(0, infos.size());
+        assertTrue(infos.isEmpty());
 
         infos = getBundledOfferingService().getBundledOfferingsByCourseBundleAndTerm("COURSE_BUNDLE1", "BAD_ID2", contextInfo);
-        assertEquals(0, infos.size());
+        assertTrue(infos.isEmpty());
 
         infos = getBundledOfferingService().getBundledOfferingsByCourseBundleAndTerm("COURSE_BUNDLE1", "0", contextInfo);
-        assertEquals(0, infos.size());
-	}
+        assertTrue(infos.isEmpty());
+    }
 	
 	/* Method Name: getBundledOfferingsByRegistrationGroup */
 	@Test
-	public void test_getBundledOfferingsByRegistrationGroup() 
-	throws 	InvalidParameterException	,MissingParameterException	,OperationFailedException	,PermissionDeniedException	{
+	public void test_getBundledOfferingsByRegistrationGroup() throws Exception {
         loadData();
 
         List<BundledOfferingInfo> infos = getBundledOfferingService().getBundledOfferingsByRegistrationGroup("9",contextInfo);
@@ -264,7 +239,7 @@ public abstract class TestBundledOfferingServiceImplConformanceExtendedCrud exte
         assertEquals(infos.get(0).getName(), "NAME9");
 
         infos = getBundledOfferingService().getBundledOfferingsByRegistrationGroup("XXX",contextInfo);
-        assertEquals(0, infos.size());
+        assertTrue(infos.isEmpty());
 
         infos = getBundledOfferingService().getBundledOfferingsByRegistrationGroup("1",contextInfo);
         assertEquals(9, infos.size());
@@ -273,8 +248,7 @@ public abstract class TestBundledOfferingServiceImplConformanceExtendedCrud exte
 	
 	/* Method Name: getBundledOfferingsByTermAndCode */
 	@Test
-	public void test_getBundledOfferingsByTermAndCode() 
-	throws 	InvalidParameterException	,MissingParameterException	,OperationFailedException	,PermissionDeniedException	{
+	public void test_getBundledOfferingsByTermAndCode() throws Exception {
         loadData();
 
         List<BundledOfferingInfo> infos = getBundledOfferingService().getBundledOfferingsByTermAndCode("1","BO_CODE1",contextInfo);
@@ -284,22 +258,21 @@ public abstract class TestBundledOfferingServiceImplConformanceExtendedCrud exte
         assertEquals(infos.get(0).getName(), "NAME1");
 
         infos = getBundledOfferingService().getBundledOfferingsByTermAndCode("BAD_ID1", "BAD_ID2", contextInfo);
-        assertEquals(0, infos.size());
+        assertTrue(infos.isEmpty());
 
         infos = getBundledOfferingService().getBundledOfferingsByTermAndCode("BAD_ID1", "BO_CODE1", contextInfo);
-        assertEquals(0, infos.size());
+        assertTrue(infos.isEmpty());
 
         infos = getBundledOfferingService().getBundledOfferingsByTermAndCode("1", "BAD_ID2", contextInfo);
-        assertEquals(0, infos.size());
+        assertTrue(infos.isEmpty());
 
         infos = getBundledOfferingService().getBundledOfferingsByTermAndCode("1", "BO_CODE2", contextInfo);
-        assertEquals(0, infos.size());
-	}
+        assertTrue(infos.isEmpty());
+    }
 	
 	/* Method Name: getBundledOfferingsByTermAndSubjectAreaOrg */
 	@Test
-	public void test_getBundledOfferingsByTermAndSubjectAreaOrg() 
-	throws 	InvalidParameterException	,MissingParameterException	,OperationFailedException	,PermissionDeniedException	{
+	public void test_getBundledOfferingsByTermAndSubjectAreaOrg() throws Exception {
         loadData();
         List<BundledOfferingInfo> infos = getBundledOfferingService().getBundledOfferingsByTermAndSubjectAreaOrg("1","SUBJECT_AREA_ORG_ID1",contextInfo);
         assertEquals(1, infos.size());
@@ -308,17 +281,17 @@ public abstract class TestBundledOfferingServiceImplConformanceExtendedCrud exte
         assertEquals(infos.get(0).getName(), "NAME1");
 
         infos = getBundledOfferingService().getBundledOfferingsByTermAndSubjectAreaOrg("BAD_ID1", "BAD_ID2", contextInfo);
-        assertEquals(0, infos.size());
+        assertTrue(infos.isEmpty());
 
         infos = getBundledOfferingService().getBundledOfferingsByTermAndSubjectAreaOrg("BAD_ID1", "SUBJECT_AREA_ORG_ID1", contextInfo);
-        assertEquals(0, infos.size());
+        assertTrue(infos.isEmpty());
 
         infos = getBundledOfferingService().getBundledOfferingsByTermAndSubjectAreaOrg("1", "BAD_ID2", contextInfo);
-        assertEquals(0, infos.size());
+        assertTrue(infos.isEmpty());
 
         infos = getBundledOfferingService().getBundledOfferingsByTermAndSubjectAreaOrg("1", "SUBJECT_AREA_ORG_ID2", contextInfo);
-        assertEquals(0, infos.size());
-	}
+        assertTrue(infos.isEmpty());
+    }
 	
 	/* Method Name: searchForBundledOfferingIds */
 	@Test
@@ -340,8 +313,7 @@ public abstract class TestBundledOfferingServiceImplConformanceExtendedCrud exte
 	
 	/* Method Name: changeBundledOfferingState */
 	@Test
-	public void test_changeBundledOfferingState() 
-	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	,PermissionDeniedException	{
+	public void test_changeBundledOfferingState() throws Exception {
         loadData();
         List<BundledOfferingInfo> infos = getBundledOfferingService().getBundledOfferingsByTermAndSubjectAreaOrg("1","SUBJECT_AREA_ORG_ID1",contextInfo);
         assertEquals(1, infos.size());
@@ -349,22 +321,14 @@ public abstract class TestBundledOfferingServiceImplConformanceExtendedCrud exte
         assertEquals(BundledOfferingDataLoader.BUNDLED_OFFERING_ACTIVE_STATE_KEY,original.getStateKey());
         original.setStateKey(BundledOfferingDataLoader.BUNDLED_OFFERING_INACTIVE_STATE_KEY);
 
-        try {
-            getBundledOfferingService().updateBundledOffering(original.getId(),original,contextInfo);
-        } catch (Exception e){
-           throw new OperationFailedException(e);
-        }
+        getBundledOfferingService().updateBundledOffering(original.getId(),original,contextInfo);
         BundledOfferingInfo updated = getBundledOfferingService().getBundledOffering(original.getId(),contextInfo);
         assertEquals(BundledOfferingDataLoader.BUNDLED_OFFERING_INACTIVE_STATE_KEY,updated.getStateKey());
     }
 
 
-    private void loadData() throws OperationFailedException {
-        try {
-            dataLoader.beforeTest();
-        } catch (Exception e) {
-            throw new OperationFailedException("failed to load data", e);
-        }
+    private void loadData() throws Exception {
+        dataLoader.beforeTest();
     }
 }
 

@@ -39,8 +39,6 @@ import static org.kuali.student.enrollment.class2.courseoffering.util.CourseOffe
 @RequestMapping(value = "/timeslot")
 public class TimeSlotController extends UifControllerBase {
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(TimeSlotController.class);
-
     private static final String MODEL_ATTRIBUTE_FORM = "KualiForm";
 
     private TimeSlotViewHelperService viewHelperService;
@@ -78,20 +76,19 @@ public class TimeSlotController extends UifControllerBase {
         if(timeSlotTypes.size() > 0) {
             // convert to type name for display
             int i = 0;
+            StringBuilder sb = new StringBuilder();
             for(String slotType : timeSlotTypes) {
                 if(slotType != null) {
                     TypeInfo typeInfo = getTypeService().getType(slotType, contextInfo);
                     form.getTypeNameSelections().add(typeInfo.getName());
-                    StringBuilder sb = new StringBuilder(namesUI);
                     if(i > 0 && i < timeSlotTypes.size()) {
                         sb = sb.append(",  ");
                     }
                     sb = sb.append(typeInfo.getName());
-                    namesUI = sb.toString();
                     i++;
                 }
             }
-            form.setTypeNamesUI(namesUI);
+            form.setTypeNamesUI( sb.toString());
         }
         form.getTimeSlotResults().clear();
         TimeSlotViewHelperService viewHelperService = getViewHelperService(form);

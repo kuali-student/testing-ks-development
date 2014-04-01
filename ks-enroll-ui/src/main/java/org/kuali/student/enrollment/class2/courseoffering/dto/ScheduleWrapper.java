@@ -48,8 +48,14 @@ public class ScheduleWrapper implements Serializable{
 
     //Properties
     private String days;
+    private String daysUI;
     private String startTime;
+    private String startTimeUI;
     private String endTime;
+    private String endTimeUI;
+    private String startTimeAmPm;
+    private String endTimeAmPm;
+
 
     private boolean tba;
 
@@ -60,14 +66,15 @@ public class ScheduleWrapper implements Serializable{
 
     private List<String> features;
 
-    //For informational display only
-    private String daysUI;
-
     private List<String> colocatedAOs;
 
     private EditRenderHelper editRenderHelper;
     private boolean modified;
+    private boolean toBeCreated;
+    private boolean toBeDeleted;
     private List<String> endTimes;
+
+    private String dayInExamPeriod;
 
     public ScheduleWrapper(){
         features = new ArrayList<String>();
@@ -336,6 +343,22 @@ public class ScheduleWrapper implements Serializable{
         this.modified = modified;
     }
 
+    public boolean isToBeCreated() {
+        return toBeCreated;
+    }
+
+    public void setToBeCreated(boolean toBeCreated) {
+        this.toBeCreated = toBeCreated;
+    }
+
+    public boolean isToBeDeleted() {
+        return toBeDeleted;
+    }
+
+    public void setToBeDeleted(boolean toBeDeleted) {
+        this.toBeDeleted = toBeDeleted;
+    }
+
     public EditRenderHelper getEditRenderHelper() {
         return editRenderHelper;
     }
@@ -377,6 +400,46 @@ public class ScheduleWrapper implements Serializable{
 
     public void setEndTimes(List<String> endTimes) {
         this.endTimes = endTimes;
+    }
+
+    public String getStartTimeAmPm() {
+        return startTimeAmPm;
+    }
+
+    public void setStartTimeAmPm(String startTimeAmPm) {
+        this.startTimeAmPm = startTimeAmPm;
+    }
+
+    public String getEndTimeAmPm() {
+        return endTimeAmPm;
+    }
+
+    public void setEndTimeAmPm(String endTimeAmPm) {
+        this.endTimeAmPm = endTimeAmPm;
+    }
+
+    public String getDayInExamPeriod() {
+        return dayInExamPeriod;
+    }
+
+    public String getStartTimeUI() {
+        return startTimeUI;
+    }
+
+    public void setStartTimeUI(String startTimeUI) {
+        this.startTimeUI = startTimeUI;
+    }
+
+    public String getEndTimeUI() {
+        return endTimeUI;
+    }
+
+    public void setEndTimeUI(String endTimeUI) {
+        this.endTimeUI = endTimeUI;
+    }
+
+    public void setDayInExamPeriod(String dayInExamPeriod) {
+        this.dayInExamPeriod = dayInExamPeriod;
     }
 
     public String[] getEndTimesArray(){

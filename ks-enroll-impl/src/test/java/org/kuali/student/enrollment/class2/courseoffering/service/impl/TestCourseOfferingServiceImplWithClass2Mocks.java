@@ -20,7 +20,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kuali.student.common.test.spring.log4j.KSLog4JConfigurer;
 import org.kuali.student.common.test.util.AttributeTester;
 import org.kuali.student.common.test.util.ListOfStringTester;
 import org.kuali.student.common.test.util.MetaTester;
@@ -39,7 +38,6 @@ import org.kuali.student.r2.common.dto.BulkStatusInfo;
 import org.kuali.student.r2.common.dto.ContextInfo;
 import org.kuali.student.r2.common.dto.StatusInfo;
 import org.kuali.student.r2.common.exceptions.AlreadyExistsException;
-import org.kuali.student.r2.common.exceptions.CircularRelationshipException;
 import org.kuali.student.r2.common.exceptions.DataValidationErrorException;
 import org.kuali.student.r2.common.exceptions.DependentObjectsExistException;
 import org.kuali.student.r2.common.exceptions.DoesNotExistException;
@@ -48,9 +46,8 @@ import org.kuali.student.r2.common.exceptions.MissingParameterException;
 import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
 import org.kuali.student.r2.common.exceptions.ReadOnlyException;
-import org.kuali.student.r2.common.exceptions.UnsupportedActionException;
 import org.kuali.student.r2.common.exceptions.VersionMismatchException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.common.util.constants.CourseOfferingServiceConstants;
 import org.kuali.student.r2.common.util.constants.LprServiceConstants;
 import org.kuali.student.r2.common.util.constants.LuServiceConstants;
@@ -61,7 +58,6 @@ import org.kuali.student.r2.core.class1.type.dto.TypeInfo;
 import org.kuali.student.r2.core.constants.AtpServiceConstants;
 import org.kuali.student.r2.lum.course.dto.CourseInfo;
 import org.kuali.student.r2.lum.course.service.CourseService;
-import org.slf4j.Logger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -73,7 +69,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -86,9 +81,6 @@ import static org.junit.Assert.fail;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:co-test-with-class2-mock-context.xml"})
 public class TestCourseOfferingServiceImplWithClass2Mocks {
-
-    private static final Logger log = KSLog4JConfigurer
-            .getLogger(TestCourseOfferingServiceImplWithClass2Mocks.class);
 
     @Resource(name = "CourseOfferingService")
     protected CourseOfferingService coService;
@@ -149,11 +141,7 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
     }
 
     @Test
-    public void testCreateAndGetRegistrationGroup()
-            throws AlreadyExistsException, DoesNotExistException,
-            DataValidationErrorException, InvalidParameterException,
-            MissingParameterException, OperationFailedException,
-            PermissionDeniedException {
+    public void testCreateAndGetRegistrationGroup() throws Exception {
         List<String> activityOfferingIds = new ArrayList<String>();
 
         activityOfferingIds.add("CO-1:LEC-ONLY:LEC-A");
@@ -167,31 +155,25 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
                         activityOfferingClusterId, activityOfferingIds, "RG-1", "RG-1", true, true,
                         10, LuiServiceConstants.REGISTRATION_GROUP_OFFERED_STATE_KEY);
 
-        try {
-            RegistrationGroupInfo created = coService.createRegistrationGroup(
-                    formatOfferingId, activityOfferingClusterId,
-                    LuiServiceConstants.REGISTRATION_GROUP_TYPE_KEY, rgLecA,
-                    callContext);
-            assertNotNull(created);
+        RegistrationGroupInfo created = coService.createRegistrationGroup(
+                formatOfferingId, activityOfferingClusterId,
+                LuiServiceConstants.REGISTRATION_GROUP_TYPE_KEY, rgLecA,
+                callContext);
+        assertNotNull(created);
 
-            RegistrationGroupInfo retrieved = coService.getRegistrationGroup(
-                    created.getId(), callContext);
-            assertNotNull(retrieved);
+        RegistrationGroupInfo retrieved = coService.getRegistrationGroup(
+                created.getId(), callContext);
+        assertNotNull(retrieved);
 
-            assertEquals(rgLecA.getFormatOfferingId(),
-                    retrieved.getFormatOfferingId());
-            assertEquals(rgLecA.getActivityOfferingClusterId(), retrieved.getActivityOfferingClusterId());
-            assertEquals(rgLecA.getName(), retrieved.getName());
-            assertEquals(rgLecA.getStateKey(), retrieved.getStateKey());
-            assertEquals(rgLecA.getTypeKey(), retrieved.getTypeKey());
+        assertEquals(rgLecA.getFormatOfferingId(),
+                retrieved.getFormatOfferingId());
+        assertEquals(rgLecA.getActivityOfferingClusterId(), retrieved.getActivityOfferingClusterId());
+        assertEquals(rgLecA.getName(), retrieved.getName());
+        assertEquals(rgLecA.getStateKey(), retrieved.getStateKey());
+        assertEquals(rgLecA.getTypeKey(), retrieved.getTypeKey());
 
-            // test getRegistrationGroupsForCourseOffering
+        // test getRegistrationGroupsForCourseOffering
 
-        } catch (Exception ex) {
-            log.error("failed from service call:", ex);
-
-            fail("Exception from service call :" + ex.getMessage());
-        }
     }
 
 
@@ -240,7 +222,7 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
 
         List<RegistrationGroupInfo> rgList = coService.getRegistrationGroupsByActivityOfferingCluster(actual.getId(), callContext);
 
-        assertEquals(0, rgList.size());
+        assertTrue(rgList.isEmpty());
 
         coService.generateRegistrationGroupsForCluster(actual.getId(), callContext);
 
@@ -327,13 +309,13 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
     }
 
     @Test
-    public void testGenerateAndDeleteRegistrationGroups() throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, DataValidationErrorException, ReadOnlyException, DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, VersionMismatchException, AlreadyExistsException, DependentObjectsExistException {
+    public void testGenerateAndDeleteRegistrationGroups() throws Exception {
 
         ActivityOfferingClusterInfo cluster = createDefaultActivityOfferingCluster("CO-1:LEC-AND-LAB");
 
         List<RegistrationGroupInfo> rgList = coService.getRegistrationGroupsForCourseOffering("CO-1", callContext);
 
-        assertEquals(0, rgList.size());
+        assertTrue(rgList.isEmpty());
 
         List<BulkStatusInfo> status = coService
                 .generateRegistrationGroupsForFormatOffering(
@@ -365,9 +347,8 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
 
         Assert.assertEquals(6, ao.size());
 
-        status = coService
-                    .generateRegistrationGroupsForFormatOffering(
-                            "CO-1:LEC-AND-LAB", callContext);
+        coService.generateRegistrationGroupsForFormatOffering(
+                "CO-1:LEC-AND-LAB", callContext);
 
         ao = coService.getActivityOfferingsByFormatOffering("CO-1:LEC-AND-LAB", callContext);
 
@@ -376,11 +357,10 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
 
         status = coService.deleteGeneratedRegistrationGroupsByFormatOffering("CO-1:LEC-AND-LAB", callContext);
 
-        assertTrue("Failed to delete existing generated registration groups", status.size() > 0);
+        assertTrue("Failed to delete existing generated registration groups", !status.isEmpty());
 
-        status = coService
-                .generateRegistrationGroupsForFormatOffering(
-                        "CO-1:LEC-AND-LAB", callContext);
+        coService.generateRegistrationGroupsForFormatOffering(
+                "CO-1:LEC-AND-LAB", callContext);
 
         rgList = coService.getRegistrationGroupsByFormatOffering("CO-1:LEC-AND-LAB", callContext);
 
@@ -418,23 +398,20 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
             InvalidParameterException, MissingParameterException,
             OperationFailedException, PermissionDeniedException {
         try {
-            try {
-                coService.getCourseOffering("Lui-blah", callContext);
-                fail("Lui-blah should have thrown DoesNotExistException");
-            } catch (DoesNotExistException enee) {
-                // expected
-            }
-
-            CourseOfferingInfo co = coService.getCourseOffering("CO-1",
-                    callContext);
-            assertNotNull(co);
-            assertEquals(LuiServiceConstants.COURSE_OFFERING_LIFECYCLE_STATE_KEYS[0],
-                    co.getStateKey());
-            assertEquals(LuiServiceConstants.COURSE_OFFERING_TYPE_KEY,
-                    co.getTypeKey());
-        } catch (Exception ex) {
-            fail(ex.getMessage());
+            coService.getCourseOffering("Lui-blah", callContext);
+            fail("Lui-blah should have thrown DoesNotExistException");
+        } catch (DoesNotExistException dnee) {
+            assertNotNull(dnee.getMessage());
+            assertEquals("Lui-blah", dnee.getMessage());
         }
+
+        CourseOfferingInfo co = coService.getCourseOffering("CO-1",
+                callContext);
+        assertNotNull(co);
+        assertEquals(LuiServiceConstants.COURSE_OFFERING_LIFECYCLE_STATE_KEYS[0],
+                co.getStateKey());
+        assertEquals(LuiServiceConstants.COURSE_OFFERING_TYPE_KEY,
+                co.getTypeKey());
     }
 
     @Test
@@ -444,11 +421,11 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
         List<String> offerings = coService.getCourseOfferingIdsByTerm(
                 "TermId-blah", true, callContext);
 
-        assertEquals(0, offerings.size());
+        assertTrue("Course offerings should be empty", offerings.isEmpty());
 
-        List<String> idList = coService.getCourseOfferingIdsByTerm("2012FA",
+        offerings = coService.getCourseOfferingIdsByTerm("2012FA",
                 true, callContext);
-        assertTrue(idList.size() > 0);
+        assertTrue("Course offerings should be non-empty", !offerings.isEmpty());
     }
 
     @Test
@@ -461,30 +438,27 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
         idsList.add("test3");
 
         try {
-            try {
-                coService.getCourseOfferingsByIds(idsList, callContext);
-                fail("idsList should have thrown DoesNotExistException");
-            } catch (DoesNotExistException enee) {
-                // expected
-            }
+            coService.getCourseOfferingsByIds(idsList, callContext);
+            fail("idsList should have thrown DoesNotExistException");
+        } catch (DoesNotExistException dnee) {
+            assertNotNull(dnee.getMessage());
+            assertEquals("test1", dnee.getMessage());
+        }
 
-            idsList.clear();
+        idsList.clear();
 
-            idsList.add("CO-1");
-            idsList.add("CO-2");
+        idsList.add("CO-1");
+        idsList.add("CO-2");
 
-            List<CourseOfferingInfo> co = coService.getCourseOfferingsByIds(
-                    idsList, callContext);
+        List<CourseOfferingInfo> co = coService.getCourseOfferingsByIds(
+                idsList, callContext);
 
-            assertNotNull(co);
-            for (CourseOfferingInfo coItem : co) {
-                assertEquals(LuiServiceConstants.COURSE_OFFERING_LIFECYCLE_STATE_KEYS[0],
-                        coItem.getStateKey());
-                assertEquals(LuiServiceConstants.COURSE_OFFERING_TYPE_KEY,
-                        coItem.getTypeKey());
-            }
-        } catch (Exception ex) {
-            fail(ex.getMessage());
+        assertNotNull(co);
+        for (CourseOfferingInfo coItem : co) {
+            assertEquals(LuiServiceConstants.COURSE_OFFERING_LIFECYCLE_STATE_KEYS[0],
+                    coItem.getStateKey());
+            assertEquals(LuiServiceConstants.COURSE_OFFERING_TYPE_KEY,
+                    coItem.getTypeKey());
         }
     }
 
@@ -493,42 +467,27 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
             throws DoesNotExistException, InvalidParameterException,
             MissingParameterException, OperationFailedException,
             PermissionDeniedException {
-        try {
-            List<CourseOfferingInfo> offerings = coService
-                    .getCourseOfferingsByCourseAndTerm("Lui-blah",
-                            "TermId-blah", callContext);
+        List<CourseOfferingInfo> offerings = coService
+                .getCourseOfferingsByCourseAndTerm("Lui-blah",
+                        "TermId-blah", callContext);
 
-            assertEquals(0, offerings.size());
+        assertTrue("Course offerings should be empty", offerings.isEmpty());
 
-            List<CourseOfferingInfo> co = coService
-                    .getCourseOfferingsByCourseAndTerm("CLU-1", "2012FA",
-                            callContext);
-            assertTrue(co.size() > 0);
+        offerings = coService
+                .getCourseOfferingsByCourseAndTerm("CLU-1", "2012FA",
+                        callContext);
+        assertTrue("Course offerings should be non-empty", !offerings.isEmpty());
 
-            for (CourseOfferingInfo coItem : co) {
-                assertEquals(LuiServiceConstants.COURSE_OFFERING_LIFECYCLE_STATE_KEYS[0],
-                        coItem.getStateKey());
-                assertEquals(LuiServiceConstants.COURSE_OFFERING_TYPE_KEY,
-                        coItem.getTypeKey());
-            }
-        } catch (Exception ex) {
-            fail(ex.getMessage());
+        for (CourseOfferingInfo coItem : offerings) {
+            assertEquals(LuiServiceConstants.COURSE_OFFERING_LIFECYCLE_STATE_KEYS[0],
+                    coItem.getStateKey());
+            assertEquals(LuiServiceConstants.COURSE_OFFERING_TYPE_KEY,
+                    coItem.getTypeKey());
         }
     }
 
     @Test
-    public void testCreateCourseOffering() throws AlreadyExistsException,
-            DoesNotExistException, DataValidationErrorException,
-            InvalidParameterException, MissingParameterException,
-            OperationFailedException, PermissionDeniedException,
-            ReadOnlyException,
-            DoesNotExistException,
-            InvalidParameterException,
-            MissingParameterException,
-            OperationFailedException,
-            PermissionDeniedException,
-            AlreadyExistsException,  VersionMismatchException, CircularRelationshipException, DependentObjectsExistException, UnsupportedActionException, DoesNotExistException, DataValidationErrorException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, ReadOnlyException
-    {
+    public void testCreateCourseOffering() throws Exception {
 
         String courseId = dataLoader.createCourse(dataLoader.getFall2012(),"MATH", "123", callContext);
 
@@ -582,67 +541,62 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
             MissingParameterException, OperationFailedException,
             PermissionDeniedException, ReadOnlyException,
             VersionMismatchException {
-        try {
-            CourseOfferingInfo coi = coService.getCourseOffering("CO-2",
-                    callContext);
-            assertNotNull(coi);
+        CourseOfferingInfo coi = coService.getCourseOffering("CO-2",
+                callContext);
+        assertNotNull(coi);
 
-            coi.setTermId("testAtpId1");
-            coi.setIsHonorsOffering(true);
-            coi.setMaximumEnrollment(40);
-            coi.setMinimumEnrollment(10);
-            List<OfferingInstructorInfo> instructors = new ArrayList<OfferingInstructorInfo>();
-            OfferingInstructorInfo instructor = new OfferingInstructorInfo();
-            instructor.setPersonId("Pers-1");
-            instructor.setPercentageEffort(Float.valueOf("60"));
-            instructor.setTypeKey(LprServiceConstants.INSTRUCTOR_MAIN_TYPE_KEY);
-            instructor.setStateKey(LprServiceConstants.ASSIGNED_STATE_KEY);
-            instructors.add(instructor);
-            coi.setInstructors(instructors);
-            CourseOfferingInfo updated = coService.updateCourseOffering("CO-2",
-                    coi, callContext);
-            assertNotNull(updated);
+        coi.setTermId("testAtpId1");
+        coi.setIsHonorsOffering(true);
+        coi.setMaximumEnrollment(40);
+        coi.setMinimumEnrollment(10);
+        List<OfferingInstructorInfo> instructors = new ArrayList<OfferingInstructorInfo>();
+        OfferingInstructorInfo instructor = new OfferingInstructorInfo();
+        instructor.setPersonId("Pers-1");
+        instructor.setPercentageEffort(Float.valueOf("60"));
+        instructor.setTypeKey(LprServiceConstants.INSTRUCTOR_MAIN_TYPE_KEY);
+        instructor.setStateKey(LprServiceConstants.ASSIGNED_STATE_KEY);
+        instructors.add(instructor);
+        coi.setInstructors(instructors);
+        CourseOfferingInfo updated = coService.updateCourseOffering("CO-2",
+                coi, callContext);
+        assertNotNull(updated);
 
-            CourseOfferingInfo retrieved = coService.getCourseOffering("CO-2",
-                    callContext);
-            assertNotNull(retrieved);
+        CourseOfferingInfo retrieved = coService.getCourseOffering("CO-2",
+                callContext);
+        assertNotNull(retrieved);
 
-            assertTrue(retrieved.getIsHonorsOffering());
-            assertEquals(1, retrieved.getInstructors().size());
-            assertEquals(coi.getMaximumEnrollment(),
-                    retrieved.getMaximumEnrollment());
-            assertEquals(coi.getMinimumEnrollment(),
-                    retrieved.getMinimumEnrollment());
+        assertTrue(retrieved.getIsHonorsOffering());
+        assertEquals(1, retrieved.getInstructors().size());
+        assertEquals(coi.getMaximumEnrollment(),
+                retrieved.getMaximumEnrollment());
+        assertEquals(coi.getMinimumEnrollment(),
+                retrieved.getMinimumEnrollment());
 
-            retrieved.setIsHonorsOffering(false);
-            List<OfferingInstructorInfo> instructors1 = new ArrayList<OfferingInstructorInfo>();
-            OfferingInstructorInfo instructor1 = new OfferingInstructorInfo();
-            instructor1.setPersonId("Pers-2");
-            instructor1.setPercentageEffort(Float.valueOf("60"));
-            instructor1
-                    .setTypeKey(LprServiceConstants.INSTRUCTOR_MAIN_TYPE_KEY);
-            instructor1.setStateKey(LprServiceConstants.ASSIGNED_STATE_KEY);
-            instructors1.add(instructor1);
-            OfferingInstructorInfo instructor2 = new OfferingInstructorInfo();
-            instructor2.setPersonId("Pers-1");
-            instructor2.setPercentageEffort(Float.valueOf("30"));
-            instructor2
-                    .setTypeKey(LprServiceConstants.INSTRUCTOR_MAIN_TYPE_KEY);
-            instructor2.setStateKey(LprServiceConstants.ASSIGNED_STATE_KEY);
-            instructors1.add(instructor2);
-            retrieved.setInstructors(instructors1);
-            CourseOfferingInfo updated1 = coService.updateCourseOffering(
-                    "CO-2", retrieved, callContext);
-            assertNotNull(updated1);
+        retrieved.setIsHonorsOffering(false);
+        List<OfferingInstructorInfo> instructors1 = new ArrayList<OfferingInstructorInfo>();
+        OfferingInstructorInfo instructor1 = new OfferingInstructorInfo();
+        instructor1.setPersonId("Pers-2");
+        instructor1.setPercentageEffort(Float.valueOf("60"));
+        instructor1
+                .setTypeKey(LprServiceConstants.INSTRUCTOR_MAIN_TYPE_KEY);
+        instructor1.setStateKey(LprServiceConstants.ASSIGNED_STATE_KEY);
+        instructors1.add(instructor1);
+        OfferingInstructorInfo instructor2 = new OfferingInstructorInfo();
+        instructor2.setPersonId("Pers-1");
+        instructor2.setPercentageEffort(Float.valueOf("30"));
+        instructor2
+                .setTypeKey(LprServiceConstants.INSTRUCTOR_MAIN_TYPE_KEY);
+        instructor2.setStateKey(LprServiceConstants.ASSIGNED_STATE_KEY);
+        instructors1.add(instructor2);
+        retrieved.setInstructors(instructors1);
+        CourseOfferingInfo updated1 = coService.updateCourseOffering(
+                "CO-2", retrieved, callContext);
+        assertNotNull(updated1);
 
-            CourseOfferingInfo retrieved1 = coService.getCourseOffering("CO-2",
-                    callContext);
-            assertNotNull(retrieved1);
-            assertEquals(2, retrieved1.getInstructors().size());
-        } catch (Exception ex) {
-            log.error("exception due to", ex);
-            fail("Exception from service call :" + ex.getMessage());
-        }
+        CourseOfferingInfo retrieved1 = coService.getCourseOffering("CO-2",
+                callContext);
+        assertNotNull(retrieved1);
+        assertEquals(2, retrieved1.getInstructors().size());
     }
 
     @Test
@@ -651,70 +605,61 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
             InvalidParameterException, MissingParameterException,
             OperationFailedException, PermissionDeniedException,
             ReadOnlyException, VersionMismatchException {
-        try {
 
-            CourseOfferingInfo coi = coService.getCourseOffering("CO-2",
-                    callContext);
-            assertNotNull(coi);
+        CourseOfferingInfo coi = coService.getCourseOffering("CO-2",
+                callContext);
+        assertNotNull(coi);
 
-            coi.setTermId("atpId1");
+        coi.setTermId("atpId1");
 
-            // dynamic attributes
-            AttributeTester attributeTester = new AttributeTester();
+        // dynamic attributes
+        AttributeTester attributeTester = new AttributeTester();
 
-            List<AttributeInfo> expectedList = new ArrayList<AttributeInfo>();
+        List<AttributeInfo> expectedList = new ArrayList<AttributeInfo>();
 
-            attributeTester.add2ForCreate(expectedList);
+        attributeTester.add2ForCreate(expectedList);
 
-            coi.getAttributes().addAll(expectedList);
+        coi.getAttributes().addAll(expectedList);
 
-            coi.setFundingSource("state");
+        coi.setFundingSource("state");
 
-            CourseOfferingInfo updated = coService.updateCourseOffering(
-                    coi.getId(), coi, callContext);
-            assertNotNull(updated);
+        CourseOfferingInfo updated = coService.updateCourseOffering(
+                coi.getId(), coi, callContext);
+        assertNotNull(updated);
 
-            CourseOfferingInfo retrieved = coService.getCourseOffering(
-                    coi.getId(), callContext);
-            assertNotNull(retrieved);
+        CourseOfferingInfo retrieved = coService.getCourseOffering(
+                coi.getId(), callContext);
+        assertNotNull(retrieved);
 
-            assertEquals("state", coi.getFundingSource());
+        assertEquals("state", coi.getFundingSource());
 
-            attributeTester.check(expectedList, coi.getAttributes());
+        attributeTester.check(expectedList, coi.getAttributes());
 
-            // TODO: fix once waitlists are implemented
-            // assertEquals("WaitlistLevelType1",
-            // coi.getWaitlistLevelTypeKey());
-        } catch (Exception ex) {
-            log.error("exception due to ", ex);
-            fail("Exception from service call :" + ex.getMessage());
-        }
+        // TODO: fix once waitlists are implemented
+        // assertEquals("WaitlistLevelType1",
+        // coi.getWaitlistLevelTypeKey());
     }
 
     @Test
     // TODO fix KSENROLL-2671, add back validation decorator and this will work again
     public void testDeleteFormatOffering() throws InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, DependentObjectsExistException, DoesNotExistException, DataValidationErrorException, VersionMismatchException, ReadOnlyException {
 
-        boolean exception = false;
-
         try {
             coService.deleteFormatOffering("DOES NOT EXIST", callContext);
+            fail("DoesNotExistException should have been thrown");
         } catch (DoesNotExistException e) {
-            exception = true;
+            assertNotNull(e.getMessage());
+            assertEquals("DOES NOT EXIST", e.getMessage());
         }
-
-        assertTrue("Activity should not exist but seems to.", exception);
-
-        exception = false;
 
         String formatOfferingId = "CO-1:LEC-ONLY";
         try {
             coService.deleteFormatOffering(formatOfferingId, callContext);
+            fail("DependentObjectsExistException should have been thrown");
         } catch (DependentObjectsExistException e) {
-            exception = true;
+            assertNotNull(e.getMessage());
+            assertEquals("Activity offerings still attached to FO (" + formatOfferingId + ")", e.getMessage());
         }
-
-        assertTrue("Deleted a format that has activities", exception);
 
         StatusInfo status = coService.deleteFormatOfferingCascaded(formatOfferingId, callContext);
 
@@ -723,7 +668,7 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
         // verify no activity offerings remain
         List<ActivityOfferingInfo> aos = coService.getActivityOfferingsByFormatOffering(formatOfferingId, callContext);
 
-        assertEquals(0, aos.size());
+        assertTrue(aos.isEmpty());
     }
 
 
@@ -737,57 +682,42 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
         String activityOfferingId = "CO-1:LEC-ONLY:LEC-A";
         coService.addSeatPoolDefinitionToActivityOffering(seatPoolDefinitionInfo.getId(), activityOfferingId, callContext);
 
-        boolean exception = false;
         try {
             coService.deleteActivityOffering(activityOfferingId, callContext);
+            fail("DependentObjectsExistException should have been thrown as we failed to detect associated seat pool for activity offering and abort delete");
         } catch (DependentObjectsExistException e) {
-            exception = true;
+            assertNotNull(e.getMessage());
+            assertEquals("Seatpools exists for Activity id = " + activityOfferingId, e.getMessage());
         }
-
-        assertTrue("Failed to detect associated seat pool for activity offering and abort delete", exception);
 
         // now cascade the delete
 
-        String formatOfferingId = "CO-1:LEC-ONLY";
         StatusInfo status = coService.deleteActivityOfferingCascaded(activityOfferingId, callContext);
 
         assertTrue(status.getIsSuccess());
 
         // check that the activity offering and seat pool are gone.
 
-        exception = false;
-
         try {
             coService.getActivityOffering(activityOfferingId, callContext);
+            fail("DoesNotExistException should have been thrown as activity should not exist after delete");
         } catch (DoesNotExistException e) {
-            exception = true;
+            assertNotNull(e.getMessage());
+            assertEquals(activityOfferingId, e.getMessage());
         }
 
-        assertTrue("activity still exists after delete", exception);
-
-        exception = false;
         try {
-            List<SeatPoolDefinitionInfo> spls = coService.getSeatPoolDefinitionsForActivityOffering(activityOfferingId, callContext);
+            coService.getSeatPoolDefinitionsForActivityOffering(activityOfferingId, callContext);
+            fail("DoesNotExistException should have been thrown as activity should not exist after delete");
         } catch (DoesNotExistException e) {
-            exception = true;
+            assertNotNull(e.getMessage());
+            assertEquals(activityOfferingId, e.getMessage());
         }
-
-        assertTrue("activity still exists after delete", exception);
-
     }
 
 
     @Test
-    public void testDeleteCourseOffering() throws AlreadyExistsException,
-            DoesNotExistException, DataValidationErrorException,
-            InvalidParameterException, MissingParameterException,
-            OperationFailedException, PermissionDeniedException,
-            ReadOnlyException,
-            DoesNotExistException,
-            InvalidParameterException,
-            MissingParameterException,
-            OperationFailedException,
-            PermissionDeniedException {
+    public void testDeleteCourseOffering() throws Exception {
 
         CourseInfo canonicalCourse = canonicalCourseService.getCourse("CLU-1", ContextUtils.getContextInfo());
 
@@ -808,50 +738,39 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
         assertEquals(LuiServiceConstants.COURSE_OFFERING_TYPE_KEY,
                 created.getTypeKey());
 
-        try {
-            // Delete the course offering and check that the status returned was
-            // a success
-            StatusInfo delResult = coService.deleteCourseOffering(
-                    created.getId(), callContext);
-            assertTrue(delResult.getIsSuccess());
-        } catch (Exception ex) {
-            log.error("exception due to ", ex);
-            fail("Exception from service call :" + ex.getMessage());
-        }
-
-        boolean exception = false;
+        // Delete the course offering and check that the status returned was
+        // a success
+        StatusInfo delResult = coService.deleteCourseOffering(
+                created.getId(), callContext);
+        assertTrue(delResult.getIsSuccess());
 
         try {
             coService.deleteCourseOffering("CO-1", callContext);
+            fail("DependentObjectsExistException should have been thrown as we failed to detect dependent objects");
         } catch (DependentObjectsExistException e) {
-            exception = true;
+            assertNotNull(e.getMessage());
+            assertEquals("Format offering still attached to CO (CO-1)", e.getMessage());
         }
-
-        assertTrue("Failed to detect dependent objects", exception);
-
-
     }
 
     @Test
     //@Ignore //KSENROLL-3482// TODO: update cascade to deal with AOC's instead of Reg Groups.
     public void testDeleteCourseOfferingCascaded() throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, AlreadyExistsException, DataValidationErrorException, VersionMismatchException, ReadOnlyException {
 
-        boolean dependantObjects = false;
-
         try {
             coService.deleteCourseOffering("CO-2", callContext);
+            fail("DependentObjectsExistException should have been thrown as dependent objects exist for CO-2");
         } catch (DependentObjectsExistException e) {
-            dependantObjects = true;
+            assertNotNull(e.getMessage());
+            assertEquals("Format offering still attached to CO (CO-2)", e.getMessage());
         }
 
-        assertTrue("No dependent objects exist for CO-2", dependantObjects);
 
-
-        List<BulkStatusInfo> rgStatus = coService.generateRegistrationGroupsForFormatOffering("CO-2:LEC-ONLY", callContext);
+        coService.generateRegistrationGroupsForFormatOffering("CO-2:LEC-ONLY", callContext);
 
         List<RegistrationGroupInfo> rgs = coService.getRegistrationGroupsByFormatOffering("CO-2:LEC-ONLY", callContext);
 
-        assertTrue(rgs.size() > 0);
+        assertTrue("Registration groups should be non-empty", !rgs.isEmpty());
 
         StatusInfo status = coService.deleteCourseOfferingCascaded("CO-2", callContext);
 
@@ -859,72 +778,56 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
 
         List<FormatOfferingInfo> formats = coService.getFormatOfferingsByCourseOffering("CO-2", callContext);
 
-        assertEquals(0, formats.size());
+        assertTrue(formats.isEmpty());
 
         rgs = coService.getRegistrationGroupsForCourseOffering("CO-2", callContext);
 
-        assertEquals(0, rgs.size());
+        assertTrue(rgs.isEmpty());
 
     }
 
 
     @Test
-    public void testCreateFormatOffering() throws DoesNotExistException,
-            InvalidParameterException, MissingParameterException,
-            OperationFailedException, PermissionDeniedException {
-        try {
+    public void testCreateFormatOffering() throws Exception {
+        List<CourseOfferingInfo> coList = coService
+                .getCourseOfferingsByCourse("CLU-1", callContext);
 
-            List<CourseOfferingInfo> coList = coService
-                    .getCourseOfferingsByCourse("CLU-1", callContext);
+        assertTrue("Course Offerings should be non-empty", !coList.isEmpty());
 
-            assertTrue(coList.size() > 0);
+        CourseOfferingInfo co = coList.get(0);
 
-            CourseOfferingInfo co = coList.get(0);
-
-            FormatOfferingInfo newFO = CourseOfferingServiceTestDataUtils
-                    .createFormatOffering(co.getId(), "format1",
-                            co.getTermId(), "TEST FORMAT OFFERING",
-                            LuiServiceConstants.ALL_ACTIVITY_TYPES);
-            FormatOfferingInfo fo = coService.createFormatOffering(co.getId(),
-                    "format1", LuiServiceConstants.FORMAT_OFFERING_TYPE_KEY,
-                    newFO, callContext);
-            assertNotNull(fo);
-            assertEquals(LuiServiceConstants.LUI_FO_STATE_PLANNED_KEY,
-                    fo.getStateKey());
-            assertEquals(LuiServiceConstants.FORMAT_OFFERING_TYPE_KEY,
-                    fo.getTypeKey());
-            assertEquals("TEST FORMAT OFFERING", fo.getDescr().getPlain());
-        } catch (Exception ex) {
-            log.error("exception due to ", ex);
-            fail(ex.getMessage());
-        }
+        FormatOfferingInfo newFO = CourseOfferingServiceTestDataUtils
+                .createFormatOffering(co.getId(), "format1",
+                        co.getTermId(), "TEST FORMAT OFFERING",
+                        LuiServiceConstants.ALL_ACTIVITY_TYPES);
+        FormatOfferingInfo fo = coService.createFormatOffering(co.getId(),
+                "format1", LuiServiceConstants.FORMAT_OFFERING_TYPE_KEY,
+                newFO, callContext);
+        assertNotNull(fo);
+        assertEquals(LuiServiceConstants.LUI_FO_STATE_PLANNED_KEY,
+                fo.getStateKey());
+        assertEquals(LuiServiceConstants.FORMAT_OFFERING_TYPE_KEY,
+                fo.getTypeKey());
+        assertEquals("TEST FORMAT OFFERING", fo.getDescr().getPlain());
     }
 
     @Test
     public void testGetFormatOffering() throws DoesNotExistException,
             InvalidParameterException, MissingParameterException,
             OperationFailedException, PermissionDeniedException {
-        try {
 
-            FormatOfferingInfo fo = coService.getFormatOffering(
-                    "CO-2:LEC-ONLY", callContext);
-            assertNotNull(fo);
-            assertEquals(LuiServiceConstants.LUI_FO_STATE_PLANNED_KEY,
-                    fo.getStateKey());
-            assertEquals(LuiServiceConstants.FORMAT_OFFERING_TYPE_KEY,
-                    fo.getTypeKey());
-            assertEquals("Lecture", fo.getDescr().getPlain());
-        } catch (Exception ex) {
-            log.error("exception due to ", ex);
-            fail(ex.getMessage());
-        }
+        FormatOfferingInfo fo = coService.getFormatOffering(
+                "CO-2:LEC-ONLY", callContext);
+        assertNotNull(fo);
+        assertEquals(LuiServiceConstants.LUI_FO_STATE_PLANNED_KEY,
+                fo.getStateKey());
+        assertEquals(LuiServiceConstants.FORMAT_OFFERING_TYPE_KEY,
+                fo.getTypeKey());
+        assertEquals("Lecture", fo.getDescr().getPlain());
     }
 
     @Test
-    public void testCreateAndGetActivityOffering()
-            throws AlreadyExistsException, DataValidationErrorException,
-            InvalidParameterException, MissingParameterException,
-            OperationFailedException, PermissionDeniedException, DoesNotExistException {
+    public void testCreateAndGetActivityOffering() throws Exception {
 
         CourseOfferingInfo courseOffering = coService.getCourseOffering("CO-1", callContext);
 
@@ -943,58 +846,52 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
                         LuiServiceConstants.LECTURE_ACTIVITY_OFFERING_TYPE_KEY,
                         instructors);
 
-        try {
-            ActivityOfferingInfo created = coService.createActivityOffering(
-                    "CO-1:LEC-ONLY", activityId,
-                    LuiServiceConstants.LECTURE_ACTIVITY_OFFERING_TYPE_KEY, ao,
-                    callContext);
-            assertNotNull(created);
+        ActivityOfferingInfo created = coService.createActivityOffering(
+                "CO-1:LEC-ONLY", activityId,
+                LuiServiceConstants.LECTURE_ACTIVITY_OFFERING_TYPE_KEY, ao,
+                callContext);
+        assertNotNull(created);
 
-            ActivityOfferingInfo retrieved = coService.getActivityOffering(
-                    created.getId(), callContext);
-            assertNotNull(retrieved);
+        ActivityOfferingInfo retrieved = coService.getActivityOffering(
+                created.getId(), callContext);
+        assertNotNull(retrieved);
 
-            assertEquals(created.getActivityId(), retrieved.getActivityId());
-            assertEquals(created.getTermId(), retrieved.getTermId());
-            assertEquals(LuiServiceConstants.LUI_AO_STATE_DRAFT_KEY,
-                    retrieved.getStateKey());
-            assertEquals(
-                    LuiServiceConstants.LECTURE_ACTIVITY_OFFERING_TYPE_KEY,
-                    retrieved.getTypeKey());
-            assertEquals(1, retrieved.getInstructors().size());
+        assertEquals(created.getActivityId(), retrieved.getActivityId());
+        assertEquals(created.getTermId(), retrieved.getTermId());
+        assertEquals(LuiServiceConstants.LUI_AO_STATE_DRAFT_KEY,
+                retrieved.getStateKey());
+        assertEquals(
+                LuiServiceConstants.LECTURE_ACTIVITY_OFFERING_TYPE_KEY,
+                retrieved.getTypeKey());
+        assertEquals(1, retrieved.getInstructors().size());
 
-            // test getActivityOfferingsByCourseOffering
-            List<ActivityOfferingInfo> activities = coService
-                    .getActivityOfferingsByCourseOffering("CO-1", callContext);
-            assertNotNull(activities);
-            // 3 existing plus this new one
-            // this one should probably not have been added so this test case
-            // may need to be adapted
-            // in the future.
-            assertEquals(8, activities.size());
+        // test getActivityOfferingsByCourseOffering
+        List<ActivityOfferingInfo> activities = coService
+                .getActivityOfferingsByCourseOffering("CO-1", callContext);
+        assertNotNull(activities);
+        // 3 existing plus this new one
+        // this one should probably not have been added so this test case
+        // may need to be adapted
+        // in the future.
+        assertEquals(8, activities.size());
 
-            boolean foundActivityId = false;
-            boolean foundId = false;
+        boolean foundActivityId = false;
+        boolean foundId = false;
 
-            for (ActivityOfferingInfo activityOfferingInfo : activities) {
+        for (ActivityOfferingInfo activityOfferingInfo : activities) {
 
-                if (activityOfferingInfo.getActivityId().equals(
-                        created.getActivityId())) {
-                    foundActivityId = true;
-                }
-
-                if (activityOfferingInfo.getId().equals("CO-1:LEC-ONLY:LEC-B"))
-                    foundId = true;
+            if (activityOfferingInfo.getActivityId().equals(
+                    created.getActivityId())) {
+                foundActivityId = true;
             }
-            assertTrue(foundActivityId);
-            assertTrue(foundId);
 
-            assertEquals(1, activities.get(0).getInstructors().size());
-        } catch (Exception ex) {
-            log.error("Exception from serviceCall", ex);
-
-            fail("Exception from service call :" + ex.getMessage());
+            if (activityOfferingInfo.getId().equals("CO-1:LEC-ONLY:LEC-B"))
+                foundId = true;
         }
+        assertTrue(foundActivityId);
+        assertTrue(foundId);
+
+        assertEquals(1, activities.get(0).getInstructors().size());
     }
 
 
@@ -1053,7 +950,8 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
             coService.getRegistrationGroup(rg.getId(), callContext);
             fail("Expected DoesNotExistException.");
         } catch (DoesNotExistException e) {
-            // Expected. Do nothing.
+            assertNotNull(e.getMessage());
+            assertEquals(rg.getId(), e.getMessage());
         }
     }
 
@@ -1068,13 +966,13 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
         assertEquals(LuiServiceConstants.LECTURE_ACTIVITY_OFFERING_TYPE_KEY,
                 validType.getKey());
 
-        TypeInfo shouldBeNull = null;
         try {
-            shouldBeNull = coService.getActivityOfferingType(
+            coService.getActivityOfferingType(
                     "madeUpINAVLIDAoType", callContext);
             fail("Expected DoesNotExistException");
         } catch (DoesNotExistException e) {
-            assertNull(shouldBeNull);
+            assertNotNull(e.getMessage());
+            assertEquals("madeUpINAVLIDAoType", e.getMessage());
         }
     }
 
@@ -1105,7 +1003,7 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
 
 
     @Test
-    public void testCreateSeatPoolDefinition() throws DataValidationErrorException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, ReadOnlyException {
+    public void testCreateSeatPoolDefinition() throws Exception {
 
         SeatPoolDefinitionInfo mainPool = CourseOfferingServiceTestDataUtils.createSeatPoolDefinition("EVERYONE", "Lab 123", AtpServiceConstants.MILESTONE_COURSE_SELECTION_PERIOD_END_TYPE_KEY, true, 85, 1);
 
@@ -1115,48 +1013,17 @@ public class TestCourseOfferingServiceImplWithClass2Mocks {
 
         secondaryPool = coService.createSeatPoolDefinition(secondaryPool, callContext);
 
-        boolean exceptionEncountered = false;
-        try {
-            coService.addSeatPoolDefinitionToActivityOffering(mainPool.getId(), "CO-1:LEC-ONLY:LEC-A", callContext);
-            coService.addSeatPoolDefinitionToActivityOffering(secondaryPool.getId(), "CO-1:LEC-ONLY:LEC-A", callContext);
-        } catch (AlreadyExistsException e) {
-            exceptionEncountered = true;
-        } catch (DoesNotExistException e) {
-            exceptionEncountered = true;
-        }
+        coService.addSeatPoolDefinitionToActivityOffering(mainPool.getId(), "CO-1:LEC-ONLY:LEC-A", callContext);
+        coService.addSeatPoolDefinitionToActivityOffering(secondaryPool.getId(), "CO-1:LEC-ONLY:LEC-A", callContext);
 
-        Assert.assertFalse(exceptionEncountered);
+        List<SeatPoolDefinitionInfo> spds = coService.getSeatPoolDefinitionsForActivityOffering("CO-1:LEC-ONLY:LEC-A", callContext);
+        Assert.assertEquals(2, spds.size());
 
-        try {
-            List<SeatPoolDefinitionInfo> spds = coService.getSeatPoolDefinitionsForActivityOffering("CO-1:LEC-ONLY:LEC-A", callContext);
 
-            Assert.assertEquals(2, spds.size());
+        coService.removeSeatPoolDefinitionFromActivityOffering(mainPool.getId(), "CO-1:LEC-ONLY:LEC-A", callContext);
 
-        } catch (DoesNotExistException e) {
-            // should not happen
-            Assert.assertFalse("Activity does not exist exception", true);
-        }
+        spds = coService.getSeatPoolDefinitionsForActivityOffering("CO-1:LEC-ONLY:LEC-A", callContext);
 
-        exceptionEncountered = false;
-
-        try {
-            coService.removeSeatPoolDefinitionFromActivityOffering(mainPool.getId(), "CO-1:LEC-ONLY:LEC-A", callContext);
-        } catch (DoesNotExistException e) {
-
-            exceptionEncountered = true;
-        }
-
-        Assert.assertFalse(exceptionEncountered);
-
-        try {
-            List<SeatPoolDefinitionInfo> spds = coService.getSeatPoolDefinitionsForActivityOffering("CO-1:LEC-ONLY:LEC-A", callContext);
-
-            Assert.assertEquals(1, spds.size());
-
-        } catch (DoesNotExistException e) {
-            // should not happen
-            Assert.assertFalse("Activity does not exist exception", true);
-        }
-
+        Assert.assertEquals(1, spds.size());
     }
 }

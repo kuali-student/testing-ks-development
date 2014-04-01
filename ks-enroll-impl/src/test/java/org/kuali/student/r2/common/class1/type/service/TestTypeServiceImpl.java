@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kuali.student.r2.common.dto.AttributeInfo;
 import org.kuali.student.r2.common.dto.ContextInfo;
-import org.kuali.student.r2.common.dto.StatusInfo;
 import org.kuali.student.r2.common.exceptions.*;
 import org.kuali.student.r2.common.util.RichTextHelper;
 import org.kuali.student.r2.core.class1.type.dto.TypeInfo;
@@ -158,12 +157,13 @@ public class TestTypeServiceImpl {
         assertEquals(1, refObjectUris.size());
         assertEquals(AtpServiceConstants.REF_OBJECT_URI_ATP, refObjectUris.get(0));
 
-        StatusInfo status = typeService.deleteType(orig.getKey(), context);
+        typeService.deleteType(orig.getKey(), context);
         try {
             typeService.getType(orig.getKey(), context);
-            fail("should have been deleted");
+            fail("DoesNotExistException should have been thrown");
         } catch (DoesNotExistException ex) {
-            // expected
+            assertNotNull(ex.getMessage());
+            assertEquals(orig.getKey(), ex.getMessage());
         }
         refObjectUris = typeService.getRefObjectUris(context);
         assertNotNull(refObjectUris);

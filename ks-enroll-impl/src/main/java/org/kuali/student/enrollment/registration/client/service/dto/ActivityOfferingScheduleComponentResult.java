@@ -20,8 +20,14 @@ public class ActivityOfferingScheduleComponentResult {
     private boolean sat;
     private String startTime;
     private String endTime;
+    private String days;
     private String buildingCode;
     private String roomCode;
+    private Boolean isTBA;
+
+    public String getDays() { return days; }
+
+    public void setDays(String days) { this.days = days; }
 
     public String getBuildingCode() {
         return buildingCode;
@@ -109,6 +115,14 @@ public class ActivityOfferingScheduleComponentResult {
 
     public void setWed(boolean wed) {
         this.wed = wed;
+    }
+
+    public Boolean getIsTBA() {
+        return isTBA;
+    }
+
+    public void setIsTBA(Boolean isTBA) {
+        this.isTBA = isTBA;
     }
 
     public void setBooleanSchedules(String daysOfTheWeek) {

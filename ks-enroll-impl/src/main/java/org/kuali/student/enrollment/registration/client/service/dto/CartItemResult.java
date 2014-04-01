@@ -14,7 +14,7 @@ import java.util.Map;
 @XmlType(name = "CartItemResult", propOrder = {
         "cartItemId", "courseCode", "regGroupCode", "courseTitle",
         "credits", "grading", "creditOptions", "gradingOptions", "gradingOptionCount",
-        "schedule"})
+        "schedule", "state", "cartId"})
 public class CartItemResult {
     private String cartItemId;
     private String courseCode;
@@ -28,6 +28,8 @@ public class CartItemResult {
     private int gradingOptionCount;
     private List<ActivityOfferingScheduleResult> schedule;
     private List<Link> actionLinks;
+    private String state; // state of the cart item. This is pulled from the LprTransactionItem state.
+    private String cartId; // we need to know what cart / reg request this item belongs to
 
     public String getCartItemId() { return cartItemId; }
 
@@ -106,5 +108,21 @@ public class CartItemResult {
 
     public void setGradingOptionCount(int gradingOptionCount) {
         this.gradingOptionCount = gradingOptionCount;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getCartId() {
+        return cartId;
+    }
+
+    public void setCartId(String cartId) {
+        this.cartId = cartId;
     }
 }

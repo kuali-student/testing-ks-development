@@ -1,22 +1,9 @@
 package org.kuali.student.enrollment.class2.courseoffering.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Resource;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.enrollment.class1.lui.service.impl.LuiServiceDataLoader;
 import org.kuali.student.enrollment.class2.acal.util.AcalTestDataLoader;
 import org.kuali.student.enrollment.class2.acal.util.MockAcalTestDataLoader;
@@ -42,7 +29,6 @@ import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
 import org.kuali.student.r2.common.exceptions.ReadOnlyException;
 import org.kuali.student.r2.common.exceptions.VersionMismatchException;
-import org.kuali.student.r2.common.util.ContextUtils;
 import org.kuali.student.r2.common.util.constants.LuServiceConstants;
 import org.kuali.student.r2.common.util.constants.LuiServiceConstants;
 import org.kuali.student.r2.core.acal.service.AcademicCalendarService;
@@ -63,6 +49,19 @@ import org.kuali.student.r2.lum.lrc.service.LRCService;
 import org.kuali.student.r2.lum.util.constants.LrcServiceConstants;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:co-test-with-mocks-context.xml"})
@@ -93,23 +92,19 @@ public class TestCourseOfferingServiceImplWithClass1Mocks {
     private SchedulingServiceDataLoader schedulingServiceDataLoader;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         callContext.setPrincipalId(principalId);
-        try {
-            new CourseR1TestDataLoader(this.courseService).loadData();
-            new LuiServiceDataLoader(this.luiService).loadData();
+        new CourseR1TestDataLoader(this.courseService).loadData();
+        new LuiServiceDataLoader(this.luiService).loadData();
 
-            // due to KSENROLL-4185, data must be loaded into the mock Atp and mock Acal services
-            AcalTestDataLoader acalLoader = new AcalTestDataLoader(this.atpService);
-            acalLoader.loadTerm("testAtpId1", "test1", "2000-01-01 00:00:00.0", "2100-12-31 00:00:00.0", AtpServiceConstants.ATP_FALL_TYPE_KEY, AtpServiceConstants.ATP_OFFICIAL_STATE_KEY, "description 1");
-            new MockAcalTestDataLoader(this.acalService).loadData();
-            new MockLrcTestDataLoader(this.lrcService).loadData();
+        // due to KSENROLL-4185, data must be loaded into the mock Atp and mock Acal services
+        AcalTestDataLoader acalLoader = new AcalTestDataLoader(this.atpService);
+        acalLoader.loadTerm("testAtpId1", "test1", "2000-01-01 00:00:00.0", "2100-12-31 00:00:00.0", AtpServiceConstants.ATP_FALL_TYPE_KEY, AtpServiceConstants.ATP_OFFICIAL_STATE_KEY, "description 1");
+        new MockAcalTestDataLoader(this.acalService).loadData();
+        new MockLrcTestDataLoader(this.lrcService).loadData();
 
-            createStateTestData();
-            createSchedulingServiceData();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+        createStateTestData();
+        createSchedulingServiceData();
     }
 
     protected void createSchedulingServiceData() throws Exception {
@@ -120,34 +115,24 @@ public class TestCourseOfferingServiceImplWithClass1Mocks {
 
         // ActivityOffering state
         cleanupStateTestData( LuiServiceConstants.LUI_AO_STATE_DRAFT_KEY );
-        cleanupLifecycleTestData( LuiServiceConstants.ACTIVITY_OFFERING_LIFECYCLE_KEY );
         LifecycleInfo aoLifecycle = addLifecycle( LuiServiceConstants.ACTIVITY_OFFERING_LIFECYCLE_KEY );
         addState( aoLifecycle, LuiServiceConstants.LUI_AO_STATE_DRAFT_KEY, true );
 
         // FormatOffering state
         cleanupStateTestData( LuiServiceConstants.LUI_FO_STATE_DRAFT_KEY );
-        cleanupLifecycleTestData( LuiServiceConstants.FORMAT_OFFERING_LIFECYCLE_KEY );
         LifecycleInfo foLifecycle = addLifecycle( LuiServiceConstants.FORMAT_OFFERING_LIFECYCLE_KEY );
         addState( foLifecycle, LuiServiceConstants.LUI_FO_STATE_DRAFT_KEY, true );
 
         // CourseOffering state
         cleanupStateTestData( LuiServiceConstants.LUI_CO_STATE_DRAFT_KEY );
-        cleanupLifecycleTestData( LuiServiceConstants.COURSE_OFFERING_LIFECYCLE_KEY );
         LifecycleInfo coLifecycle = addLifecycle( LuiServiceConstants.COURSE_OFFERING_LIFECYCLE_KEY );
         addState( coLifecycle, LuiServiceConstants.LUI_CO_STATE_DRAFT_KEY, true );
     }
 
-    // TODO: temporary stop-gap because SS throws an error about duplicate-data; this cleans state from previous runs
+    //temporary stop-gap because SS throws an error about duplicate-data; this cleans state from previous runs
     private void cleanupStateTestData( String state ) {
         try {
             stateService.deleteState( state, callContext );
-        } catch( Exception e ) { }
-    }
-
-    // TODO: temporary stop-gap because SS throws an error about duplicate-data; this cleans state from previous runs
-    private void cleanupLifecycleTestData( String name ) {
-        try {
-            stateService.deleteLifecycle( name, callContext );
         } catch( Exception e ) { }
     }
 
@@ -291,11 +276,7 @@ public class TestCourseOfferingServiceImplWithClass1Mocks {
             OperationFailedException, PermissionDeniedException, ReadOnlyException, VersionMismatchException {
         // get course
         CourseInfo course;
-        try {
-            course = courseService.getCourse("COURSE1", ContextUtils.getContextInfo());
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+        course = courseService.getCourse("COURSE1", ContextUtils.getContextInfo());
         // create co from course
         List<String> optionKeys = new ArrayList<String>();
         CourseOfferingInfo orig = new CourseOfferingInfo();
@@ -403,10 +384,11 @@ public class TestCourseOfferingServiceImplWithClass1Mocks {
         assertEquals(Boolean.TRUE, status.getIsSuccess());
 
         try {
-            ao = courseOfferingService.getActivityOffering(ao.getId(), callContext);
+            courseOfferingService.getActivityOffering(ao.getId(), callContext);
             fail("should have thrown DoesNotExistException");
         } catch (DoesNotExistException ex) {
-            // expected
+            assertNotNull(ex.getMessage());
+            assertEquals(ao.getId(), ex.getMessage());
         }
 
         // delete fo
@@ -415,10 +397,11 @@ public class TestCourseOfferingServiceImplWithClass1Mocks {
         assertEquals(Boolean.TRUE, status.getIsSuccess());
 
         try {
-            fo = courseOfferingService.getFormatOffering(fo.getId(), callContext);
+            courseOfferingService.getFormatOffering(fo.getId(), callContext);
             fail("should have thrown DoesNotExistException");
         } catch (DoesNotExistException ex) {
-            // expected
+            assertNotNull(ex.getMessage());
+            assertEquals(fo.getId(), ex.getMessage());
         }
 
         // delete co
@@ -427,10 +410,11 @@ public class TestCourseOfferingServiceImplWithClass1Mocks {
         assertEquals(Boolean.TRUE, status.getIsSuccess());
 
         try {
-            co = courseOfferingService.getCourseOffering(co.getId(), callContext);
+            courseOfferingService.getCourseOffering(co.getId(), callContext);
             fail("should have thrown DoesNotExistException");
         } catch (DoesNotExistException ex) {
-            // expected
+            assertNotNull(ex.getMessage());
+            assertEquals(co.getId(), ex.getMessage());
         }
     }
 

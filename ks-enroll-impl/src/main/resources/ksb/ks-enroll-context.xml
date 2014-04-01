@@ -20,6 +20,7 @@
     <import resource="classpath:enrollDao.xml" />
     <import resource="classpath:statement-context.xml" />
     <import resource="classpath:mq-context.xml" />
+    <import resource="classpath:ks-enroll-batch-context.xml" />
     <!-- import resource="classpath:ks-enroll-mock-room-data-context.xml"/ -->
 
     <!-- Top Level Alias -->
@@ -77,6 +78,25 @@
             </bean>
         </property>
     </bean>
+
+    <!-- Seat count service START -->
+    <bean id="courseSeatCountService" class="org.kuali.student.enrollment.class2.courseseatcount.service.impl.CourseSeatCountServiceImpl"
+          scope="singleton">
+    </bean>
+
+    <bean id="ks.exp.courseSeatCountService" class="org.kuali.rice.ksb.api.bus.support.ServiceBusExporter">
+        <property name="serviceDefinition">
+            <bean class="org.kuali.rice.ksb.api.bus.support.SoapServiceDefinition">
+                <property name="jaxWsService" value="true" />
+                <property name="service" ref="courseSeatCountService" />
+                <property name="serviceInterface" value="org.kuali.student.enrollment.courseseatcount.service.CourseSeatCountService" />
+                <property name="localServiceName" value="CourseSeatCountService" />
+                <property name="serviceNameSpaceURI" value="http://student.kuali.org/wsdl/courseSeatCount" />
+                <property name="busSecurity" value="${ks.enroll.bus.security}" />
+            </bean>
+        </property>
+    </bean>
+    <!-- Seat count service END -->
 
     <bean id="coCriteriaLookupService" class="org.kuali.student.r2.common.criteria.impl.CriteriaLookupServiceImpl">
         <property name="criteriaLookupDao" ref="criterialookupDaoJpa"/>
@@ -642,9 +662,10 @@
         <property name="setLocation" value="true" />
     </bean>
 
-    <bean id="examOfferingScheduleEvaluator" class="org.kuali.student.enrollment.class2.examoffering.krms.evaluator.ExamOfferingScheduleEvaluatorImpl">
+    <bean id="examOfferingScheduleEvaluator" class="org.kuali.student.enrollment.class2.examoffering.krms.evaluator.ExamOfferingSlottingEvaluatorImpl">
         <property name="schedulingService" ref="SchedulingService"/>
         <property name="courseService" ref="courseServiceImpl"/>
+        <property name="userMessenger" ref="userMessenger"/>
     </bean>
 
     <!-- Put facade on the bus -->
@@ -1450,7 +1471,7 @@
                         <bean class="org.kuali.student.enrollment.registration.client.service.impl.CustomHeaderJacksonJsonProvider">
                             <property name="headers">
                                 <map>
-                                    <entry key="Access-Control-Allow-Origin" value="*"/>
+                                    <entry key="Access-Control-Allow-Origin" value="http://127.0.0.1:9000"/>
                                     <entry key="Access-Control-Allow-Methods" value="POST, GET, OPTIONS"/>
                                     <entry key="Access-Control-Allow-Header" value="Content-Type"/>
                                 </map>
@@ -1477,7 +1498,7 @@
                         <bean class="org.kuali.student.enrollment.registration.client.service.impl.CustomHeaderJacksonJsonProvider">
                             <property name="headers">
                                 <map>
-                                    <entry key="Access-Control-Allow-Origin" value="*"/>
+                                    <entry key="Access-Control-Allow-Origin" value="http://127.0.0.1:9000"/>
                                     <entry key="Access-Control-Allow-Methods" value="POST, GET, OPTIONS"/>
                                     <entry key="Access-Control-Allow-Header" value="Content-Type"/>
                                 </map>
@@ -1506,7 +1527,7 @@
                         <bean class="org.kuali.student.enrollment.registration.client.service.impl.CustomHeaderJacksonJsonProvider">
                             <property name="headers">
                                 <map>
-                                    <entry key="Access-Control-Allow-Origin" value="*"/>
+                                    <entry key="Access-Control-Allow-Origin" value="http://127.0.0.1:9000"/>
                                     <entry key="Access-Control-Allow-Methods" value="POST, GET, OPTIONS"/>
                                     <entry key="Access-Control-Allow-Header" value="Content-Type"/>
                                 </map>
@@ -1517,7 +1538,47 @@
             </bean>
         </property>
     </bean>
-    
+
+    <bean id="developerLoginClientService" class="org.kuali.student.enrollment.registration.client.service.impl.DevelopmentLoginClientServiceImpl">
+    </bean>
+
+    <bean id="ks.exp.developerLoginClientService" class="org.kuali.rice.ksb.api.bus.support.ServiceBusExporter">
+        <property name="serviceDefinition">
+            <bean class="org.kuali.rice.ksb.api.bus.support.RestServiceDefinition">
+                <property name="serviceNameSpaceURI" value="http://student.kuali.org/wsdl/developerLoginClient" />
+                <property name="service" ref="developerLoginClientService" />
+                <property name="resourceClass" value="org.kuali.student.enrollment.registration.client.service.DevelopmentLoginClientService" />
+                <property name="localServiceName" value="DevelopmentLoginClientService" />
+                <property name="providers">
+                    <list>
+                        <bean class="org.kuali.student.enrollment.registration.client.service.impl.CustomHeaderJacksonJsonProvider">
+                            <property name="headers">
+                                <map>
+                                    <entry key="Access-Control-Allow-Origin" value="http://127.0.0.1:9000"/>
+                                    <entry key="Access-Control-Allow-Methods" value="POST, GET, OPTIONS"/>
+                                    <entry key="Access-Control-Allow-Header" value="Content-Type"/>
+                                </map>
+                            </property>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- Batch Scheduler: the bean is defined in ks-enroll-batch-context.xml. -->
+    <bean id="ks.exp.batchScheduler" class="org.kuali.rice.ksb.api.bus.support.ServiceBusExporter">
+        <property name="serviceDefinition">
+            <bean class="org.kuali.rice.ksb.api.bus.support.JavaServiceDefinition">
+                <property name="service" ref="batchScheduler" /> <!-- Must match id in the bean -->
+                <property name="serviceInterface" value="org.kuali.student.enrollment.batch.BatchScheduler" />
+                <property name="localServiceName" value="BatchScheduler" /> <!-- Part of the QName -->
+                <property name="serviceNameSpaceURI" value="http://student.kuali.org/wsdl/batch" />
+                <property name="busSecurity" value="${ks.enroll.bus.security}" />
+            </bean>
+        </property>
+    </bean>
+
  </beans>
 
 

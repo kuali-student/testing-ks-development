@@ -1,14 +1,36 @@
 'use strict';
+
 angular.module('regCartApp')
-    .factory('TermsService', ['$resource', 'APP_URL', function ($resource, APP_URL) {
-    return $resource(APP_URL + 'ScheduleOfClassesService/terms', {}, {
-        query:{
-            method:'GET',
-            cache:true,
-            isArray:true
-        }
-    });
-}]);
+    .service('TermsService', ['$resource', 'APP_URL', function TermsService($resource, APP_URL) {
+
+
+        var termId = 'kuali.atp.2012Spring';   // default value
+
+        this.getTermId = function () {
+            return termId;
+        };
+
+        this.setTermId = function (value) {
+            termId = value;
+        };
+
+        this.getTermsFromServer = function () {
+            return $resource(APP_URL + 'ScheduleOfClassesService/terms', {}, {
+                query: { method: 'GET', cache: true, isArray: true }
+            });
+        };
+
+        this.getTermNameForTermId = function(terms, termId){
+            var retTermName;
+            angular.forEach(terms, function (term) {
+                if (term.termId === termId) {
+                    retTermName = term.termName;
+                }
+            });
+            return retTermName;
+        };
+
+    }]);
 //angular.module('regCartApp')
 //    .service('TermsService', function TermsService($resource) {
 //        this.getTerms = function () {

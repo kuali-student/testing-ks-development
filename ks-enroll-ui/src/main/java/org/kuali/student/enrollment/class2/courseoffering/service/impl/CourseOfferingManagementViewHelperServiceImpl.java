@@ -16,9 +16,6 @@
 package org.kuali.student.enrollment.class2.courseoffering.service.impl;
 
 import org.apache.commons.lang.BooleanUtils;
-import org.kuali.student.r2.common.util.TimeOfDayHelper;
-import org.kuali.student.enrollment.class2.courseofferingset.util.CourseOfferingSetUtil;
-import org.kuali.student.r2.core.scheduling.infc.TimeSlot;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.rice.core.api.criteria.PredicateFactory;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
@@ -33,6 +30,7 @@ import org.kuali.rice.krms.api.repository.reference.ReferenceObjectBinding;
 import org.kuali.student.common.collection.KSCollectionUtils;
 import org.kuali.student.common.uif.util.GrowlIcon;
 import org.kuali.student.common.uif.util.KSUifUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.enrollment.class2.courseoffering.dto.ActivityOfferingClusterWrapper;
 import org.kuali.student.enrollment.class2.courseoffering.dto.ActivityOfferingWrapper;
 import org.kuali.student.enrollment.class2.courseoffering.dto.CourseOfferingContextBar;
@@ -52,6 +50,7 @@ import org.kuali.student.enrollment.class2.courseoffering.util.CourseOfferingMan
 import org.kuali.student.enrollment.class2.courseoffering.util.CourseOfferingViewHelperUtil;
 import org.kuali.student.enrollment.class2.courseoffering.util.ManageSocConstants;
 import org.kuali.student.enrollment.class2.courseoffering.util.RegistrationGroupConstants;
+import org.kuali.student.enrollment.class2.courseofferingset.util.CourseOfferingSetUtil;
 import org.kuali.student.enrollment.class2.scheduleofclasses.dto.ActivityOfferingDisplayWrapper;
 import org.kuali.student.enrollment.class2.scheduleofclasses.dto.CourseOfferingDisplayWrapper;
 import org.kuali.student.enrollment.class2.scheduleofclasses.form.ActivityOfferingDisplayUI;
@@ -85,12 +84,13 @@ import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
 import org.kuali.student.r2.common.infc.ValidationResult;
 import org.kuali.student.r2.common.permutation.PermutationUtils;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.r2.common.util.TimeOfDayHelper;
 import org.kuali.student.r2.common.util.constants.CourseOfferingServiceConstants;
 import org.kuali.student.r2.common.util.constants.CourseOfferingSetServiceConstants;
 import org.kuali.student.r2.common.util.constants.ExamOfferingServiceConstants;
 import org.kuali.student.r2.common.util.constants.LprServiceConstants;
 import org.kuali.student.r2.common.util.constants.LuiServiceConstants;
+import org.kuali.student.r2.common.util.date.DateFormatters;
 import org.kuali.student.r2.core.acal.dto.KeyDateInfo;
 import org.kuali.student.r2.core.acal.dto.TermInfo;
 import org.kuali.student.r2.core.atp.dto.AtpInfo;
@@ -109,6 +109,7 @@ import org.kuali.student.r2.core.scheduling.dto.ScheduleRequestComponentInfo;
 import org.kuali.student.r2.core.scheduling.dto.ScheduleRequestInfo;
 import org.kuali.student.r2.core.scheduling.dto.TimeSlotInfo;
 import org.kuali.student.r2.core.scheduling.infc.ScheduleComponentDisplay;
+import org.kuali.student.r2.core.scheduling.infc.TimeSlot;
 import org.kuali.student.r2.core.scheduling.util.SchedulingServiceUtil;
 import org.kuali.student.r2.core.search.dto.SearchParamInfo;
 import org.kuali.student.r2.core.search.dto.SearchRequestInfo;
@@ -119,9 +120,12 @@ import org.kuali.student.r2.lum.course.dto.ActivityInfo;
 import org.kuali.student.r2.lum.course.dto.CourseInfo;
 import org.kuali.student.r2.lum.course.dto.CourseJointInfo;
 import org.kuali.student.r2.lum.course.dto.FormatInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -141,7 +145,7 @@ import static java.util.Arrays.asList;
  */
 public class CourseOfferingManagementViewHelperServiceImpl extends CO_AO_RG_ViewHelperServiceImpl implements CourseOfferingManagementViewHelperService {
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(CourseOfferingManagementViewHelperServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CourseOfferingManagementViewHelperServiceImpl.class);
 
     /**
      * This method fetches the <code>TermInfo</code> and validate for exact match
@@ -228,7 +232,7 @@ public class CourseOfferingManagementViewHelperServiceImpl extends CO_AO_RG_View
         loadCourseOfferings(searchRequest, form);
 
         if (form.getCourseOfferingResultList().isEmpty()) {
-            LOG.error("Error: Can't find any Course Offering for a course code: " + courseCode + " in term: " + termInfo.getName());
+            LOG.error("Error: Can't find any Course Offering for a course code: {}  in term: {}", courseCode, termInfo.getName());
             GlobalVariables.getMessageMap().putError(KRADConstants.GLOBAL_ERRORS, CourseOfferingConstants.COURSEOFFERING_MSG_ERROR_NO_COURSE_OFFERING_IS_FOUND, "course code", courseCode, termInfo.getName());
         }
 
@@ -451,7 +455,7 @@ public class CourseOfferingManagementViewHelperServiceImpl extends CO_AO_RG_View
                 i++;
             }
             Date endOfValidation = new Date();
-            LOG.info("Time of RG Validation:" + (endOfValidation.getTime() - startOfValidation.getTime()) + "ms");
+            LOG.info("Time of RG Validation: {}ms", (endOfValidation.getTime() - startOfValidation.getTime()));
         }
     }
 
@@ -507,7 +511,14 @@ public class CourseOfferingManagementViewHelperServiceImpl extends CO_AO_RG_View
     }
 
     private void processInstructors(Map<String, ActivityOfferingWrapper> aoMap, ContextInfo contextInfo) throws InvalidParameterException, MissingParameterException, DoesNotExistException, PermissionDeniedException, OperationFailedException {
-        List<LprInfo> lprInfos = CourseOfferingManagementUtil.getLprService().getLprsByLuis(new ArrayList<String>(aoMap.keySet()), contextInfo);
+        List<LprInfo> lprInfos = new ArrayList<LprInfo>();
+        for(String ao: aoMap.keySet()){
+            QueryByCriteria.Builder qbcBuilder = QueryByCriteria.Builder.create();
+            qbcBuilder.setPredicates(PredicateFactory.in("luiId", ao),
+                    PredicateFactory.in("personRelationTypeId", LprServiceConstants.COURSE_INSTRUCTOR_TYPE_KEYS));
+            QueryByCriteria criteria = qbcBuilder.build();
+            lprInfos.addAll(CourseOfferingManagementUtil.getLprService().searchForLprs(criteria, contextInfo));
+        }
         if (lprInfos != null) {
             Map<String, Set<String>> principalId2aoIdMap = new HashMap<String, Set<String>>();
             for (LprInfo lprInfo : lprInfos) {
@@ -704,13 +715,15 @@ public class CourseOfferingManagementViewHelperServiceImpl extends CO_AO_RG_View
                 List<ScheduleCalcContainer> schedList = ao2sch.get(aoId);
                 boolean newRow = false;
                 for (ScheduleCalcContainer sched : schedList) {
+                    // Start and End are assigned a value of TimeOfDayInfo(0,0,0)). Perhaps this code can be cleaned up.
+                    // The same thing is repeated in a few places. See jira  KSENROLL-11518
                     TimeOfDayInfo start = sched.getStart().isEmpty() ? null
                             : TimeOfDayHelper.setMillis(Long.parseLong(sched.getStart()));
-                    aoWrapper.setStartTimeDisplay(start == null ? ""
+                    aoWrapper.setStartTimeDisplay((start == null || start.equals(new TimeOfDayInfo(0,0,0))) ? ""
                             : TimeOfDayHelper.makeFormattedTimeForAOSchedules(start), newRow);
                     TimeOfDayInfo end = sched.getEnd().isEmpty() ? null
                             : TimeOfDayHelper.setMillis(Long.parseLong(sched.getEnd()));
-                    aoWrapper.setEndTimeDisplay(end == null ? ""
+                    aoWrapper.setEndTimeDisplay((end == null || end.equals(new TimeOfDayInfo(0,0,0))) ? ""
                             : TimeOfDayHelper.makeFormattedTimeForAOSchedules(end), newRow);
                     aoWrapper.setBuildingName(sched.getBldgName(), newRow);
                     aoWrapper.setBuildingCode(sched.getBldgCode(), newRow);
@@ -809,7 +822,7 @@ public class CourseOfferingManagementViewHelperServiceImpl extends CO_AO_RG_View
     }
 
     private void setStartTimeOnAoWrapper(TimeSlotInfo timeSlotInfo, ActivityOfferingWrapper aoWrapper, boolean newline, String cssStyle) {
-        if (timeSlotInfo == null || timeSlotInfo.getStartTime() == null || timeSlotInfo.getStartTime().getHour() == null) {
+        if (timeSlotInfo == null || timeSlotInfo.getStartTime() == null || timeSlotInfo.getStartTime().equals(new TimeOfDayInfo(0,0,0))) {
             aoWrapper.setStartTimeDisplay(StringUtils.EMPTY, newline, cssStyle);
             return;
         }
@@ -817,7 +830,7 @@ public class CourseOfferingManagementViewHelperServiceImpl extends CO_AO_RG_View
     }
 
     private void setEndTimeOnAoWrapper(TimeSlotInfo timeSlotInfo, ActivityOfferingWrapper aoWrapper, boolean newline, String cssStyle) {
-        if (timeSlotInfo == null || timeSlotInfo.getEndTime() == null || timeSlotInfo.getEndTime().getHour() == null) {
+        if (timeSlotInfo == null || timeSlotInfo.getEndTime() == null || timeSlotInfo.getEndTime().equals(new TimeOfDayInfo(0,0,0))) {
             aoWrapper.setEndTimeDisplay(StringUtils.EMPTY, newline, cssStyle);
             return;
         }
@@ -1614,10 +1627,10 @@ public class CourseOfferingManagementViewHelperServiceImpl extends CO_AO_RG_View
         info.setWeekdays(SchedulingServiceUtil.weekdaysString2WeekdaysList(sched.getWeekdays()));
 
         info.setStartTime(TimeOfDayHelper.setMillis(((sched.getStart() != null && !"".equals(sched.getStart()))
-                ? new Long(sched.getStart()) : null)));
+                ? Long.valueOf(sched.getStart()) : null)));
 
         info.setEndTime(TimeOfDayHelper.setMillis(((sched.getEnd() != null && !"".equals(sched.getEnd()))
-                ? new Long(sched.getEnd()) : null)));
+                ? Long.valueOf(sched.getEnd()) : null)));
 
         info.setDescr(new RichTextInfo());
         info.getDescr().setFormatted(null);
@@ -2396,7 +2409,7 @@ public class CourseOfferingManagementViewHelperServiceImpl extends CO_AO_RG_View
                 new ArrayList<String>(examOfferingIds), ContextUtils.createDefaultContextInfo());
 
         for (ExamOfferingInfo examOfferingInfo : examOfferingInfos) {
-            ExamOfferingWrapper examOfferingWrapper = createWrapperFromExamOffering(examOfferingInfo);
+            ExamOfferingWrapper examOfferingWrapper = createWrapperFromExamOffering(examOfferingInfo, theForm);
 
             if (isDriverPerAO(examOfferingInfo)) {
 
@@ -2469,6 +2482,7 @@ public class CourseOfferingManagementViewHelperServiceImpl extends CO_AO_RG_View
 
                     examOfferingWrapper.setAoInfo(wrapper.getAoInfo());
                     examOfferingWrapper.setActivityCode(wrapper.getActivityCode());
+                    examOfferingWrapper.setDriverPerAO(true);
                     eoClusterWrapper.getEoWrapperList().add(examOfferingWrapper);
 
                     return;
@@ -2496,51 +2510,14 @@ public class CourseOfferingManagementViewHelperServiceImpl extends CO_AO_RG_View
     }
 
 
-    private ExamOfferingWrapper createWrapperFromExamOffering(ExamOfferingInfo examOfferingInfo) throws Exception {
+    private ExamOfferingWrapper createWrapperFromExamOffering(ExamOfferingInfo examOfferingInfo, CourseOfferingManagementForm theForm) throws Exception {
         ExamOfferingWrapper eoWrapper = new ExamOfferingWrapper();
         eoWrapper.setEoInfo(examOfferingInfo);
 
         StateInfo state = getStateService().getState(examOfferingInfo.getStateKey(),
                 ContextUtils.createDefaultContextInfo());
         eoWrapper.setStateName(state.getName());
-
-        List<ScheduleRequestInfo> scheduleRequestInfos = CourseOfferingManagementUtil.getSchedulingService().getScheduleRequestsByRefObject(
-                ExamOfferingServiceConstants.REF_OBJECT_URI_EXAM_OFFERING, examOfferingInfo.getId(), ContextUtils.createDefaultContextInfo());
-
-        for (ScheduleRequestInfo scheduleRequestInfo : scheduleRequestInfos) {
-            for (ScheduleRequestComponentInfo componentInfo : scheduleRequestInfo.getScheduleRequestComponents()) {
-
-                String timeSlotId = KSCollectionUtils.getOptionalZeroElement(componentInfo.getTimeSlotIds());
-                TimeSlotInfo timeSlot = CourseOfferingManagementUtil.getSchedulingService().getTimeSlot(timeSlotId, ContextUtils.createDefaultContextInfo());
-                if (timeSlot != null) {
-
-                    TimeOfDayInfo startTime = timeSlot.getStartTime();
-                    TimeOfDayInfo endTime = timeSlot.getEndTime();
-                    List<Integer> days = timeSlot.getWeekdays();
-
-                    if (startTime != null && startTime.getHour() != null) {
-                        eoWrapper.setStartTimeDisplay(TimeOfDayHelper.makeFormattedTimeForAOSchedules(startTime));
-                    }
-
-                    if (endTime != null && endTime.getHour() != null) {
-                        eoWrapper.setEndTimeDisplay(TimeOfDayHelper.makeFormattedTimeForAOSchedules(endTime));
-                    }
-
-                    if (days != null && days.size() > 0) {
-                        eoWrapper.setDaysDisplayName(getDays(days));
-                    }
-                }
-
-                String roomId = KSCollectionUtils.getOptionalZeroElement(componentInfo.getRoomIds());
-                if (StringUtils.isNotBlank(roomId)) {
-                    RoomInfo roomInfo = CourseOfferingManagementUtil.getRoomService().getRoom(roomId, ContextUtils.createDefaultContextInfo());
-                    BuildingInfo buildingInfo = CourseOfferingManagementUtil.getRoomService().getBuilding(roomInfo.getBuildingId(),
-                            ContextUtils.createDefaultContextInfo());
-                    eoWrapper.setBuildingName(buildingInfo.getName());
-                    eoWrapper.setRoomName(roomInfo.getRoomCode());
-                }
-            }
-        }
+        CourseOfferingManagementUtil.getExamOfferingScheduleHelper().loadScheduleRequests(eoWrapper, theForm, ContextUtils.createDefaultContextInfo());
 
         return eoWrapper;
     }
@@ -2592,5 +2569,53 @@ public class CourseOfferingManagementViewHelperServiceImpl extends CO_AO_RG_View
         }
 
         return sb.toString();
+    }
+
+    public static String examPeriodDaysDisplay(List<Integer> weekdaysList, Date startTime,
+                                               Date endTime, boolean excludeSaturdays, boolean excludeSundays) {
+        StringBuilder result = new StringBuilder();
+        List<Date> dates = new ArrayList<Date>();
+        dates.addAll(getExamPeriodDates(startTime, endTime, excludeSaturdays, excludeSundays));
+        for(Integer weekday : weekdaysList) {
+            result.append("Day "+weekday);
+            result.append(" - ");
+            result.append(DateFormatters.EXAM_OFFERING_VIEW_EXAM_OFFERING_DATE_FORMATTER.format(dates.get(weekday - 1)));
+        }
+
+        return result.toString();
+    }
+
+    public static List<Date> getExamPeriodDates(Date fechInitial, Date fechFinal, boolean excludeSaturdays, boolean excludeSundays)
+    {
+        List<Date> dates = new ArrayList<Date>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(fechInitial);
+
+        while (calendar.getTime().before(fechFinal))
+        {
+            Date resultado = calendar.getTime();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(resultado);
+            int weekday = cal.get(Calendar.DAY_OF_WEEK);
+            if((weekday == Calendar.SATURDAY && !excludeSaturdays) ||(weekday == Calendar.SUNDAY && !excludeSundays) ) {
+                dates.add(resultado);
+            }
+            else if((weekday != Calendar.SATURDAY)&&(weekday != Calendar.SUNDAY))  {
+                dates.add(resultado);
+            }
+
+            calendar.add(Calendar.DATE, 1);
+        }
+        calendar.setTime(fechFinal);
+        Date finalDate = calendar.getTime();
+        dates.add(finalDate);
+        return dates;
+    }
+
+    /**
+     * A pass-thru to the building info search in the schedule helper.
+     */
+    public List<BuildingInfo> retrieveBuildingInfoByCode(String buildingCode) throws Exception {
+        return CourseOfferingManagementUtil.getScheduleHelper().retrieveBuildingInfoByCode(buildingCode, false);
     }
 }

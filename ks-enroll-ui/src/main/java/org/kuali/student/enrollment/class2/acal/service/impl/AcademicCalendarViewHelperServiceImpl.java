@@ -19,7 +19,6 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.log4j.Logger;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeConstants;
 import org.kuali.rice.core.api.criteria.Predicate;
@@ -38,6 +37,9 @@ import org.kuali.rice.krad.uif.view.View;
 import org.kuali.rice.krad.uif.view.ViewModel;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
+import org.kuali.rice.krms.api.KrmsConstants;
+import org.kuali.rice.krms.api.repository.RuleManagementService;
+import org.kuali.rice.krms.api.repository.reference.ReferenceObjectBinding;
 import org.kuali.student.common.uif.service.impl.KSViewHelperServiceImpl;
 import org.kuali.student.enrollment.class2.acal.dto.AcademicTermWrapper;
 import org.kuali.student.enrollment.class2.acal.dto.AcalEventWrapper;
@@ -52,6 +54,7 @@ import org.kuali.student.enrollment.class2.acal.keyvalue.AcalEventTypeKeyValues;
 import org.kuali.student.enrollment.class2.acal.service.AcademicCalendarViewHelperService;
 import org.kuali.student.enrollment.class2.acal.util.AcalCommonUtils;
 import org.kuali.student.enrollment.class2.acal.util.CalendarConstants;
+import org.kuali.student.enrollment.class2.courseoffering.util.CourseOfferingManagementUtil;
 import org.kuali.student.r2.common.dto.ContextInfo;
 import org.kuali.student.r2.common.util.date.DateFormatters;
 import org.kuali.student.r2.core.acal.dto.AcademicCalendarInfo;
@@ -73,6 +76,8 @@ import org.kuali.student.r2.core.class1.type.service.TypeService;
 import org.kuali.student.r2.core.constants.AcademicCalendarServiceConstants;
 import org.kuali.student.r2.core.constants.AtpServiceConstants;
 import org.kuali.student.r2.core.constants.TypeServiceConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -96,12 +101,13 @@ import static org.kuali.rice.core.api.criteria.PredicateFactory.equalIgnoreCase;
  */
 public class AcademicCalendarViewHelperServiceImpl extends KSViewHelperServiceImpl implements AcademicCalendarViewHelperService {
 
-    private final static Logger LOG = Logger.getLogger(AcademicCalendarViewHelperServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AcademicCalendarViewHelperServiceImpl.class);
 
     private AcademicCalendarService acalService;
     private TypeService typeService;
     private AtpService atpService;
     private TermCodeGenerator termCodeGenerator;
+    private transient RuleManagementService ruleManagementService;
 
     public AcademicCalendarViewHelperServiceImpl getInstance(){
         return this;
@@ -116,9 +122,7 @@ public class AcademicCalendarViewHelperServiceImpl extends KSViewHelperServiceIm
      */
     public void populateAcademicCalendar(String acalId, AcademicCalendarForm acalForm){
 
-        if (LOG.isDebugEnabled()){
-            LOG.debug("Loading Academic calendar for the id " + acalId);
-        }
+        LOG.debug("Loading Academic calendar for the id {}", acalId);
 
         try{
 
@@ -147,7 +151,7 @@ public class AcademicCalendarViewHelperServiceImpl extends KSViewHelperServiceIm
 
         }catch(Exception e){
             if (LOG.isDebugEnabled()){
-                LOG.debug("Error loading academic calendar [id=" + acalId + "] - " + e.getMessage());
+                LOG.debug(String.format("Error loading academic calendar [id=%s]", acalId), e);
             }
             throw convertServiceExceptionsToUI(e);
         }
@@ -163,9 +167,7 @@ public class AcademicCalendarViewHelperServiceImpl extends KSViewHelperServiceIm
      */
     protected List<HolidayCalendarWrapper> populateHolidayCalendars(List<String> holidayCalendarIds) throws Exception {
 
-        if (LOG.isDebugEnabled()){
-            LOG.debug("Loading all the holiday calendars associated with the Acal");
-        }
+        LOG.debug("Loading all the holiday calendars associated with the Acal");
 
         List<HolidayCalendarWrapper> holidayCalendarWrapperList = new ArrayList<HolidayCalendarWrapper>();
 
@@ -235,9 +237,7 @@ public class AcademicCalendarViewHelperServiceImpl extends KSViewHelperServiceIm
     public List<AcademicTermWrapper> populateTermWrappers(String acalId, boolean isCopy, boolean calculateInstrDays){
         ContextInfo contextInfo = createContextInfo();
 
-        if (LOG.isDebugEnabled()){
-            LOG.debug("Loading all the terms associated with an acal [id=" + acalId + "]");
-        }
+        LOG.debug("Loading all the terms associated with an acal [id={}]", acalId);
 
         List<AcademicTermWrapper> termWrappers = new ArrayList<AcademicTermWrapper>();
 
@@ -301,9 +301,7 @@ public class AcademicCalendarViewHelperServiceImpl extends KSViewHelperServiceIm
 
     public AcademicTermWrapper populateTermWrapper(TermInfo termInfo, boolean isCopy, boolean calculateInstrDays) throws Exception {
 
-        if (LOG.isDebugEnabled()){
-            LOG.debug("Populating Term - " + termInfo.getId());
-        }
+        LOG.debug("Populating Term - {}", termInfo.getId());
 
         TypeInfo type = getAcalService().getTermType(termInfo.getTypeKey(),createContextInfo());
 
@@ -361,9 +359,7 @@ public class AcademicCalendarViewHelperServiceImpl extends KSViewHelperServiceIm
      * @param keyDateGroup
      */
     protected void addKeyDateGroup(List<TypeInfo> keyDateTypes,KeyDateWrapper keyDateWrapper,Map<String,KeyDatesGroupWrapper> keyDateGroup){
-        if (LOG.isDebugEnabled()){
-            LOG.debug("Adding key date to a group");
-        }
+        LOG.debug("Adding key date to a group");
         for (TypeInfo keyDateType : keyDateTypes) {
             try {
                 List<TypeInfo> allowedTypes = getTypeService().getTypesForGroupType(keyDateType.getKey(), createContextInfo());
@@ -822,6 +818,20 @@ public class AcademicCalendarViewHelperServiceImpl extends KSViewHelperServiceIm
                 GlobalVariables.getMessageMap().putWarning(KRADConstants.GLOBAL_MESSAGES, CalendarConstants.MessageKeys.ERROR_DATE_NOT_IN_ACAL_RANGE,"Added Holiday Calendar: " + holidayCalendarWrapper.getHolidayCalendarInfo().getName());
             }
         }
+
+        // This could not be done at the time of copying so it is done here for the copied acals
+        // find out the parent terms
+        // find their subterms
+        // reassign the subterm's parent to this.
+            for (AcademicTermWrapper termWrapper : acalForm.getTermWrapperList()) {
+                for(AcademicTermWrapper subtermWrapper : termWrapper.getSubterms()){
+                    subtermWrapper.setParentTermInfo(termWrapper.getTermInfo());
+                    subtermWrapper.getParentTermInfo().setStartDate(termWrapper.getStartDate());
+                    subtermWrapper.getParentTermInfo().setEndDate(termWrapper.getEndDate());
+                    subtermWrapper.setParentTermName(termWrapper.getName());
+                    subtermWrapper.getParentTermInfo().setName(termWrapper.getName());
+                }
+            }
 
         // sort the light-weighted term wrappers for displaying error/warning messages on the correct term section
         List<SimplifiedAcademicTermWrapper> simplifiedAcademicTermWrappers = populateSimplifiedAcademicTermWrappers(acalForm.getTermWrapperList());
@@ -1563,22 +1573,24 @@ public class AcademicCalendarViewHelperServiceImpl extends KSViewHelperServiceIm
             throw new Exception("term wrapper is null");
         }
 
-        String finalExamSectionName="acal-term-examdates_line"+afterSortingIndex;
+        List<ReferenceObjectBinding> refObjectsBindings = this.getRuleManagementService().findReferenceObjectBindingsByReferenceObject(TypeServiceConstants.REF_OBJECT_URI_TYPE, termWrapperToValidate.getTypeInfo().getKey());
+        if(refObjectsBindings.size() > 0){
+            String finalExamSectionName="acal-term-examdates_line"+afterSortingIndex;
 
-        SelectControl select = (SelectControl) ComponentFactory.getNewComponentInstance("KSFE-FinalExam-ExamDaysDropdown");
-        int maxday = 0;
-        for(KeyValue value : select.getOptions()){
-            maxday = Math.max(Integer.valueOf(value.getKey()), maxday);
-        }
+            SelectControl select = (SelectControl) ComponentFactory.getNewComponentInstance("KSFE-FinalExam-ExamDaysDropdown");
+            int maxday = 0;
+            for(KeyValue value : select.getOptions()){
+                maxday = Math.max(Integer.valueOf(value.getKey()), maxday);
+            }
 
-        if (termWrapperToValidate.getExamdates()!=null && !termWrapperToValidate.getExamdates().isEmpty()) {
-            for (ExamPeriodWrapper examPeriodWrapper : termWrapperToValidate.getExamdates()){
-                if (getDaysForExamPeriod(examPeriodWrapper, holidayInfos, createContextInfo()) < maxday) {
-                    GlobalVariables.getMessageMap().putErrorForSectionId(finalExamSectionName, CalendarConstants.MessageKeys.ERROR_EXAM_PERIOD_DAYS_VALIDATION);
+            if (termWrapperToValidate.getExamdates()!=null && !termWrapperToValidate.getExamdates().isEmpty()) {
+                for (ExamPeriodWrapper examPeriodWrapper : termWrapperToValidate.getExamdates()){
+                    if (getDaysForExamPeriod(examPeriodWrapper, holidayInfos, createContextInfo()) < maxday) {
+                        GlobalVariables.getMessageMap().putErrorForSectionId(finalExamSectionName, CalendarConstants.MessageKeys.ERROR_EXAM_PERIOD_DAYS_VALIDATION);
+                    }
                 }
             }
         }
-
     }
 
     /**
@@ -1710,5 +1722,12 @@ public class AcademicCalendarViewHelperServiceImpl extends KSViewHelperServiceIm
             this.parentTerm = academicTermWrapper.getParentTerm();
             this.parentTermInfo = academicTermWrapper.getParentTermInfo();
         }
+    }
+
+    public RuleManagementService getRuleManagementService() {
+        if (ruleManagementService == null) {
+            ruleManagementService = (RuleManagementService) GlobalResourceLoader.getService(new QName(KrmsConstants.Namespaces.KRMS_NAMESPACE_2_0, "ruleManagementService"));
+        }
+        return ruleManagementService;
     }
 }

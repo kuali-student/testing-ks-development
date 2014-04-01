@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -91,18 +92,12 @@ public class TestLuiServiceCacheDecorator {
     public ContextInfo callContext = null;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         principalId = "123";
         callContext = new ContextInfo();
         callContext.setPrincipalId(principalId);
-        try {
-            new LuiTestDataLoader(luiDao, luiLuiRelationDao).loadData();
-
-            luiDao.getEm().flush();
-
-        } catch (Exception ex) {
-            throw new RuntimeException (ex);
-        }
+        new LuiTestDataLoader(luiDao, luiLuiRelationDao).loadData();
+        luiDao.getEm().flush();
     }
 
     @Test
@@ -121,6 +116,6 @@ public class TestLuiServiceCacheDecorator {
 
         objs = this.getLuiService().getLuiLuiRelationsByLui("Lui-1", callContext);
         assertNotNull(objs);
-        assertEquals(0, objs.size());
+        assertTrue(objs.isEmpty());
     }
 }

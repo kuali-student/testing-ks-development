@@ -15,7 +15,6 @@
  */
 package org.kuali.student.enrollment.class1.krms.builder;
 
-import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krms.util.KRMSConstants;
@@ -26,7 +25,7 @@ import org.kuali.student.enrollment.courseoffering.service.CourseOfferingService
 import org.kuali.student.lum.lu.ui.krms.builder.CourseComponentBuilder;
 import org.kuali.student.lum.lu.ui.krms.dto.LUPropositionEditor;
 import org.kuali.student.r2.common.exceptions.DoesNotExistException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.core.acal.dto.TermInfo;
 import org.kuali.student.r2.core.acal.service.AcademicCalendarService;
 import org.kuali.student.r2.core.atp.service.AtpService;
@@ -43,7 +42,6 @@ import java.util.Map;
  */
 public class EnrolCourseComponentBuilder extends CourseComponentBuilder {
 
-    private final static Logger LOG = Logger.getLogger(EnrolCourseComponentBuilder.class);
     private transient AtpService atpService;
     private transient CourseOfferingService courseOfferingService;
     private AcademicCalendarService acalService = null;
@@ -52,7 +50,7 @@ public class EnrolCourseComponentBuilder extends CourseComponentBuilder {
     public Map<String, String> buildTermParameters(LUPropositionEditor propositionEditor) {
         Map<String, String> termParameters = new HashMap<String, String>();
         if (propositionEditor.getCourseInfo() != null) {
-            termParameters.put(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_CLU_KEY, propositionEditor.getCourseInfo().getVersion().getVersionIndId());
+            termParameters.put(KSKRMSServiceConstants.TERM_PARAMETER_TYPE_COURSE_CLU_KEY, propositionEditor.getCourseInfo().getVersion().getVersionIndId());
         }
 
         if (propositionEditor.getTermInfo() != null) {

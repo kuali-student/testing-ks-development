@@ -16,7 +16,6 @@
 package org.kuali.student.ui.admin.state;
 
 
-import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.criteria.Predicate;
 import org.kuali.rice.core.api.criteria.PredicateFactory;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
@@ -37,7 +36,6 @@ import java.util.Map;
 
 public class StateInfoAdminLookupableImpl extends LookupableImpl
 {
-	private static final Logger LOG = Logger.getLogger(StateInfoAdminLookupableImpl.class);
 	private transient StateService stateService;
     private static final long serialVersionUID = 1L;
 	@Override
@@ -65,8 +63,7 @@ public class StateInfoAdminLookupableImpl extends LookupableImpl
 		}
 		try
 		{
-			List<StateInfo> list = this.getStateService().searchForStates(qBuilder.build(), getContextInfo());
-			return list;
+            return this.getStateService().searchForStates(qBuilder.build(), getContextInfo());
 		}
 		catch (Exception ex) {
 		    throw new RuntimeException(ex);

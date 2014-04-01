@@ -2,6 +2,7 @@ package org.kuali.student.r2.core.class1.state.service.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assert.assertNotSame;
 
@@ -48,13 +49,12 @@ public class TestStateServiceImpl {
 
     @Autowired
     private StateService stateService;
-    private static String PRINCIPAL_ID = "123";
     private ContextInfo callContext = null;
 
     @Before
     public void setUp() {
         callContext = new ContextInfo();
-        callContext.setPrincipalId(PRINCIPAL_ID);
+        callContext.setPrincipalId("123");
         callContext.setCurrentDate(new Date());
     }
 
@@ -272,7 +272,7 @@ public class TestStateServiceImpl {
         pList.toArray(preds);
         qBuilder.setPredicates(PredicateFactory.and(preds));
         List<StateInfo> nostates = stateService.searchForStates(qBuilder.build(), callContext);
-        assertEquals (0, nostates.size());
+        assertTrue (nostates.isEmpty());
 
         qBuilder = QueryByCriteria.Builder.create();
         List<LifecycleInfo> allLifecycles = stateService.searchForLifecycles(qBuilder.build(), callContext);
@@ -299,7 +299,8 @@ public class TestStateServiceImpl {
             stateService.getState(atpDraftState.getKey(), callContext);
             fail("should have thrown dne exception");
         } catch (DoesNotExistException e) {
-            // expected
+            assertNotNull(e.getMessage());
+            assertEquals(atpDraftState.getKey(), e.getMessage());
         }
         // delete life 
         result = stateService.deleteLifecycle(atpLife.getKey(), callContext);
@@ -308,7 +309,8 @@ public class TestStateServiceImpl {
             stateService.getLifecycle(atpLife.getKey(), callContext);
             fail("should have thrown dne exception");
         } catch (DoesNotExistException e) {
-            // expected
+            assertNotNull(e.getMessage());
+            assertEquals(atpLife.getKey(), e.getMessage());
         }
     }
 

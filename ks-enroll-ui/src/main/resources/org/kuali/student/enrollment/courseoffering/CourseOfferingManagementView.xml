@@ -38,6 +38,8 @@
             </bean>
         </property>
 
+        <property name="onDocumentReadyScript" value="initAMQListener();"/>
+        <property name="onSubmitScript" value="deactivateAMQListener();"/>
         <property name="viewSourceFile" value="CourseOfferingManagementView.xml" /> <!-- Shows up in HTML so devs can find the code -->
 
         <property name="authorizer">
@@ -52,6 +54,7 @@
             <list merge="true">
                 <value>themes/ksboot/scripts/toolbar.js</value>
                 <value>ks-krad/scripts/ks-krad-collection-rowSelection.js</value>
+                <value>themes/ksboot/scripts/timeentry.js</value>
             </list>
         </property>
         <property name="additionalCssFiles">

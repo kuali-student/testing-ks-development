@@ -288,14 +288,7 @@ public class TestSchedulingServiceMockImpl {
 
     // test crud Schedule
     @Test
-    public void testCrudSchedule () throws DataValidationErrorException
-            ,DoesNotExistException
-            ,InvalidParameterException
-            ,MissingParameterException
-            ,OperationFailedException
-            ,PermissionDeniedException
-            ,ReadOnlyException
-            ,Exception {
+    public void testCrudSchedule () throws Exception {
 
         // test data
         // -------------------------
@@ -319,8 +312,6 @@ public class TestSchedulingServiceMockImpl {
         sci_scheduleInfo2.setId("77");
         sci_scheduleInfo2.setRoomId("r77");
         sci_scheduleInfo2.setTimeSlotIds(timeSlotIds_scheduleInfo2);
-        List<ScheduleComponentInfo> scheduleComponentInfos_scheduleInfo2 = new ArrayList<ScheduleComponentInfo>();
-        scheduleComponentInfos_scheduleInfo2.add(sci_scheduleInfo2);
 
         // test create
         // ----------------
@@ -380,7 +371,7 @@ public class TestSchedulingServiceMockImpl {
                 fail(scheduleInfo.getId());
             }
         }
-        assertEquals(0, IDS_SCHEDULE_INFO.size());
+        assertTrue(IDS_SCHEDULE_INFO.isEmpty());
 
         // test get by type
         // -------------------
@@ -391,7 +382,7 @@ public class TestSchedulingServiceMockImpl {
         assertEquals(actual_scheduleInfo1.getId(), IDS_SCHEDULE_INFO.get(0));
         assertEquals(actual_scheduleInfo2.getId(), IDS_SCHEDULE_INFO.get(1));
         IDS_SCHEDULE_INFO = schedulingService.getScheduleIdsByType(SchedulingServiceConstants.SCHEDULE_TYPE_SCHEDULE + "324", callContext);
-        assertEquals(0, IDS_SCHEDULE_INFO.size());
+        assertTrue(IDS_SCHEDULE_INFO.isEmpty());
 
         // test delete
         // -----------------
@@ -402,7 +393,8 @@ public class TestSchedulingServiceMockImpl {
             actual_scheduleInfo1 = schedulingService.getSchedule(actual_scheduleInfo1.getId(), callContext);
             fail("Did not receive DoesNotExistException when attempting to get already-deleted ScheduleInfo");
         } catch (DoesNotExistException dnee) {
-            // expected
+            assertNotNull(dnee.getMessage());
+            assertEquals(actual_scheduleInfo1.getId(), dnee.getMessage());
         }
     }
 
@@ -495,14 +487,7 @@ public class TestSchedulingServiceMockImpl {
 
     // test crud ScheduleRequest
     @Test
-    public void testCrudScheduleRequest () throws DataValidationErrorException
-            ,DoesNotExistException
-            ,InvalidParameterException
-            ,MissingParameterException
-            ,OperationFailedException
-            ,PermissionDeniedException
-            ,ReadOnlyException
-            ,Exception {
+    public void testCrudScheduleRequest () throws Exception {
 
 
         // test data (ScheduleRequestComponentInfo)
@@ -619,7 +604,7 @@ public class TestSchedulingServiceMockImpl {
                 fail(scheduleRequestInfo.getId());
             }
         }
-        assertEquals(0, IDS.size());
+        assertTrue(IDS.isEmpty());
 
         // test get by type
         // -------------------
@@ -630,7 +615,7 @@ public class TestSchedulingServiceMockImpl {
         assertEquals(actual.getId(), IDS.get(0));
         assertEquals(actual2.getId(), IDS.get(1));
         IDS = schedulingService.getScheduleRequestIdsByType(SchedulingServiceConstants.SCHEDULE_REQUEST_TYPE_SCHEDULE_REQUEST + "123", callContext);
-        assertEquals(0, IDS.size());
+        assertTrue(IDS.isEmpty());
 
         // test get ids by ref object type key
         // --------------------------------------
@@ -648,21 +633,15 @@ public class TestSchedulingServiceMockImpl {
             actual = schedulingService.getScheduleRequest(actual.getId(), callContext);
             fail("Did not receive DoesNotExistException when attempting to get already-deleted ScheduleRequestInfo");
         } catch (DoesNotExistException dnee) {
-            // expected
+            assertNotNull(dnee.getMessage());
+            assertEquals(actual.getId(), dnee.getMessage());
         }
     }
 
 
     // test crud ScheduleTransaction
     @Test
-    public void testCrudScheduleTransaction () throws DataValidationErrorException
-            ,DoesNotExistException
-            ,InvalidParameterException
-            ,MissingParameterException
-            ,OperationFailedException
-            ,PermissionDeniedException
-            ,ReadOnlyException
-            ,Exception {
+    public void testCrudScheduleTransaction () throws Exception {
 
         // test data (ScheduleRequestComponentInfo)
         // -------------------------------------------------
@@ -782,7 +761,7 @@ public class TestSchedulingServiceMockImpl {
                 fail(scheduleTransactionInfo.getId());
             }
         }
-        assertEquals(0, IDS.size());
+        assertTrue(IDS.isEmpty());
 
         // test get by type
         // -------------------
@@ -793,7 +772,7 @@ public class TestSchedulingServiceMockImpl {
         assertEquals(actual.getId(), IDS.get(0));
         assertEquals(actual2.getId(), IDS.get(1));
         IDS = schedulingService.getScheduleTransactionIdsByType(SchedulingServiceConstants.SCHEDULE_TRANSACTION_TYPE_REQUEST_TRANSACTION + "123", callContext);
-        assertEquals(0, IDS.size());
+        assertTrue(IDS.isEmpty());
 
         // test delete
         // -----------------
@@ -804,20 +783,14 @@ public class TestSchedulingServiceMockImpl {
             actual = schedulingService.getScheduleTransaction(actual.getId(), callContext);
             fail("Did not receive DoesNotExistException when attempting to get already-deleted ScheduleTransactionInfo");
         } catch (DoesNotExistException dnee) {
-            // expected
+            assertNotNull(dnee.getMessage());
+            assertEquals(actual.getId(), dnee.getMessage());
         }
     }
 
     // test crud ScheduleBatch
     @Test
-    public void testCrudScheduleBatch () throws DataValidationErrorException
-            ,DoesNotExistException
-            ,InvalidParameterException
-            ,MissingParameterException
-            ,OperationFailedException
-            ,PermissionDeniedException
-            ,ReadOnlyException
-            ,Exception {
+    public void testCrudScheduleBatch () throws Exception {
 
         // test create
         // ----------------
@@ -886,7 +859,7 @@ public class TestSchedulingServiceMockImpl {
                 fail(info.getId());
             }
         }
-        assertEquals(0, IDS.size());
+        assertTrue(IDS.isEmpty());
 
         // test get by type
         // -------------------
@@ -897,7 +870,7 @@ public class TestSchedulingServiceMockImpl {
         assertEquals(actual.getId(), IDS.get(0));
         assertEquals(actual2.getId(), IDS.get(1));
         IDS = schedulingService.getScheduleBatchIdsByType(SchedulingServiceConstants.SCHEDULE_BATCH_TYPE_BATCH + "123", callContext);
-        assertEquals(0, IDS.size());
+        assertTrue(IDS.isEmpty());
 
         // test delete
         // -----------------
@@ -908,30 +881,17 @@ public class TestSchedulingServiceMockImpl {
             actual = schedulingService.getScheduleBatch(actual.getId(), callContext);
             fail("Did not receive DoesNotExistException when attempting to get already-deleted ScheduleBatchInfo");
         } catch (DoesNotExistException dnee) {
-            // expected
+            assertNotNull(dnee.getMessage());
+            assertEquals(actual.getId(), dnee.getMessage());
         }
     }
 
     // test crud TimeSlot
     @Test
-    public void testCrudTimeSlot() throws DataValidationErrorException
-            ,DoesNotExistException
-            ,InvalidParameterException
-            ,MissingParameterException
-            ,OperationFailedException
-            ,PermissionDeniedException
-            ,ReadOnlyException
-            ,Exception {
+    public void testCrudTimeSlot() throws Exception {
 
         // test data
         // -----------------
-
-        // times
-        Long START_TIME_MILLIS_8_00_AM = (long) (8 * 60 * 60 * 1000);
-        Long START_TIME_MILLIS_10_00_AM = (long) (10 * 60 * 60 * 1000);
-
-        Long END_TIME_MILLIS_8_50_AM = (long) (8 * 60 * 60 * 1000 + 50 * 60 * 1000);
-        Long END_TIME_MILLIS_10_50_AM = (long) (10 * 60 * 60 * 1000 + 50 * 60 * 1000);
 
         // days of week M W F
         List<Integer> DOW_M_W_F= new ArrayList<Integer>();
@@ -1012,7 +972,7 @@ public class TestSchedulingServiceMockImpl {
                 fail(info.getId());
             }
         }
-        assertEquals(0, IDS.size());
+        assertTrue(IDS.isEmpty());
 
         // test get by type
         // -------------------
@@ -1026,14 +986,7 @@ public class TestSchedulingServiceMockImpl {
     // test some TimeSlot operations as specified in Jira 525
     // as well as older tests that I didn't want to delete
     @Test
-    public void testTimeSlotOperations() throws DataValidationErrorException
-            ,DoesNotExistException
-            ,InvalidParameterException
-            ,MissingParameterException
-            ,OperationFailedException
-            ,PermissionDeniedException
-            ,ReadOnlyException
-            ,Exception {
+    public void testTimeSlotOperations() throws Exception {
 
         // Note: these tests also incorporate specific tests as mentioned in Jira 525
         // See: https://jira.kuali.org/browse/KSENROLL-525
@@ -1159,7 +1112,7 @@ public class TestSchedulingServiceMockImpl {
         assertTrue(l_actoff.contains("16"));
 
         List l_final = schedulingService.getTimeSlotIdsByType(SchedulingServiceConstants.TIME_SLOT_TYPE_EXAM, callContext);
-        assertEquals(0, l_final.size());
+        assertTrue(l_final.isEmpty());
 
         // test case: all valid ids
         List<String> valid_ids = new ArrayList<String>();
@@ -1208,9 +1161,11 @@ public class TestSchedulingServiceMockImpl {
         invalid_ids.add("300");
         try {
             schedulingService.getTimeSlotsByIds(invalid_ids, callContext);
-            fail("Should not be here - test invalid_ids");
-        } catch (DoesNotExistException e) {}
-        catch (Exception e) { fail("Should throw DoesNotExistException - invalid_ids"); }
+            fail("DoesNotExistException should have been thrown due to invalid ids");
+        } catch (DoesNotExistException e) {
+            assertNotNull(e.getMessage());
+            assertEquals("100", e.getMessage());
+        }
 
         // test case: mixture of valid and invalid
         List<String> mix_ids = new ArrayList<String>();
@@ -1218,9 +1173,11 @@ public class TestSchedulingServiceMockImpl {
         mix_ids.add("1000");
         try {
             schedulingService.getTimeSlotsByIds(mix_ids, callContext);
-            fail("Should not be here - test mix_ids");
-        } catch (DoesNotExistException e) {}
-        catch (Exception e) { fail("Should throw DoesNotExistException - mix_ids"); }
+            fail("DoesNotExistException should have been thrown due to invalid ids");
+        } catch (DoesNotExistException e) {
+            assertNotNull(e.getMessage());
+            assertEquals("1000", e.getMessage());
+        }
 
         // get valid days of week by time slot
         List<Integer> valid_days_act_off = schedulingService.getValidDaysOfWeekByTimeSlotType(SchedulingServiceConstants.TIME_SLOT_TYPE_ACTIVITY_OFFERING_STANDARD, callContext);
@@ -1356,14 +1313,7 @@ public class TestSchedulingServiceMockImpl {
 
     // test the schedule display methods
     @Test
-    public void testDisplayObjects () throws DataValidationErrorException
-            ,DoesNotExistException
-            ,InvalidParameterException
-            ,MissingParameterException
-            ,OperationFailedException
-            ,PermissionDeniedException
-            ,ReadOnlyException
-            ,Exception {
+    public void testDisplayObjects () throws Exception {
 
         // test data
         // -------------------------
@@ -1374,8 +1324,6 @@ public class TestSchedulingServiceMockImpl {
         BUILDING.setTypeKey("TEST BLD");
         crudInfoTester.initializeInfoForTestCreate(BUILDING, BUILDING.getTypeKey(), BUILDING.getStateKey());
         BUILDING = roomService.createBuilding(BUILDING.getTypeKey(), BUILDING, callContext);
-        List<BuildingInfo> BUILDINGS = new ArrayList<BuildingInfo>();
-        BUILDINGS.add(BUILDING);
         List<String> BLD_IDS = new ArrayList<String>();
         BLD_IDS.add(BUILDING.getId());
 
@@ -1391,14 +1339,10 @@ public class TestSchedulingServiceMockImpl {
         ROOM.setRoomUsages(new ArrayList<RoomUsageInfo>());
         ROOM.setBuildingId(BUILDING.getId());
         ROOM = roomService.createRoom(BUILDING.getId(), ROOM.getTypeKey(), ROOM, callContext);
-        List<RoomInfo> ROOMS = new ArrayList<RoomInfo>();
-        ROOMS.add(ROOM);
         List<String> ROOM_IDS = new ArrayList<String>();
         ROOM_IDS.add(ROOM.getId());
 
         // create TimeSlot TIME_SLOT
-        Long START_TIME_MILLIS_8_00_AM = (long) (8 * 60 * 60 * 1000);
-        Long END_TIME_MILLIS_8_50_AM = (long) (8 * 60 * 60 * 1000 + 50 * 60 * 1000);
         List<Integer> DOW_T_TH = new ArrayList<Integer>();
         DOW_T_TH.add(Calendar.TUESDAY);
         DOW_T_TH.add(Calendar.THURSDAY);
@@ -1449,14 +1393,14 @@ public class TestSchedulingServiceMockImpl {
         SCHEDULE_REQUEST_CMPS.add(SCHEDULE_REQUEST_CMP);
 
         String scheduleRequestSetId = "searchForScheduleRequestDisplaySetId";
-        List<String> refObjectIds = new ArrayList();
+        List<String> refObjectIds = new ArrayList<String>();
         refObjectIds.add("Ao1");
         refObjectIds.add("Ao2");
         ScheduleRequestSetInfo setInfo =  SchedulingServiceDataLoader.setupScheduleRequestSetInfo(scheduleRequestSetId, refObjectIds,
                 "REF_OBJECT_URI_GLOBAL_PREFIX",
                 false, 168);
 
-        ScheduleRequestSetInfo returnSetInfo = schedulingService.createScheduleRequestSet(SchedulingServiceConstants.SCHEDULE_REQUEST_SET_TYPE_SCHEDULE_REQUEST_SET,
+        schedulingService.createScheduleRequestSet(SchedulingServiceConstants.SCHEDULE_REQUEST_SET_TYPE_SCHEDULE_REQUEST_SET,
                 "REF_OBJECT_URI_GLOBAL_PREFIX", setInfo, callContext );
 
         ScheduleRequestInfo SCHEDULE_REQUEST = new ScheduleRequestInfo();

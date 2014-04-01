@@ -50,7 +50,7 @@ public class LrcContextImplTest extends AbstractServiceTest {
 	}
 
 	@Before
-	public void beforeMethod() {
+	public void beforeMethod() throws Exception {
 		lrcContext.setLrcService(lrcService);
         ContextInfo context = new ContextInfo();
         context.setPrincipalId("testUser1");
@@ -86,8 +86,6 @@ public class LrcContextImplTest extends AbstractServiceTest {
                     context);
         } catch (AlreadyExistsException e) {
             //Might already be inserted
-        } catch (Exception e) {
-            Assert.fail("Problem creating test data in the LRC Service");
         }
         setupTerm1();
 		setupTerm2();
@@ -111,8 +109,8 @@ public class LrcContextImplTest extends AbstractServiceTest {
         ResultScaleInfo gradeType = (ResultScaleInfo) contextMap.get(LrcContextImpl.GRADE_TYPE_TOKEN);
 
         Assert.assertNotNull(contextMap);
-        Assert.assertEquals(null, grade);
-        Assert.assertEquals(null, gradeType);
+        Assert.assertNull(grade);
+        Assert.assertNull(gradeType);
 
 	}
 

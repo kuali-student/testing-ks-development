@@ -15,18 +15,10 @@
  */
 package org.kuali.student.enrollment.class2.courseoffering.service.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kuali.student.common.test.spring.log4j.KSLog4JConfigurer;
 import org.kuali.student.enrollment.class2.acal.util.MockAcalTestDataLoader;
 import org.kuali.student.enrollment.class2.courseoffering.service.facade.ActivityOfferingResult;
 import org.kuali.student.enrollment.class2.courseoffering.service.facade.CourseOfferingServiceFacade;
@@ -67,13 +59,19 @@ import org.kuali.student.r2.core.atp.service.AtpService;
 import org.kuali.student.r2.core.constants.AtpServiceConstants;
 import org.kuali.student.r2.lum.course.service.CourseService;
 import org.kuali.student.r2.lum.lrc.service.LRCService;
-import org.slf4j.Logger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * A test case for the course offering service facade impl.
@@ -84,9 +82,6 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:co-autogen-rg-test-class2-mock-context.xml"})
 public class TestCourseOfferingServiceFacadeImpl {
-    private static final Logger log = KSLog4JConfigurer
-            .getLogger(TestCourseOfferingServiceFacadeImpl.class);
-
     @Resource (name="CourseOfferingService")
     protected CourseOfferingService coService;
 
@@ -142,7 +137,7 @@ public class TestCourseOfferingServiceFacadeImpl {
             throws PermissionDeniedException, MissingParameterException, InvalidParameterException,
             OperationFailedException, DoesNotExistException, ReadOnlyException, DataValidationErrorException, VersionMismatchException {
         String foId = "CO-2:LEC-ONLY";
-        FormatOfferingInfo foInfo = coService.getFormatOffering(foId, contextInfo);
+        coService.getFormatOffering(foId, contextInfo);
         List<ActivityOfferingClusterInfo> clusters =
                 coService.getActivityOfferingClustersByFormatOffering(foId, contextInfo);
         String aocId = clusters.get(0).getId();
@@ -172,7 +167,6 @@ public class TestCourseOfferingServiceFacadeImpl {
             InvalidParameterException, OperationFailedException, DoesNotExistException, DataValidationErrorException, VersionMismatchException, ReadOnlyException {
         // This FO has only 2 AOs in it
         String foId = "CO-2:LEC-ONLY";
-        FormatOfferingInfo foInfo = coService.getFormatOffering(foId, contextInfo);
         List<ActivityOfferingClusterInfo> clusters = coService.getActivityOfferingClustersByFormatOffering(foId, contextInfo);
         assertEquals(1, clusters.size());
         String aocId = clusters.get(0).getId();
@@ -194,8 +188,6 @@ public class TestCourseOfferingServiceFacadeImpl {
         String aoIdSecond = aoInfos.get(1).getId();
         // App layer call
         coServiceFacade.deleteActivityOfferingCascaded(aoIdFirst, contextInfo);
-        List<ActivityOfferingClusterInfo> retrieved =
-                coService.getActivityOfferingClustersByFormatOffering(foId, contextInfo);
         // Fetch the AOs again--should only be 1
         aoInfos = coService.getActivityOfferingsByCluster(aocId, contextInfo);
         assertEquals(1, aoInfos.size()); // Should only have 1 AO
@@ -215,7 +207,6 @@ public class TestCourseOfferingServiceFacadeImpl {
             throws PermissionDeniedException, MissingParameterException,
             InvalidParameterException, OperationFailedException, DoesNotExistException, DependentObjectsExistException {
         String foId = "CO-2:LEC-ONLY";
-        FormatOfferingInfo foInfo = coService.getFormatOffering(foId, contextInfo);
         List<ActivityOfferingClusterInfo> clusters = coService.getActivityOfferingClustersByFormatOffering(foId, contextInfo);
         assertEquals(1, clusters.size());
         String aocId = clusters.get(0).getId();
@@ -233,14 +224,15 @@ public class TestCourseOfferingServiceFacadeImpl {
         coServiceFacade.deleteActivityOfferingCluster(aocId, contextInfo);
         try {
             coService.getActivityOfferingCluster(aocId, contextInfo);
-            assert(false); // Shouldn't get here
+            fail("DoesNotExistException should have been thrown");
         } catch (DoesNotExistException e) {
-            // Should go here
+            assertNotNull(e.getMessage());
+            assertEquals("No ActivityOfferingCluster for id = " + aocId, e.getMessage());
         }
         List<ActivityOfferingInfo> activitiesByFo2 = coService.getActivityOfferingsByFormatOffering(foId, contextInfo);
-        assertEquals(0, activitiesByFo2.size());
+        assertTrue(activitiesByFo2.isEmpty());
         List<ActivityOfferingClusterInfo> clusters2 = coService.getActivityOfferingClustersByFormatOffering(foId, contextInfo);
-        assertEquals(0, clusters2.size());
+        assertTrue(clusters2.isEmpty());
     }
 
     /**
@@ -250,7 +242,6 @@ public class TestCourseOfferingServiceFacadeImpl {
     @Test
     public void testMoveActivityOffering() throws PermissionDeniedException, MissingParameterException, InvalidParameterException, OperationFailedException, DoesNotExistException, ReadOnlyException, DataValidationErrorException, VersionMismatchException {
         String foId = "CO-2:LEC-ONLY";
-        FormatOfferingInfo foInfo = coService.getFormatOffering(foId, contextInfo);
         List<ActivityOfferingClusterInfo> clusters = coService.getActivityOfferingClustersByFormatOffering(foId, contextInfo);
         assertEquals(1, clusters.size());
         String aocId = clusters.get(0).getId();
@@ -318,9 +309,7 @@ public class TestCourseOfferingServiceFacadeImpl {
         term.setStateKey(atp.getStateKey());
         term.setTypeKey(atp.getTypeKey());
         
-        TestAutogenRegGroupUserStoryThreeCourseOfferingCreationDetails details;
-        
-        String courseOfferingId = dataLoader.createCourseOffering(term, details = new TestAutogenRegGroupUserStoryThreeCourseOfferingCreationDetails(), contextInfo);
+        String courseOfferingId = dataLoader.createCourseOffering(term, new TestAutogenRegGroupUserStoryThreeCourseOfferingCreationDetails(), contextInfo);
       
         CourseOfferingInfo co = coService.getCourseOffering(courseOfferingId, contextInfo);
         
@@ -352,7 +341,7 @@ public class TestCourseOfferingServiceFacadeImpl {
       
         assertNotNull(results);
         
-        assertTrue(results.getGeneratedRegistrationGroups().size() > 0);
+        assertTrue(!results.getGeneratedRegistrationGroups().isEmpty());
     }
     @Test
     public void testUserStoryEight () throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, DataValidationErrorException, ReadOnlyException, VersionMismatchException, AlreadyExistsException, CircularRelationshipException, DependentObjectsExistException, UnsupportedActionException {
@@ -371,9 +360,7 @@ public class TestCourseOfferingServiceFacadeImpl {
         term.setStateKey(atp.getStateKey());
         term.setTypeKey(atp.getTypeKey());
         
-        TestAutogenRegGroupUserStoryThreeCourseOfferingCreationDetails details;
-        
-        String courseOfferingId = dataLoader.createCourseOffering(term, details = new TestAutogenRegGroupUserStoryThreeCourseOfferingCreationDetails(), contextInfo);
+        String courseOfferingId = dataLoader.createCourseOffering(term, new TestAutogenRegGroupUserStoryThreeCourseOfferingCreationDetails(), contextInfo);
       
         CourseOfferingInfo co = coService.getCourseOffering(courseOfferingId, contextInfo);
         
@@ -405,8 +392,8 @@ public class TestCourseOfferingServiceFacadeImpl {
       
         assertNotNull(results);
         
-        assertTrue(results.getGeneratedRegistrationGroups().size() > 0);
-        
+        assertTrue(!results.getGeneratedRegistrationGroups().isEmpty());
+
         
         Integer aocSeatCount = coServiceFacade.getSeatCountByActivityOfferingCluster(aoc.getId(), contextInfo);
         
@@ -444,16 +431,13 @@ public class TestCourseOfferingServiceFacadeImpl {
     }
 
     @Test
-    public void copyCourseOfferingToTargetTerm() throws InvalidParameterException, PermissionDeniedException, DataValidationErrorException,
-            AlreadyExistsException, ReadOnlyException, OperationFailedException, MissingParameterException,
-            DoesNotExistException, UnsupportedActionException, DependentObjectsExistException, CircularRelationshipException, VersionMismatchException {
+    public void copyCourseOfferingToTargetTerm() throws Exception {
 
         // Create new Course Offering
         MockAcalTestDataLoader acalLoader = new MockAcalTestDataLoader(this.acalService);
         TermInfo term = acalLoader.loadTerm("2012SP", "Spring 2012", "2012-03-01 00:00:00.0", "2012-05-31 00:00:00.0", AtpServiceConstants.ATP_SPRING_TYPE_KEY, AtpServiceConstants.ATP_OFFICIAL_STATE_KEY, "Spring Term 2012");
         assertEquals("2012SP", term.getCode());
-        TestAutogenRegGroupUserStoryThreeCourseOfferingCreationDetails details;
-        String courseOfferingId = dataLoader.createCourseOffering(term, details = new TestAutogenRegGroupUserStoryThreeCourseOfferingCreationDetails(), contextInfo);
+        String courseOfferingId = dataLoader.createCourseOffering(term, new TestAutogenRegGroupUserStoryThreeCourseOfferingCreationDetails(), contextInfo);
         CourseOfferingInfo co = coService.getCourseOffering(courseOfferingId, contextInfo);
         assertEquals("MATH123", co.getCourseOfferingCode());
 

@@ -16,7 +16,6 @@
 package org.kuali.student.ui.admin.lrc;
 
 
-import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.criteria.Predicate;
 import org.kuali.rice.core.api.criteria.PredicateFactory;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
@@ -37,7 +36,6 @@ import java.util.Map;
 
 public class ResultScaleInfoAdminLookupableImpl extends LookupableImpl
 {
-	private static final Logger LOG = Logger.getLogger(ResultScaleInfoAdminLookupableImpl.class);
 	private transient LRCService lRCService;
     private static final long serialVersionUID = 1L;
 	@Override

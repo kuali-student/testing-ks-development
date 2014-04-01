@@ -18,7 +18,6 @@ package org.kuali.student.enrollment.class2.courseoffering.service.impl;
 import net.sf.ehcache.Element;
 import org.apache.commons.collections.keyvalue.MultiKey;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.util.RiceKeyConstants;
 import org.kuali.rice.kim.api.KimConstants;
 import org.kuali.rice.krad.maintenance.Maintainable;
@@ -45,7 +44,7 @@ import org.kuali.student.r2.common.exceptions.InvalidParameterException;
 import org.kuali.student.r2.common.exceptions.MissingParameterException;
 import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.common.util.constants.CourseOfferingServiceConstants;
 import org.kuali.student.r2.common.util.constants.LuiServiceConstants;
 import org.kuali.student.r2.common.util.date.DateFormatters;
@@ -61,6 +60,8 @@ import org.kuali.student.r2.lum.course.dto.CourseJointInfo;
 import org.kuali.student.r2.lum.course.dto.FormatInfo;
 import org.kuali.student.r2.lum.util.constants.CluServiceConstants;
 import org.kuali.student.r2.lum.util.constants.LrcServiceConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,7 +79,7 @@ import java.util.Set;
  */
 public class CourseOfferingCreateMaintainableImpl extends CourseOfferingMaintainableImpl implements Maintainable {
 
-    private static final Logger LOG = org.apache.log4j.Logger.getLogger(CourseOfferingCreateMaintainableImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CourseOfferingCreateMaintainableImpl.class);
     private final static String CACHE_NAME = "CourseOfferingMaintainableImplCache";
 
     /**
@@ -136,6 +137,7 @@ public class CourseOfferingCreateMaintainableImpl extends CourseOfferingMaintain
      */
     protected CourseOfferingInfo createCourseOfferingInfo(String termId, CourseInfo courseInfo, String courseOfferingSuffix,CourseOfferingInfo courseOffering) throws Exception {
 
+        ContextInfo context = createContextInfo();
         List<String> optionKeys = CourseOfferingManagementUtil.getDefaultOptionKeysService().getDefaultOptionKeysForCreateCourseOfferingFromCanonical();
 
         courseOffering.setTermId(termId);
@@ -181,11 +183,11 @@ public class CourseOfferingCreateMaintainableImpl extends CourseOfferingMaintain
             }
         }
 
-        CourseOfferingInfo info = CourseOfferingManagementUtil.getCourseOfferingService().createCourseOffering(courseInfo.getId(), termId, LuiServiceConstants.COURSE_OFFERING_TYPE_KEY, courseOffering, optionKeys, ContextUtils.createDefaultContextInfo());
+        CourseOfferingInfo info = CourseOfferingManagementUtil.getCourseOfferingService().createCourseOffering(courseInfo.getId(), termId, LuiServiceConstants.COURSE_OFFERING_TYPE_KEY, courseOffering, optionKeys, context);
 
         try {
-            String examPeriodID = CourseOfferingManagementUtil.getExamOfferingServiceFacade().getExamPeriodId(info.getTermId(), ContextUtils.createDefaultContextInfo());
-            CourseOfferingManagementUtil.getExamOfferingServiceFacade().generateFinalExamOffering(info, info.getTermId(), examPeriodID, new ArrayList<String>(), ContextUtils.createDefaultContextInfo());
+            String examPeriodID = CourseOfferingManagementUtil.getExamOfferingServiceFacade().getExamPeriodId(info.getTermId(), context);
+            CourseOfferingManagementUtil.getExamOfferingServiceFacade().generateFinalExamOffering(info, info.getTermId(), examPeriodID, new ArrayList<String>(), context);
         }  catch (Exception e){
             KSUifUtils.addGrowlMessageIcon(GrowlIcon.ERROR, CourseOfferingConstants.COURSEOFFERING_EXAMPERIOD_MISSING);
         }
@@ -247,7 +249,7 @@ public class CourseOfferingCreateMaintainableImpl extends CourseOfferingMaintain
         ContextInfo contextInfo = ContextUtils.createDefaultContextInfo();
          for (JointCourseWrapper jointWrapper : wrapper.getJointCourses()){
              if (jointWrapper.isSelectedToJointlyOfferred()){
-                 LOG.debug("Creating offerings for the joint course " + jointWrapper.getCourseCode());
+                 LOG.debug("Creating offerings for the joint course {}", jointWrapper.getCourseCode());
                   CourseOfferingInfo coInfo = createCourseOfferingInfo(wrapper.getTerm().getId(), jointWrapper.getCourseInfo(), StringUtils.EMPTY, new CourseOfferingInfo());
                   for (FormatOfferingWrapper foWrapper : jointWrapper.getFormatOfferingWrappers()){
                       foWrapper.getFormatOfferingInfo().setStateKey(LuiServiceConstants.LUI_FO_STATE_DRAFT_KEY);
@@ -296,7 +298,7 @@ public class CourseOfferingCreateMaintainableImpl extends CourseOfferingMaintain
             List<CourseOfferingInfo> cos = CourseOfferingManagementUtil.getCourseOfferingService().getCourseOfferingsByCourseAndTerm(joint.getCourseId(),wrapper.getTerm().getId(),contextInfo);
 
             if (!cos.isEmpty()){
-                LOG.debug("For the joint course " + jointCourse.getCode() + ", it already has the offerings created.");
+                LOG.debug("For the joint course {}, it already has the offerings created.", jointCourse.getCode());
                 jointCourseWrapper.setAlreadyOffered(true);
             }
 
@@ -318,10 +320,13 @@ public class CourseOfferingCreateMaintainableImpl extends CourseOfferingMaintain
             // Check authz
             List<String> orgIds = jointCourse.getUnitsContentOwner();
             if(orgIds != null && !orgIds.isEmpty()){
-                String orgIDs = "";
+                StringBuffer orgIDBuffer = new StringBuffer("");
                 for (String orgId : orgIds) {
-                    orgIDs = orgIDs + orgId + ",";
+                    orgIDBuffer.append(orgId);
+                    orgIDBuffer.append(",");
                 }
+                String orgIDs = orgIDBuffer.toString();
+
                 if (orgIDs.length() > 0) {
                     roleQualifications.put("offeringAdminOrgId", orgIDs.substring(0, orgIDs.length() - 1));
                 }

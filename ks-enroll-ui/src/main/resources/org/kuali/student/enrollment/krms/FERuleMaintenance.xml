@@ -44,7 +44,7 @@ limitations under the License.
                   value="org.kuali.student.enrollment.class1.krms.dto.FERuleManagementWrapper"/>
         <property name="viewHelperServiceClass"
                   value="org.kuali.student.enrollment.class1.krms.service.impl.FERuleViewHelperServiceImpl"/>
-        <property name="headerText" value="Final Exam Matrix"/>
+        <property name="headerText" value="Standard Final Exam Matrix"/>
         <property name="authorizer">
             <bean class="org.kuali.student.enrollment.main.view.KsViewAuthorizerBase"/>
         </property>
@@ -201,9 +201,9 @@ limitations under the License.
                       p:style="margin-top:-25px" p:forceSessionPersistence="true">
                     <property name="agendaPrototypeMap">
                         <map>
-                            <entry key="kuali.krms.agenda.type.final.exam.standard"
+                            <entry key="kuali.krms.agenda.type.final.exam.activity.offering.driven"
                                    value-ref="KSFE-RuleTable-Standard"/>
-                            <entry key="kuali.krms.agenda.type.final.exam.common" value-ref="KSFE-RuleTable-Common"/>
+                            <entry key="kuali.krms.agenda.type.final.exam.course.offering.driven" value-ref="KSFE-RuleTable-Common"/>
                         </map>
                     </property>
                 </bean>
@@ -317,7 +317,7 @@ limitations under the License.
 
         <property name="items">
             <list>
-                <bean parent="Uif-DataField" p:label="If course meets:" p:propertyName="description"/>
+                <bean parent="Uif-MessageField" p:label="If course meets:" p:messageText="@{#line.description}"/>
                 <bean parent="Uif-DataField" p:label="Exam will be on:" p:propertyName="dayToDisplay"/>
                 <bean parent="Uif-DataField" p:label="Time:" p:propertyName="timePeriodToDisplay"/>
             </list>
@@ -663,8 +663,6 @@ limitations under the License.
                             <ref bean="KSFE_days"/>
                             <ref bean="KSFE_starttime"/>
                             <ref bean="KSFE_starttime_ampm"/>
-                            <ref bean="KSFE_endtime"/>
-                            <ref bean="KSFE_endtime_ampm"/>
                         </list>
                     </property>
                 </bean>

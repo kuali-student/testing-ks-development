@@ -16,7 +16,6 @@
  */
 package org.kuali.student.enrollment.class2.courseoffering.service.impl;
 
-import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.criteria.PredicateFactory;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
 import org.kuali.rice.krad.uif.service.impl.ViewHelperServiceImpl;
@@ -33,11 +32,12 @@ import org.kuali.student.enrollment.class2.courseofferingset.service.impl.Delete
 import org.kuali.student.enrollment.courseofferingset.dto.SocInfo;
 import org.kuali.student.enrollment.courseofferingset.dto.SocRolloverResultInfo;
 import org.kuali.student.r2.common.dto.ContextInfo;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.common.util.constants.CourseOfferingSetServiceConstants;
 import org.kuali.student.r2.common.util.date.DateFormatters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,7 +49,7 @@ import java.util.List;
  */
 public class CourseOfferingViewHelperServiceImpl extends ViewHelperServiceImpl implements CourseOfferingViewHelperService {
 
-    private static final Logger LOG = Logger.getLogger(CourseOfferingViewHelperServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CourseOfferingViewHelperServiceImpl.class);
 
     @Override
     public List<TermInfo> findTermByTermCode(String termCode) throws Exception {

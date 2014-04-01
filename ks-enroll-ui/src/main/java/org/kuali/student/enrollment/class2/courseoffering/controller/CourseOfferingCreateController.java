@@ -35,9 +35,11 @@ import org.kuali.student.enrollment.common.util.EnrollConstants;
 import org.kuali.student.enrollment.courseoffering.dto.CourseOfferingInfo;
 import org.kuali.student.enrollment.courseofferingset.dto.SocInfo;
 import org.kuali.student.enrollment.courseofferingset.dto.SocRolloverResultItemInfo;
+import org.kuali.student.r2.common.dto.AttributeInfo;
 import org.kuali.student.r2.common.dto.ContextInfo;
 import org.kuali.student.r2.common.exceptions.DoesNotExistException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
+import org.kuali.student.r2.common.messenger.util.MessengerConstants;
 import org.kuali.student.r2.common.util.constants.CourseOfferingSetServiceConstants;
 import org.kuali.student.r2.common.util.constants.LuServiceConstants;
 import org.kuali.student.r2.core.acal.dto.TermInfo;
@@ -403,6 +405,10 @@ public class CourseOfferingCreateController extends CourseOfferingBaseController
         List<String> optionKeys = CourseOfferingControllerPopulateUIForm.getOptionKeys(createWrapper, existingCO);
         optionKeys.add(CourseOfferingSetServiceConstants.CONTINUE_WITHOUT_EXAM_OFFERINGS_OPTION_KEY);
         ContextInfo contextInfo = ContextUtils.createDefaultContextInfo();
+        AttributeInfo attr = new AttributeInfo();
+        attr.setKey(MessengerConstants.USER_MESSAGE_PROCESS_ID);
+        attr.setValue(GlobalVariables.getUserSession().getKualiSessionId());
+        contextInfo.getAttributes().add(attr);
         SocRolloverResultItemInfo item = CourseOfferingManagementUtil.getCourseOfferingService().rolloverCourseOffering(existingCO.getId(),
                 createWrapper.getTerm().getId(),
                 optionKeys,
@@ -428,7 +434,6 @@ public class CourseOfferingCreateController extends CourseOfferingBaseController
             urlParameters.put(EnrollConstants.GROWL_MESSAGE, CourseOfferingConstants.COURSE_OFFERING_CREATE_SUCCESS_WITH_EXAMOFFERING_GENERATED);
         }
         urlParameters.put(EnrollConstants.GROWL_MESSAGE_PARAMS, courseOfferingInfo.getCourseOfferingCode());
-
 
         urlParameters.put(KRADConstants.DISPATCH_REQUEST_PARAMETER, "show");
         urlParameters.put("termCode",createWrapper.getTargetTermCode());

@@ -19,6 +19,7 @@ import org.kuali.rice.krad.web.form.UifFormBase;
 import org.kuali.rice.krms.api.KrmsConstants;
 import org.kuali.rice.krms.api.repository.RuleManagementService;
 import org.kuali.student.common.uif.form.KSUifForm;
+import org.kuali.student.enrollment.class2.acal.dto.ExamPeriodWrapper;
 import org.kuali.student.enrollment.class2.courseoffering.controller.ActivityOfferingControllerTransactionHelper;
 import org.kuali.student.enrollment.class2.courseoffering.dto.ActivityOfferingClusterWrapper;
 import org.kuali.student.enrollment.class2.courseoffering.dto.ActivityOfferingWrapper;
@@ -28,16 +29,17 @@ import org.kuali.student.enrollment.class2.courseoffering.dto.CourseOfferingWrap
 import org.kuali.student.enrollment.class2.courseoffering.dto.RegistrationGroupWrapper;
 import org.kuali.student.enrollment.class2.courseoffering.form.CourseOfferingManagementForm;
 import org.kuali.student.enrollment.class2.courseoffering.form.CreateSocForm;
+import org.kuali.student.enrollment.class2.courseoffering.form.DevTestWidgetForm;
 import org.kuali.student.enrollment.class2.courseoffering.form.DiagnoseRolloverForm;
-import org.kuali.student.enrollment.class2.courseoffering.form.TestServiceCallForm;
 import org.kuali.student.enrollment.class2.courseoffering.helper.impl.ActivityOfferingScheduleHelperImpl;
+import org.kuali.student.enrollment.class2.courseoffering.helper.impl.ExamOfferingScheduleHelperImpl;
 import org.kuali.student.enrollment.class2.courseoffering.refdata.CluFixer;
 import org.kuali.student.enrollment.class2.courseoffering.service.CourseOfferingManagementViewHelperService;
 import org.kuali.student.enrollment.class2.courseoffering.service.CourseOfferingViewHelperService;
 import org.kuali.student.enrollment.class2.courseoffering.service.CreateSocViewHelperService;
+import org.kuali.student.enrollment.class2.courseoffering.service.DevTestWidgetViewHelperService;
 import org.kuali.student.enrollment.class2.courseoffering.service.DiagnoseRolloverViewHelperService;
 import org.kuali.student.enrollment.class2.courseoffering.service.SeatPoolUtilityService;
-import org.kuali.student.enrollment.class2.courseoffering.service.TestServiceCallViewHelperService;
 import org.kuali.student.enrollment.class2.courseoffering.service.facade.CSRServiceFacade;
 import org.kuali.student.enrollment.class2.courseoffering.service.facade.CourseOfferingServiceFacade;
 import org.kuali.student.enrollment.class2.courseoffering.service.impl.CourseInfoByTermLookupableImpl;
@@ -54,6 +56,7 @@ import org.kuali.student.enrollment.courseoffering.dto.FormatOfferingInfo;
 import org.kuali.student.enrollment.courseoffering.service.CourseOfferingService;
 import org.kuali.student.enrollment.courseofferingset.service.CourseOfferingSetService;
 import org.kuali.student.enrollment.courseregistration.service.CourseRegistrationService;
+import org.kuali.student.enrollment.courseseatcount.service.CourseSeatCountService;
 import org.kuali.student.enrollment.coursewaitlist.service.CourseWaitListService;
 import org.kuali.student.enrollment.examoffering.service.ExamOfferingService;
 import org.kuali.student.enrollment.lpr.service.LprService;
@@ -63,10 +66,11 @@ import org.kuali.student.r2.common.dto.AttributeInfo;
 import org.kuali.student.r2.common.dto.ContextInfo;
 import org.kuali.student.r2.common.dto.DtoConstants;
 import org.kuali.student.r2.common.exceptions.DoesNotExistException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.common.util.constants.CourseOfferingServiceConstants;
 import org.kuali.student.r2.common.util.constants.CourseOfferingSetServiceConstants;
 import org.kuali.student.r2.common.util.constants.CourseRegistrationServiceConstants;
+import org.kuali.student.r2.common.util.constants.CourseSeatCountServiceConstants;
 import org.kuali.student.r2.common.util.constants.ExamOfferingServiceConstants;
 import org.kuali.student.r2.common.util.constants.LprServiceConstants;
 import org.kuali.student.r2.common.util.constants.LuiServiceConstants;
@@ -105,6 +109,7 @@ import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
@@ -125,7 +130,7 @@ public class CourseOfferingManagementUtil {
     private static CourseOfferingViewHelperService coViewHelperService;
     private static CreateSocViewHelperService socViewHelperService;
     private static DiagnoseRolloverViewHelperService drViewHelperService;
-    private static  TestServiceCallViewHelperService testViewHelperService;
+    private static DevTestWidgetViewHelperService devTestWidgetViewHelperService;
     private static OrganizationService organizationService;
     private static StateService stateService;
     private static LRCService lrcService;
@@ -160,6 +165,7 @@ public class CourseOfferingManagementUtil {
     private static ActivityOfferingControllerTransactionHelper activityOfferingControllerTransactionHelper;
     private static EnumerationManagementService enumerationManagementService;
     private static PersonService personService;
+    private static CourseSeatCountService courseSeatCountService;
 
     private static HashMap<String, String> scheduleStateHm = null;
 
@@ -260,6 +266,10 @@ public class CourseOfferingManagementUtil {
         return new ActivityOfferingScheduleHelperImpl();
     }
 
+    public static ExamOfferingScheduleHelperImpl getExamOfferingScheduleHelper(){
+        return new ExamOfferingScheduleHelperImpl();
+    }
+
     public static SeatPoolUtilityService getSeatPoolUtilityService(){
         return new SeatPoolUtilityServiceImpl();
     }
@@ -292,11 +302,11 @@ public class CourseOfferingManagementUtil {
         return drViewHelperService;
     }
 
-    public static TestServiceCallViewHelperService getTestViewHelperService(TestServiceCallForm serviceCallForm) {
-        if (testViewHelperService == null) {
-            testViewHelperService = (TestServiceCallViewHelperService) serviceCallForm.getViewHelperService();
+    public static DevTestWidgetViewHelperService getDevTestWidgetViewHelperService(DevTestWidgetForm serviceCallForm) {
+        if (devTestWidgetViewHelperService == null) {
+            devTestWidgetViewHelperService = (DevTestWidgetViewHelperService) serviceCallForm.getViewHelperService();
         }
-        return testViewHelperService;
+        return devTestWidgetViewHelperService;
     }
 
     public static OrganizationService getOrganizationService() {
@@ -447,6 +457,15 @@ public class CourseOfferingManagementUtil {
         return defaultOptionKeysService;
     }
 
+    public static CourseSeatCountService getCourseSeatCountService() {
+        if (courseSeatCountService == null) {
+            courseSeatCountService =
+                    (CourseSeatCountService) GlobalResourceLoader.getService(new QName(CourseSeatCountServiceConstants.NAMESPACE,
+                            CourseSeatCountServiceConstants.SERVICE_NAME_LOCAL_PART));
+        }
+        return courseSeatCountService;
+    }
+
     public static boolean checkEditViewAuthz(CourseOfferingManagementForm theForm) {
         Person user = GlobalVariables.getUserSession().getPerson();
         return theForm.getView().getAuthorizer().canEditView(theForm.getView(), theForm, user);
@@ -455,6 +474,7 @@ public class CourseOfferingManagementUtil {
     public static void prepareManageAOsModelAndView(CourseOfferingManagementForm form, CourseOfferingListSectionWrapper selectedCO) throws Exception {
 
         CourseOfferingWrapper currentCOWrapper = new CourseOfferingWrapper(selectedCO.isCrossListed(),selectedCO.getCourseOfferingCode(),selectedCO.getCourseOfferingDesc(),selectedCO.getAlternateCOCodes(),selectedCO.getCourseOfferingId());
+        currentCOWrapper.setOwnerAliases(selectedCO.getOwnerAliases());
         form.setSubjectCode(selectedCO.getSubjectArea());
         prepare_AOs_RGs_AOCs_Lists(form, currentCOWrapper);
     }
@@ -948,4 +968,19 @@ public class CourseOfferingManagementUtil {
         }
         return scheduleStateHm;
     }
+
+    public static String examPeriodDaysDisplay(List<Integer> weekdaysList, ExamPeriodWrapper examPeriodWrapper) {
+        StringBuilder result = new StringBuilder();
+        List<Date> dates = new ArrayList<Date>();
+        dates.addAll(examPeriodWrapper.getExamPeriodDates());
+        for(Integer weekday : weekdaysList) {
+            result.append("Day "+weekday);
+            result.append(" - ");
+            result.append(DateFormatters.EXAM_OFFERING_VIEW_EXAM_OFFERING_DATE_FORMATTER.format(dates.get(weekday - 1)));
+        }
+
+        return result.toString();
+    }
+
+
 }

@@ -15,7 +15,6 @@
  */
 package org.kuali.student.enrollment.class2.courseoffering.service.impl;
 
-import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,12 +30,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -45,7 +44,6 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:co-test-with-class2-mock-context.xml"})
 public class TestRiceDataDictionaryValidatorImplAgainstLpr {
-    private static final Logger log = Logger.getLogger(TestRiceDataDictionaryValidatorImplAgainstLpr.class);
     public ContextInfo callContext = null;
 
     @Resource
@@ -64,15 +62,9 @@ public class TestRiceDataDictionaryValidatorImplAgainstLpr {
     public void tearDown() throws Exception {
     }
 
-    private Date parseDate(String str) {
+    private Date parseDate(String str) throws Exception {
         DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
-        Date date = null;
-        try {
-            date = df.parse(str);
-        } catch (ParseException ex) {
-            throw new IllegalArgumentException(str, ex);
-        }
-        return date;
+        return df.parse(str);
     }
 
     /**
@@ -92,7 +84,7 @@ public class TestRiceDataDictionaryValidatorImplAgainstLpr {
         lpri.setEffectiveDate(parseDate("2010-01-01"));
 
         List<ValidationResultInfo> result = validator.validate(validationType, lpri, callContext);
-        assertEquals(0, result.size());
+        assertTrue(result.isEmpty());
 
         lpri.setTypeKey(null);
         result = validator.validate(validationType, lpri, callContext);
@@ -102,6 +94,6 @@ public class TestRiceDataDictionaryValidatorImplAgainstLpr {
 
         validationType = DataDictionaryValidator.ValidationType.SKIP_REQUREDNESS_VALIDATIONS;
         result = validator.validate(validationType, lpri, callContext);
-        assertEquals(0, result.size());
+        assertTrue(result.isEmpty());
     }
 }

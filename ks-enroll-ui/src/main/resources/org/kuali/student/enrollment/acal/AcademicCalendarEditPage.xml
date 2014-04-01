@@ -32,8 +32,7 @@ limitations under the License.
           p:readOnly="@{#view.readOnly}"
           p:viewAuthz="true" p:stickyFooter="@{!#view.readOnly}">
         <property name="id" value="academicCalendarEditPage"/>
-        <property name="headerText"
-                  value="@{!newCalendar ? !#view.readOnly ? 'Edit Academic Calendar' : 'Academic Calendar' : 'Academic Calendar'}"/>
+        <property name="headerText" value="&#160;"/>
         <property name="pageSourceFile" value="AcademicCalendarEditPage.xml"/>
         <property name="header">
             <bean parent="Uif-HeaderTwo"/>
@@ -520,7 +519,7 @@ limitations under the License.
                                               p:render="@{!#view.readOnly}"
                                               p:additionalCssClasses="right-aligned">
                                             <property name="actionImage">
-                                                <bean parent="Uif-Image" p:source="" p:style="ks-fontello-icon-cancel"/>
+                                                <bean parent="Uif-Image" p:source="" p:cssClasses="ks-fontello-icon-cancel"/>
                                             </property>
                                         </bean>
                                     </list>
@@ -558,7 +557,7 @@ limitations under the License.
                 <bean parent="Uif-AddLineAction-SecondaryButton" p:actionLabel="Add Holiday Calendar"
                       p:onClickScript="findDirtyFields('AcalEdit-DirtyFields');"
                       p:disabled="@{(#lp.id == null) or (#lp.id == '')}" p:refreshWhenChangedPropertyNames="@{#lp.id}">
-                    <property name="additionalCssClasses" value="ks-fontello-icon-plus"/>
+                    <property name="additionalCssClasses" value="ks-fontello-icon-plus-1"/>
                 </bean>
             </list>
         </property>

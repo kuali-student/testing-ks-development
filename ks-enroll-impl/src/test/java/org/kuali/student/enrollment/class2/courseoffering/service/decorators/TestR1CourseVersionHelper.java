@@ -14,13 +14,6 @@ import org.kuali.student.enrollment.class2.courseoffering.service.impl.AcademicC
 import org.kuali.student.enrollment.class2.courseoffering.service.impl.CourseR1TestDataLoader;
 import org.kuali.student.enrollment.class2.courseoffering.service.impl.CourseServiceR1MockImpl;
 import org.kuali.student.r2.common.dto.ContextInfo;
-import org.kuali.student.r2.common.exceptions.DataValidationErrorException;
-import org.kuali.student.r2.common.exceptions.DoesNotExistException;
-import org.kuali.student.r2.common.exceptions.InvalidParameterException;
-import org.kuali.student.r2.common.exceptions.MissingParameterException;
-import org.kuali.student.r2.common.exceptions.OperationFailedException;
-import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
-import org.kuali.student.r2.common.exceptions.ReadOnlyException;
 import org.kuali.student.r2.common.util.constants.LuServiceConstants;
 import org.kuali.student.r2.core.acal.service.AcademicCalendarService;
 import org.kuali.student.r2.core.constants.AtpServiceConstants;
@@ -30,6 +23,7 @@ import org.kuali.student.r2.lum.course.service.CourseService;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -56,7 +50,7 @@ public class TestR1CourseVersionHelper {
     public void tearDown() {
     }
 
-    private void loadData(CourseService courseService, AcademicCalendarService acalService) throws InvalidParameterException, DataValidationErrorException, MissingParameterException, DoesNotExistException, ReadOnlyException, PermissionDeniedException, OperationFailedException {
+    private void loadData(CourseService courseService, AcademicCalendarService acalService) throws Exception {
 
         MockAcalTestDataLoader acalLoader = new MockAcalTestDataLoader(acalService);
         acalLoader.loadTerm("2011SP", "Spring 2011", "2011-03-01 00:00:00.0", "2011-05-31 00:00:00.0", AtpServiceConstants.ATP_SPRING_TYPE_KEY, AtpServiceConstants.ATP_OFFICIAL_STATE_KEY, "Spring Term 2011"
@@ -99,25 +93,25 @@ public class TestR1CourseVersionHelper {
     @Test
     public void testGetCoursesForTerm() throws Exception {
         System.out.println("getCoursesForTerm");
-        String courseId = null;
-        String targetTermId = null;
+        String courseId;
+        String targetTermId;
         ContextInfo context = new ContextInfo ();
         CourseService courseService = new CourseServiceR1MockImpl();
         AcademicCalendarService acalService = new AcademicCalendarServiceMockImpl();
         loadData (courseService, acalService);
         R1CourseServiceHelper instance = new R1CourseServiceHelper(courseService, acalService);
-        List<CourseInfo> courses = null;
+        List<CourseInfo> courses;
         
         courseId = "COURSE1";
         targetTermId = "2011SP";
         courses = instance.getCoursesForTerm(courseId, targetTermId, context);
-        assertEquals (0, courses.size());
+        assertTrue (courses.isEmpty());
         
         
         courseId = "COURSE1";
         targetTermId = "2012SP";
         courses = instance.getCoursesForTerm(courseId, targetTermId, context);
-        assertEquals (0, courses.size());
+        assertTrue (courses.isEmpty());
         
         courseId = "COURSE1";
         targetTermId = "2012FA";

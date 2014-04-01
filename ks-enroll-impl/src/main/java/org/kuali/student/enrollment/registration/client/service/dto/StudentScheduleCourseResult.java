@@ -5,7 +5,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -15,7 +17,12 @@ public class StudentScheduleCourseResult {
     private String courseCode;
     private String description;
     private String credits;
+    private String gradingOptionId;
     private String longName;
+    private String regGroupCode;
+    private String masterLprId;
+    private List<String> creditOptions;
+    private Map<String, String> gradingOptions;
     private List<StudentScheduleActivityOfferingResult> activityOfferings;
 
     public List<StudentScheduleActivityOfferingResult> getActivityOfferings() {
@@ -45,6 +52,10 @@ public class StudentScheduleCourseResult {
         this.credits = credits;
     }
 
+    public String getGradingOptionId() { return gradingOptionId; }
+
+    public void setGradingOptionId(String gradingOptionId) { this.gradingOptionId = gradingOptionId; }
+
     public String getDescription() {
         return description;
     }
@@ -60,4 +71,30 @@ public class StudentScheduleCourseResult {
     public void setLongName(String longName) {
         this.longName = longName;
     }
+
+    public String getRegGroupCode() { return regGroupCode; }
+
+    public void setRegGroupCode(String regGroupCode) { this.regGroupCode = regGroupCode; }
+
+    public String getMasterLprId() { return masterLprId; }
+
+    public void setMasterLprId(String masterLprId) { this.masterLprId = masterLprId; }
+
+    public List<String> getCreditOptions() {
+        if(creditOptions == null){
+            creditOptions = new ArrayList<String>();
+        }
+        return creditOptions;
+    }
+
+    public void setCreditOptions(List<String> creditOptions) { this.creditOptions = creditOptions; }
+
+    public Map<String, String> getGradingOptions() {
+        if(gradingOptions == null){
+            gradingOptions = new HashMap<String, String>();
+        }
+        return gradingOptions;
+    }
+
+    public void setGradingOptions(Map<String, String> gradingOptions) { this.gradingOptions = gradingOptions; }
 }

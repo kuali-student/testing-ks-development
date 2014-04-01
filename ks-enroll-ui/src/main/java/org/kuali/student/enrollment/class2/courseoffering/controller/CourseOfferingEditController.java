@@ -24,6 +24,7 @@ import org.kuali.rice.krad.web.form.MaintenanceDocumentForm;
 import org.kuali.student.common.uif.form.KSUifMaintenanceDocumentForm;
 import org.kuali.student.enrollment.class2.courseoffering.dto.CourseOfferingEditWrapper;
 import org.kuali.student.enrollment.class2.courseoffering.util.CourseOfferingConstants;
+import org.kuali.student.enrollment.class2.courseoffering.util.ExamOfferingConstants;
 import org.kuali.student.enrollment.common.util.EnrollConstants;
 import org.kuali.student.r2.core.class1.search.CourseOfferingManagementSearchImpl;
 import org.springframework.stereotype.Controller;

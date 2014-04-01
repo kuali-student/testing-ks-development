@@ -1,6 +1,8 @@
 package org.kuali.student.enrollment.class2.courseoffering.service.transformer;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.kuali.rice.core.api.criteria.PredicateFactory;
+import org.kuali.rice.core.api.criteria.QueryByCriteria;
 import org.kuali.rice.krms.impl.util.KrmsRuleManagementCopyMethods;
 import org.kuali.student.enrollment.courseoffering.dto.ActivityOfferingInfo;
 import org.kuali.student.enrollment.courseoffering.dto.OfferingInstructorInfo;
@@ -17,6 +19,7 @@ import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
 import org.kuali.student.r2.common.infc.Attribute;
 import org.kuali.student.r2.common.util.constants.CourseOfferingServiceConstants;
+import org.kuali.student.r2.common.util.constants.LprServiceConstants;
 import org.kuali.student.r2.common.util.constants.LuiServiceConstants;
 import org.kuali.student.r2.core.class1.search.ActivityOfferingSearchServiceImpl;
 import org.kuali.student.r2.core.class1.search.CoreSearchServiceImpl;
@@ -289,7 +292,11 @@ public class ActivityOfferingTransformer {
         }
 
         // build list of OfferingInstructors
-        List<LprInfo> lprs = lprService.getLprsByLui(ao.getId(), context);
+        QueryByCriteria.Builder qbcBuilder = QueryByCriteria.Builder.create();
+        qbcBuilder.setPredicates(PredicateFactory.in("luiId", ao.getId()),
+                PredicateFactory.in("personRelationTypeId", LprServiceConstants.COURSE_INSTRUCTOR_TYPE_KEYS));
+        QueryByCriteria criteria = qbcBuilder.build();
+        List<LprInfo> lprs = lprService.searchForLprs(criteria, context);
 
         ao.setInstructors(OfferingInstructorTransformer.lprs2Instructors(lprs));
 

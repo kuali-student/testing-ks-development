@@ -25,8 +25,6 @@ import org.kuali.student.enrollment.class1.lui.service.impl.LuiServiceDataLoader
 import org.kuali.student.enrollment.examoffering.dto.ExamOfferingInfo;
 import org.kuali.student.enrollment.examoffering.dto.ExamOfferingRelationInfo;
 import org.kuali.student.enrollment.examoffering.service.ExamOfferingService;
-import org.kuali.student.enrollment.lui.service.LuiService;
-import org.kuali.student.r2.common.dto.AttributeInfo;
 import org.kuali.student.r2.common.dto.ContextInfo;
 import org.kuali.student.r2.common.dto.StatusInfo;
 import org.kuali.student.r2.common.exceptions.AlreadyExistsException;
@@ -45,10 +43,7 @@ import org.kuali.student.r2.core.atp.service.impl.AtpTestDataLoader;
 import org.kuali.student.r2.core.class1.type.dto.TypeInfo;
 import org.kuali.student.r2.core.class1.type.dto.TypeTypeRelationInfo;
 import org.kuali.student.r2.core.class1.type.service.TypeService;
-import org.kuali.student.r2.core.constants.AtpServiceConstants;
 import org.kuali.student.r2.core.constants.TypeServiceConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,16 +55,14 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:examoffering-test-context.xml"})
 @Transactional
 public class TestExamOfferingServiceImpl {
-
-    private static final Logger log = LoggerFactory.getLogger(TestExamOfferingServiceImpl.class);
 
     @Resource
     private ExamOfferingService examOfferingService;
@@ -87,15 +80,11 @@ public class TestExamOfferingServiceImpl {
     public static String principalId = "123";
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         callContext = new ContextInfo();
         callContext.setPrincipalId(principalId);
-        try {
-            dataLoader.loadData();
-            atpTestDataLoader.loadExamPeriod();
-        } catch (Exception ex) {
-            throw new RuntimeException (ex);
-        }
+        dataLoader.loadData();
+        atpTestDataLoader.loadExamPeriod();
     }
 
     @After
@@ -124,35 +113,31 @@ public class TestExamOfferingServiceImpl {
             DependentObjectsExistException
     {
         ExamOfferingRelationInfo eoRelInfo = createExamOfferingRelationInfo();
-        try {
-            //Create
-            ExamOfferingRelationInfo created = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
-                    LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo, callContext);
+        //Create
+        ExamOfferingRelationInfo created = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
+                LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo, callContext);
 
-            String examOfferingRelationId = created.getId();
-            assertNotNull(created);
-            assertNotNull(examOfferingRelationId);
-            assertEquals(3, created.getActivityOfferingIds().size());
+        String examOfferingRelationId = created.getId();
+        assertNotNull(created);
+        assertNotNull(examOfferingRelationId);
+        assertEquals(3, created.getActivityOfferingIds().size());
 
-            //Get
-            ExamOfferingRelationInfo retrieved = examOfferingService.getExamOfferingRelation(examOfferingRelationId, callContext);
-            assertNotNull(retrieved);
-            assertEquals(examOfferingRelationId, retrieved.getId());
-            assertEquals(3, created.getActivityOfferingIds().size());
+        //Get
+        ExamOfferingRelationInfo retrieved = examOfferingService.getExamOfferingRelation(examOfferingRelationId, callContext);
+        assertNotNull(retrieved);
+        assertEquals(examOfferingRelationId, retrieved.getId());
+        assertEquals(3, created.getActivityOfferingIds().size());
 
-            //Update
-            retrieved.setActivityOfferingIds(Arrays.asList("AO-01","AO-02","AO-03","AO-04"));
-            ExamOfferingRelationInfo retrievedUpdated = examOfferingService.updateExamOfferingRelation(examOfferingRelationId, retrieved, callContext);
-            assertNotNull(retrievedUpdated);
-            assertEquals(examOfferingRelationId, retrievedUpdated.getId());
-            assertEquals(4, retrievedUpdated.getActivityOfferingIds().size());
+        //Update
+        retrieved.setActivityOfferingIds(Arrays.asList("AO-01","AO-02","AO-03","AO-04"));
+        ExamOfferingRelationInfo retrievedUpdated = examOfferingService.updateExamOfferingRelation(examOfferingRelationId, retrieved, callContext);
+        assertNotNull(retrievedUpdated);
+        assertEquals(examOfferingRelationId, retrievedUpdated.getId());
+        assertEquals(4, retrievedUpdated.getActivityOfferingIds().size());
 
-            //Delete
-            StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationId, callContext);
-            assertTrue(ret.getIsSuccess());
-        } catch (Exception ex) {
-            fail("exception from service call :" + ex.getMessage());
-        }
+        //Delete
+        StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationId, callContext);
+        assertTrue(ret.getIsSuccess());
     }
 
     @Test
@@ -178,147 +163,119 @@ public class TestExamOfferingServiceImpl {
 
     @Test 
     public void testGetExamOfferingRelationIdsByType ()
-            throws InvalidParameterException,
-            MissingParameterException,
-            OperationFailedException,
-            PermissionDeniedException {
+            throws Exception {
         
         ExamOfferingRelationInfo eoRelInfo1 = createExamOfferingRelationInfo();
         ExamOfferingRelationInfo eoRelInfo2 = createExamOfferingRelationInfo();
         eoRelInfo2.setExamOfferingId("Lui-10");
         List<String> examOfferingRelationIds;
-        try {
-            //Create
-            ExamOfferingRelationInfo created1 = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
-                    LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo1, callContext);
-            ExamOfferingRelationInfo created2 = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-10",
-                                LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo2, callContext);
-            
-            examOfferingRelationIds = examOfferingService.getExamOfferingRelationIdsByType(LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, callContext);
+        //Create
+        ExamOfferingRelationInfo created1 = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
+                LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo1, callContext);
+        examOfferingService.createExamOfferingRelation("Lui-6", "Lui-10",
+                            LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo2, callContext);
 
-            assertNotNull(examOfferingRelationIds);
-            assertEquals(2, examOfferingRelationIds.size());
-            assertTrue(examOfferingRelationIds.contains(created1.getId()));
+        examOfferingRelationIds = examOfferingService.getExamOfferingRelationIdsByType(LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, callContext);
 
-            //Delete
-            for (String examOfferingRelationId :examOfferingRelationIds) {
-                StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationId, callContext);
-                assertTrue(ret.getIsSuccess());
-            }
-        } catch (Exception ex) {
-            fail("exception from service call :" + ex.getMessage());
+        assertNotNull(examOfferingRelationIds);
+        assertEquals(2, examOfferingRelationIds.size());
+        assertTrue(examOfferingRelationIds.contains(created1.getId()));
+
+        //Delete
+        for (String examOfferingRelationId :examOfferingRelationIds) {
+            StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationId, callContext);
+            assertTrue(ret.getIsSuccess());
         }
     }
 
     @Test
     public void testGetExamOfferingRelationsByFormatOffering ()
-            throws InvalidParameterException,
-            MissingParameterException,
-            OperationFailedException,
-            PermissionDeniedException {
+            throws Exception {
 
         ExamOfferingRelationInfo eoRelInfo1 = createExamOfferingRelationInfo();
         ExamOfferingRelationInfo eoRelInfo2 = createExamOfferingRelationInfo();
         eoRelInfo2.setExamOfferingId("Lui-10");
-        try {
-            //Create
-            ExamOfferingRelationInfo created1 = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
-                    LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo1, callContext);
-            ExamOfferingRelationInfo created2 = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-10",
-                                LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo2, callContext);
+        //Create
+        examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
+                LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo1, callContext);
+        examOfferingService.createExamOfferingRelation("Lui-6", "Lui-10",
+                            LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo2, callContext);
 
-            List<ExamOfferingRelationInfo> examOfferingRelationInfos = examOfferingService.getExamOfferingRelationsByFormatOffering("Lui-6", callContext);
+        List<ExamOfferingRelationInfo> examOfferingRelationInfos = examOfferingService.getExamOfferingRelationsByFormatOffering("Lui-6", callContext);
 
-            assertNotNull(examOfferingRelationInfos);
-            assertEquals(2, examOfferingRelationInfos.size());
-            assertEquals("Lui-6", examOfferingRelationInfos.get(0).getFormatOfferingId());
-            assertEquals("Lui-6", examOfferingRelationInfos.get(1).getFormatOfferingId());
+        assertNotNull(examOfferingRelationInfos);
+        assertEquals(2, examOfferingRelationInfos.size());
+        assertEquals("Lui-6", examOfferingRelationInfos.get(0).getFormatOfferingId());
+        assertEquals("Lui-6", examOfferingRelationInfos.get(1).getFormatOfferingId());
 
-            //Delete
-            for (ExamOfferingRelationInfo examOfferingRelationInfo :examOfferingRelationInfos) {
-                StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationInfo.getId(), callContext);
-                assertTrue(ret.getIsSuccess());
-            }
-
-        } catch (Exception ex) {
-            fail("exception from service call :" + ex.getMessage());
+        //Delete
+        for (ExamOfferingRelationInfo examOfferingRelationInfo :examOfferingRelationInfos) {
+            StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationInfo.getId(), callContext);
+            assertTrue(ret.getIsSuccess());
         }
+
     }
 
     @Test
     public void testGetExamOfferingRelationsByIds ()
-            throws InvalidParameterException,
-            MissingParameterException,
-            OperationFailedException,
-            PermissionDeniedException {
+            throws Exception {
 
         ExamOfferingRelationInfo eoRelInfo1 = createExamOfferingRelationInfo();
         ExamOfferingRelationInfo eoRelInfo2 = createExamOfferingRelationInfo();
         eoRelInfo2.setExamOfferingId("Lui-10");
-        try {
-            //Create
-            ExamOfferingRelationInfo created1 = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
-                    LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo1, callContext);
-            ExamOfferingRelationInfo created2 = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-10",
-                    LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo2, callContext);
+        //Create
+        ExamOfferingRelationInfo created1 = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
+                LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo1, callContext);
+        ExamOfferingRelationInfo created2 = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-10",
+                LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo2, callContext);
 
-            List<String> examOfferingRelationIds = new ArrayList<String>();
-            examOfferingRelationIds.add(created1.getId());
-            examOfferingRelationIds.add(created2.getId());
+        List<String> examOfferingRelationIds = new ArrayList<String>();
+        examOfferingRelationIds.add(created1.getId());
+        examOfferingRelationIds.add(created2.getId());
 
-            List<ExamOfferingRelationInfo> examOfferingRelationInfos = examOfferingService.getExamOfferingRelationsByIds(examOfferingRelationIds, callContext);
+        List<ExamOfferingRelationInfo> examOfferingRelationInfos = examOfferingService.getExamOfferingRelationsByIds(examOfferingRelationIds, callContext);
 
-            assertNotNull(examOfferingRelationInfos);
-            assertEquals(2, examOfferingRelationInfos.size());
-            assertEquals("Lui-6", examOfferingRelationInfos.get(0).getFormatOfferingId());
-            assertEquals("Lui-6", examOfferingRelationInfos.get(1).getFormatOfferingId());
+        assertNotNull(examOfferingRelationInfos);
+        assertEquals(2, examOfferingRelationInfos.size());
+        assertEquals("Lui-6", examOfferingRelationInfos.get(0).getFormatOfferingId());
+        assertEquals("Lui-6", examOfferingRelationInfos.get(1).getFormatOfferingId());
 
-            //Delete
-            for (ExamOfferingRelationInfo examOfferingRelationInfo :examOfferingRelationInfos) {
-                StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationInfo.getId(), callContext);
-                assertTrue(ret.getIsSuccess());
-            }
-
-        } catch (Exception ex) {
-            fail("exception from service call :" + ex.getMessage());
+        //Delete
+        for (ExamOfferingRelationInfo examOfferingRelationInfo :examOfferingRelationInfos) {
+            StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationInfo.getId(), callContext);
+            assertTrue(ret.getIsSuccess());
         }
+
     }
 
 
     @Test
     public void testGetExamOfferingRelationsByExamOffering ()
-            throws InvalidParameterException,
-            MissingParameterException,
-            OperationFailedException,
-            PermissionDeniedException {
+            throws Exception {
 
-        try {
-            ExamOfferingRelationInfo eoRelInfo1 = createExamOfferingRelationInfo();
-            ExamOfferingRelationInfo eoRelInfo2 = createExamOfferingRelationInfo();
-            eoRelInfo2.setFormatOfferingId("Lui-7");
+        ExamOfferingRelationInfo eoRelInfo1 = createExamOfferingRelationInfo();
+        ExamOfferingRelationInfo eoRelInfo2 = createExamOfferingRelationInfo();
+        eoRelInfo2.setFormatOfferingId("Lui-7");
 
-            //Create
-            ExamOfferingRelationInfo created1 = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
-                    LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo1, callContext);
-            ExamOfferingRelationInfo created2 = examOfferingService.createExamOfferingRelation("Lui-7", "Lui-9",
-                                LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo2, callContext);
+        //Create
+        examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
+                LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo1, callContext);
+        examOfferingService.createExamOfferingRelation("Lui-7", "Lui-9",
+                            LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo2, callContext);
 
-            List<ExamOfferingRelationInfo> examOfferingRelationInfos = examOfferingService.getExamOfferingRelationsByExamOffering("Lui-9", callContext);
+        List<ExamOfferingRelationInfo> examOfferingRelationInfos = examOfferingService.getExamOfferingRelationsByExamOffering("Lui-9", callContext);
 
-            for (ExamOfferingRelationInfo examOfferingRelationInfo : examOfferingRelationInfos){
-                    assertNotNull(examOfferingRelationInfo);
-                    assertEquals("Lui-9", examOfferingRelationInfo.getExamOfferingId());
-                }
-
-            //Delete
-            for (ExamOfferingRelationInfo examOfferingRelationInfo :examOfferingRelationInfos) {
-                StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationInfo.getId(), callContext);
-                assertTrue(ret.getIsSuccess());
+        for (ExamOfferingRelationInfo examOfferingRelationInfo : examOfferingRelationInfos){
+                assertNotNull(examOfferingRelationInfo);
+                assertEquals("Lui-9", examOfferingRelationInfo.getExamOfferingId());
             }
 
-        } catch (Exception ex) {
-            fail("exception from service call :" + ex.getMessage());
+        //Delete
+        for (ExamOfferingRelationInfo examOfferingRelationInfo :examOfferingRelationInfos) {
+            StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationInfo.getId(), callContext);
+            assertTrue(ret.getIsSuccess());
         }
+
     }
 
     @Test
@@ -345,7 +302,7 @@ public class TestExamOfferingServiceImpl {
         type1.setDescr(new RichTextHelper().fromPlain("A canonical exam that will be used to instantiate final exam offerings."));
         type1.setEffectiveDate(new Date());
         type1.setRefObjectUri("http://student.kuali.org/wsdl/exam/ExamInfo");
-        TypeInfo type1Created = typeService.createType(type1.getKey(), type1, callContext);
+        typeService.createType(type1.getKey(), type1, callContext);
 
         TypeInfo type2 = new TypeInfo();
         type2.setKey("kuali.lui.type.exam.offering.final");
@@ -353,7 +310,7 @@ public class TestExamOfferingServiceImpl {
         type2.setDescr(new RichTextHelper().fromPlain("Final Exam Offering"));
         type2.setEffectiveDate(new Date());
         type2.setRefObjectUri("http://student.kuali.org/wsdl/lui/LuiInfo");
-        TypeInfo type2Created = typeService.createType(type2.getKey(), type2, callContext);
+        typeService.createType(type2.getKey(), type2, callContext);
 
         TypeTypeRelationInfo origRel = new TypeTypeRelationInfo();
         origRel.setEffectiveDate(new Date());
@@ -366,7 +323,7 @@ public class TestExamOfferingServiceImpl {
         attr.setKey("attribute.key");
         attr.setValue("attribute value");
         origRel.getAttributes().add(attr);*/
-        TypeTypeRelationInfo infoRel = typeService.createTypeTypeRelation(origRel.getTypeKey(),
+        typeService.createTypeTypeRelation(origRel.getTypeKey(),
                 origRel.getOwnerTypeKey(),
                 origRel.getRelatedTypeKey(),
                 origRel,
@@ -375,38 +332,31 @@ public class TestExamOfferingServiceImpl {
 
     @Test
     public void getExamOfferingRelationIdsByActivityOffering ()
-            throws InvalidParameterException,
-            MissingParameterException,
-            OperationFailedException,
-            PermissionDeniedException {
+            throws Exception {
 
         ExamOfferingRelationInfo eoRelInfo = createExamOfferingRelationInfo();
-        try {
-            //Create
-            eoRelInfo.setActivityOfferingIds(Arrays.asList("AO-01","AO-02","AO-03","Lui-2"));
-            ExamOfferingRelationInfo created = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
-                    LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo, callContext);
+        //Create
+        eoRelInfo.setActivityOfferingIds(Arrays.asList("AO-01","AO-02","AO-03","Lui-2"));
+        examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
+                LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo, callContext);
 
-            //Retrieve IDs
-            List<String> examOfferingRelationIds = examOfferingService.getExamOfferingRelationIdsByActivityOffering("Lui-2", callContext);
-            assertNotNull(examOfferingRelationIds);
-            assertTrue(examOfferingRelationIds.size() > 0);
-            //test for aoId match
-            for (String examOfferingRelationId : examOfferingRelationIds) {
-                ExamOfferingRelationInfo retrieved = examOfferingService.getExamOfferingRelation(examOfferingRelationId, callContext);
-                assertNotNull(retrieved);
-                assertTrue(retrieved.getActivityOfferingIds().contains("Lui-2"));
-            }
-
-            //Delete
-            for (String examOfferingRelationId : examOfferingRelationIds) {
-                StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationId, callContext);
-                assertTrue(ret.getIsSuccess());
-            }
-
-        } catch (Exception ex) {
-            fail("exception from service call :" + ex.getMessage());
+        //Retrieve IDs
+        List<String> examOfferingRelationIds = examOfferingService.getExamOfferingRelationIdsByActivityOffering("Lui-2", callContext);
+        assertNotNull(examOfferingRelationIds);
+        assertTrue("Relation IDs should be non-empty", !examOfferingRelationIds.isEmpty());
+        //test for aoId match
+        for (String examOfferingRelationId : examOfferingRelationIds) {
+            ExamOfferingRelationInfo retrieved = examOfferingService.getExamOfferingRelation(examOfferingRelationId, callContext);
+            assertNotNull(retrieved);
+            assertTrue(retrieved.getActivityOfferingIds().contains("Lui-2"));
         }
+
+        //Delete
+        for (String examOfferingRelationId : examOfferingRelationIds) {
+            StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationId, callContext);
+            assertTrue(ret.getIsSuccess());
+        }
+
     }
 
     @Test
@@ -415,63 +365,55 @@ public class TestExamOfferingServiceImpl {
         ExamOfferingRelationInfo eoRelInfo2 = createExamOfferingRelationInfo();
         eoRelInfo2.setExamOfferingId("Lui-10");
 
-        try {
-            //Create
-            ExamOfferingRelationInfo created1 = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
-                    LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo1, callContext);
-            ExamOfferingRelationInfo created2 = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-10",
-                                LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo2, callContext);
+        //Create
+        examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
+                LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo1, callContext);
+        examOfferingService.createExamOfferingRelation("Lui-6", "Lui-10",
+                            LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo2, callContext);
 
-            QueryByCriteria.Builder qbcBuilder = QueryByCriteria.Builder.create();
-            qbcBuilder.setPredicates(PredicateFactory.and(PredicateFactory.equal("lui.id", "Lui-6")));
-            QueryByCriteria criteria = qbcBuilder.build();
+        QueryByCriteria.Builder qbcBuilder = QueryByCriteria.Builder.create();
+        qbcBuilder.setPredicates(PredicateFactory.and(PredicateFactory.equal("lui.id", "Lui-6")));
+        QueryByCriteria criteria = qbcBuilder.build();
 
-            //Retrieve Ids
-            List<String> relIds = examOfferingService.searchForExamOfferingRelationIds(criteria, callContext);
+        //Retrieve Ids
+        List<String> relIds = examOfferingService.searchForExamOfferingRelationIds(criteria, callContext);
 
-            //Retrieve ExamOfferingRelationInfos
-            List<ExamOfferingRelationInfo> examOfferingRelationInfos = examOfferingService.getExamOfferingRelationsByFormatOffering("Lui-6", callContext);
+        //Retrieve ExamOfferingRelationInfos
+        List<ExamOfferingRelationInfo> examOfferingRelationInfos = examOfferingService.getExamOfferingRelationsByFormatOffering("Lui-6", callContext);
 
-            assertNotNull(relIds);
-            for (ExamOfferingRelationInfo examOfferingRelationInfo : examOfferingRelationInfos) {
-                assertTrue(relIds.contains(examOfferingRelationInfo.getId()));
-            }
+        assertNotNull(relIds);
+        for (ExamOfferingRelationInfo examOfferingRelationInfo : examOfferingRelationInfos) {
+            assertTrue(relIds.contains(examOfferingRelationInfo.getId()));
+        }
 
-            //Delete
-            for (ExamOfferingRelationInfo examOfferingRelationInfo : examOfferingRelationInfos) {
-                StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationInfo.getId(), callContext);
-                assertTrue(ret.getIsSuccess());
-            }
-        } catch (Exception ex) {
-            fail("Exception from service call :" + ex.getMessage());
+        //Delete
+        for (ExamOfferingRelationInfo examOfferingRelationInfo : examOfferingRelationInfos) {
+            StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationInfo.getId(), callContext);
+            assertTrue(ret.getIsSuccess());
         }
     }
 
     @Test
     public void testSearchForExamOfferingRelations() throws Exception {
         ExamOfferingRelationInfo eoRelInfo = createExamOfferingRelationInfo();
-        ExamOfferingRelationInfo created = examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
+        examOfferingService.createExamOfferingRelation("Lui-6", "Lui-9",
                 LuiServiceConstants.LUI_LUI_RELATION_DELIVERED_VIA_FO_TO_EO_TYPE_KEY, eoRelInfo, callContext);
 
-        try {
-            QueryByCriteria.Builder qbcBuilder = QueryByCriteria.Builder.create();
-            qbcBuilder.setPredicates(PredicateFactory.and(
-                    PredicateFactory.like("lui.id", "Lui-6"),
-                    PredicateFactory.equalIgnoreCase("relatedLui.id", "Lui-9")));
-            QueryByCriteria criteria = qbcBuilder.build();
+        QueryByCriteria.Builder qbcBuilder = QueryByCriteria.Builder.create();
+        qbcBuilder.setPredicates(PredicateFactory.and(
+                PredicateFactory.like("lui.id", "Lui-6"),
+                PredicateFactory.equalIgnoreCase("relatedLui.id", "Lui-9")));
+        QueryByCriteria criteria = qbcBuilder.build();
 
-            List<ExamOfferingRelationInfo> examOfferingRelationInfos = examOfferingService.searchForExamOfferingRelations(criteria, callContext);
-            assertNotNull(examOfferingRelationInfos);
-            assertEquals("Lui-6", examOfferingRelationInfos.get(0).getFormatOfferingId());
-            assertEquals("Lui-9", examOfferingRelationInfos.get(0).getExamOfferingId());
+        List<ExamOfferingRelationInfo> examOfferingRelationInfos = examOfferingService.searchForExamOfferingRelations(criteria, callContext);
+        assertNotNull(examOfferingRelationInfos);
+        assertEquals("Lui-6", examOfferingRelationInfos.get(0).getFormatOfferingId());
+        assertEquals("Lui-9", examOfferingRelationInfos.get(0).getExamOfferingId());
 
-            //Delete
-            for (ExamOfferingRelationInfo examOfferingRelationInfo : examOfferingRelationInfos) {
-                StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationInfo.getId(), callContext);
-                assertTrue(ret.getIsSuccess());
-            }
-        } catch (Exception ex) {
-            fail("Exception from service call :" + ex.getMessage());
+        //Delete
+        for (ExamOfferingRelationInfo examOfferingRelationInfo : examOfferingRelationInfos) {
+            StatusInfo ret = examOfferingService.deleteExamOfferingRelation(examOfferingRelationInfo.getId(), callContext);
+            assertTrue(ret.getIsSuccess());
         }
     }
 

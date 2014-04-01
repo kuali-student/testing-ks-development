@@ -42,7 +42,7 @@ import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
 import org.kuali.student.r2.common.exceptions.ReadOnlyException;
 import org.kuali.student.r2.common.exceptions.VersionMismatchException;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.common.util.TimeOfDayHelper;
 import org.kuali.student.r2.common.util.constants.CourseOfferingServiceConstants;
 import org.kuali.student.r2.common.util.constants.CourseOfferingSetServiceConstants;
@@ -585,13 +585,13 @@ public class ActivityOfferingScheduleHelperImpl implements ActivityOfferingSched
                 scheduleWrapper.setTimeSlot(timeSlotInfos.get(firstTimeSlotInfo));
 
                 TimeOfDayInfo startTime = scheduleWrapper.getTimeSlot().getStartTime();
-                if(startTime != null) {
+                if(startTime != null && !startTime.equals(new TimeOfDayInfo(0,0,0))) {
                     String formattedTime = TimeOfDayHelper.makeFormattedTimeForAOSchedules(startTime);
                     scheduleWrapper.setStartTime(formattedTime);
                 }
 
                 TimeOfDayInfo endTime = scheduleWrapper.getTimeSlot().getEndTime();
-                if (endTime != null) {
+                if (endTime != null && !endTime.equals(new TimeOfDayInfo(0,0,0))) {
                     String formattedTime = TimeOfDayHelper.makeFormattedTimeForAOSchedules(endTime);
                     scheduleWrapper.setEndTime(formattedTime);
                 }
@@ -662,12 +662,12 @@ public class ActivityOfferingScheduleHelperImpl implements ActivityOfferingSched
                             scheduleWrapper.setTimeSlot(timeSlotInfos.get(firstTimeSlotInfo));
 
                             TimeOfDayInfo startTime = scheduleWrapper.getTimeSlot().getStartTime();
-                            if (startTime != null){
+                            if (startTime != null && !startTime.equals(new TimeOfDayInfo(0,0,0))){
                                 scheduleWrapper.setStartTime(TimeOfDayHelper.makeFormattedTimeForAOSchedules(startTime));
                             }
 
                             TimeOfDayInfo endTime = scheduleWrapper.getTimeSlot().getEndTime();
-                            if (endTime != null){
+                            if (endTime != null && !endTime.equals(new TimeOfDayInfo(0,0,0))){
                                 scheduleWrapper.setEndTime(TimeOfDayHelper.makeFormattedTimeForAOSchedules(endTime));
                             }
                             scheduleWrapper.setDaysUI(SchedulingServiceUtil.weekdaysList2WeekdaysString(scheduleWrapper.getTimeSlot().getWeekdays()));
@@ -709,16 +709,14 @@ public class ActivityOfferingScheduleHelperImpl implements ActivityOfferingSched
         SocInfo socInfo = CourseOfferingSetUtil.getMainSocForTermId(activityOfferingInfo.getTermId(), context);
         String aoNextState = null;
 
-        // If the SOC is in Final Edits state, and the Scheduled Activity Offering is in Draft state, set the Activity Offering state to Approved
+        // If the SOC is in Locked, Final Edits, Publishing or Published, and the Scheduled Activity Offering is in Draft state, set the Activity Offering state to Offered
         if (socInfo != null) {
-            if (socInfo.getStateKey().equals(CourseOfferingSetServiceConstants.FINALEDITS_SOC_STATE_KEY)) {
-                if (LuiServiceConstants.LUI_AO_STATE_DRAFT_KEY.equals(activityOfferingInfo.getStateKey())) {
-                    aoNextState = LuiServiceConstants.LUI_AO_STATE_APPROVED_KEY;
-                }
-            }
-            // If the SOC is in Final Edits state, and the Scheduled Activity Offering is in Draft state, AND the Activity Offering is Scheduled, then set the Activity Offering State to Offered
-            else if (socInfo.getStateKey().equals(CourseOfferingSetServiceConstants.PUBLISHED_SOC_STATE_KEY)) {
-                if (LuiServiceConstants.LUI_AO_STATE_DRAFT_KEY.equals(activityOfferingInfo.getStateKey())) {
+            if (socInfo.getStateKey().equals(CourseOfferingSetServiceConstants.LOCKED_SOC_STATE_KEY)
+                    || socInfo.getStateKey().equals(CourseOfferingSetServiceConstants.FINALEDITS_SOC_STATE_KEY)
+                    || socInfo.getStateKey().equals(CourseOfferingSetServiceConstants.PUBLISHING_SOC_STATE_KEY)
+                    || socInfo.getStateKey().equals(CourseOfferingSetServiceConstants.PUBLISHED_SOC_STATE_KEY)) {
+                if (LuiServiceConstants.LUI_AO_STATE_DRAFT_KEY.equals(activityOfferingInfo.getStateKey())
+                    || LuiServiceConstants.LUI_AO_STATE_APPROVED_KEY.equals(activityOfferingInfo.getStateKey())) {
                     String aoSchedulingState = activityOfferingInfo.getSchedulingStateKey();
                     if (LuiServiceConstants.LUI_AO_SCHEDULING_STATE_SCHEDULED_KEY.equals(aoSchedulingState) ||
                             LuiServiceConstants.LUI_AO_SCHEDULING_STATE_EXEMPT_KEY.equals(aoSchedulingState)) {

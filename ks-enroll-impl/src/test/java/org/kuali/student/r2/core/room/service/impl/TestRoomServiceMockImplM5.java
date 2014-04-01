@@ -93,14 +93,7 @@ public class TestRoomServiceMockImplM5 {
 
     // test crud RoomInfo
     @Test
-    public void testCrudRoom () throws DataValidationErrorException
-            ,DoesNotExistException
-            ,InvalidParameterException
-            ,MissingParameterException
-            ,OperationFailedException
-            ,PermissionDeniedException
-            ,ReadOnlyException
-            ,Exception {
+    public void testCrudRoom () throws Exception {
 
         // test create
         // ----------------
@@ -156,7 +149,7 @@ public class TestRoomServiceMockImplM5 {
                 fail(info.getId());
             }
         }
-        assertEquals(0, IDS.size());
+        assertTrue(IDS.isEmpty());
 
         // test get by type
         // -------------------
@@ -169,32 +162,20 @@ public class TestRoomServiceMockImplM5 {
         assertEquals(1, IDS.size());
         assertEquals(actual2.getId(), IDS.get(0));
         IDS = roomService.getRoomIdsByType(TEST_TYPE + "123", callContext);
-        assertEquals(0, IDS.size());
+        assertTrue(IDS.isEmpty());
 
         // test delete
         // -----------------
         StatusInfo status = roomService.deleteRoom(actual.getId(), callContext);
         assertNotNull(status);
         assertTrue(status.getIsSuccess());
-        try {
-            actual = roomService.getRoom(actual.getId(), callContext);
-            assertEquals("FAKE_ID",actual.getId());
-            //fail("Did not receive DoesNotExistException when attempting to get already-deleted RoomInfo");
-        } catch (DoesNotExistException dnee) {
-            // expected
-        }
+        actual = roomService.getRoom(actual.getId(), callContext);
+        assertEquals("FAKE_ID",actual.getId());
     }
 
     // test crud BuildingInfo
     @Test
-    public void testCrudBuilding () throws DataValidationErrorException
-            ,DoesNotExistException
-            ,InvalidParameterException
-            ,MissingParameterException
-            ,OperationFailedException
-            ,PermissionDeniedException
-            ,ReadOnlyException
-            ,Exception {
+    public void testCrudBuilding () throws Exception {
 
         // test create
         // ----------------
@@ -244,7 +225,7 @@ public class TestRoomServiceMockImplM5 {
                 fail(info.getId());
             }
         }
-        assertEquals(0, IDS.size());
+        assertTrue(IDS.isEmpty());
 
         // test get by campus key
         // -------------------
@@ -257,20 +238,15 @@ public class TestRoomServiceMockImplM5 {
         assertEquals(1, IDS.size());
         assertEquals(actual2.getId(), IDS.get(0));
         IDS = roomService.getBuildingIdsByCampus("300", callContext);
-        assertEquals(0, IDS.size());
+        assertTrue(IDS.isEmpty());
 
         // test delete
         // -----------------
         StatusInfo status = roomService.deleteBuilding(actual.getId(), callContext);
         assertNotNull(status);
         assertTrue(status.getIsSuccess());
-        try {
-            actual = roomService.getBuilding(actual.getId(), callContext);
-            assertEquals("FAKE_ID",actual.getId());
-            //fail("Did not receive DoesNotExistException when attempting to get already-deleted BuildingInfo");
-        } catch (DoesNotExistException dnee) {
-            // expected
-        }
+        actual = roomService.getBuilding(actual.getId(), callContext);
+        assertEquals("FAKE_ID",actual.getId());
     }
 
 }

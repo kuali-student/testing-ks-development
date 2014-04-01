@@ -202,15 +202,11 @@ public class TestLprRosterServiceImplConformanceExtendedCrud extends TestLprRost
 	/*
 		A method to set the fields for a LprRosterEntry in a 'test create' section prior to calling the 'create' operation.
 	*/
-	public void testCrudLprRosterEntry_setDTOFieldsForTestCreate(LprRosterEntryInfo expected) {
+	public void testCrudLprRosterEntry_setDTOFieldsForTestCreate(LprRosterEntryInfo expected) throws Exception {
 		expected.setTypeKey("typeKey01");
 		expected.setStateKey("stateKey01");
-        try {
-            expected.setEffectiveDate(dateFormat.parse("20130611"));
-            expected.setExpirationDate(dateFormat.parse("21000101"));
-        } catch (ParseException e) {
-            throw new RuntimeException("Failed to parse date", e);
-        }
+        expected.setEffectiveDate(dateFormat.parse("20130611"));
+        expected.setExpirationDate(dateFormat.parse("21000101"));
 		expected.setLprRosterId("A");
 		expected.setLprId("100");
 		expected.setPosition(5);
@@ -236,14 +232,10 @@ public class TestLprRosterServiceImplConformanceExtendedCrud extends TestLprRost
 	/*
 		A method to set the fields for a LprRosterEntry in a 'test update' section prior to calling the 'update' operation.
 	*/
-	public void testCrudLprRosterEntry_setDTOFieldsForTestUpdate(LprRosterEntryInfo expected) {
+	public void testCrudLprRosterEntry_setDTOFieldsForTestUpdate(LprRosterEntryInfo expected) throws Exception {
 		expected.setStateKey("stateKey_Updated");
-        try {
-            expected.setEffectiveDate(dateFormat.parse("20120611"));
-            expected.setExpirationDate(dateFormat.parse("20130601"));
-        } catch (ParseException e) {
-            throw new RuntimeException("Failed to parse date", e);
-        }
+        expected.setEffectiveDate(dateFormat.parse("20120611"));
+        expected.setExpirationDate(dateFormat.parse("20130601"));
         expected.setLprRosterId("A");
         expected.setLprId("100");
         expected.setPosition(2);
@@ -269,16 +261,12 @@ public class TestLprRosterServiceImplConformanceExtendedCrud extends TestLprRost
 		A method to set the fields for a LprRosterEntry in the 'test read after update' section.
 		This dto is another (second) dto object being created for other tests.
 	*/
-	public void testCrudLprRosterEntry_setDTOFieldsForTestReadAfterUpdate(LprRosterEntryInfo expected) 
+	public void testCrudLprRosterEntry_setDTOFieldsForTestReadAfterUpdate(LprRosterEntryInfo expected) throws Exception
 	{
         expected.setLprRosterId("C");
         expected.setLprId("222");
-        try {
-            expected.setEffectiveDate(dateFormat.parse("20120611"));
-            expected.setExpirationDate(dateFormat.parse("30300601"));
-        } catch (ParseException e) {
-            throw new RuntimeException("Failed to parse date", e);
-        }
+        expected.setEffectiveDate(dateFormat.parse("20120611"));
+        expected.setExpirationDate(dateFormat.parse("30300601"));
         expected.setPosition(1);
 	}
 	
@@ -289,8 +277,7 @@ public class TestLprRosterServiceImplConformanceExtendedCrud extends TestLprRost
 	
 	/* Method Name: getLprRostersByLui */
 	@Test
-	public void test_getLprRostersByLui()
-	throws 	InvalidParameterException	,MissingParameterException	,OperationFailedException	,PermissionDeniedException	{
+	public void test_getLprRostersByLui() throws Exception{
         loadData();
 
         List<LprRosterInfo> rosters = testService.getLprRostersByLui("4", contextInfo);
@@ -299,7 +286,7 @@ public class TestLprRosterServiceImplConformanceExtendedCrud extends TestLprRost
         assertContainsId("B", rosters);
 
         rosters = testService.getLprRostersByLui("DOES_NOT_EXIST", contextInfo);
-        assertEquals(0, rosters.size());
+        assertTrue(rosters.isEmpty());
 
         rosters = testService.getLprRostersByLui("2", contextInfo);
         assertEquals(1, rosters.size());
@@ -308,8 +295,7 @@ public class TestLprRosterServiceImplConformanceExtendedCrud extends TestLprRost
 	
 	/* Method Name: getLprRostersByTypeAndLui */
 	@Test
-	public void test_getLprRostersByTypeAndLui() 
-	throws 	InvalidParameterException	,MissingParameterException	,OperationFailedException	,PermissionDeniedException	{
+	public void test_getLprRostersByTypeAndLui() throws Exception {
         loadData();
 
         List<LprRosterInfo> rosters = testService.getLprRostersByTypeAndLui(LprServiceConstants.LPRROSTER_COURSE_MIDTERM_GRADE_TYPE_KEY, "4", contextInfo);
@@ -318,15 +304,15 @@ public class TestLprRosterServiceImplConformanceExtendedCrud extends TestLprRost
         assertContainsId("B", rosters);
 
         rosters = testService.getLprRostersByTypeAndLui(LprServiceConstants.LPRROSTER_COURSE_MIDTERM_GRADE_TYPE_KEY, "DOES_NOT_EXIST", contextInfo);
-        assertEquals(0, rosters.size());
+        assertTrue(rosters.isEmpty());
 
         rosters = testService.getLprRostersByTypeAndLui(LprServiceConstants.LPRROSTER_COURSE_FINAL_GRADE_TYPE_KEY, "1", contextInfo);
         assertEquals(1, rosters.size());
         assertContainsId("A", rosters);
 
         rosters = testService.getLprRostersByTypeAndLui("SOME_TYPE_KEY_THAT_DOES_NOT_EXIST", "1", contextInfo);
-        assertEquals(0, rosters.size());
-	}
+        assertTrue(rosters.isEmpty());
+    }
 	
 	/* Method Name: searchForLprRosterIds */
 	@Test
@@ -354,8 +340,7 @@ public class TestLprRosterServiceImplConformanceExtendedCrud extends TestLprRost
 	
 	/* Method Name: getLprRosterEntriesByLpr */
 	@Test
-	public void test_getLprRosterEntriesByLpr() 
-	throws 	InvalidParameterException	,MissingParameterException	,OperationFailedException	,PermissionDeniedException	{
+	public void test_getLprRosterEntriesByLpr() throws Exception {
         loadData();
         List<LprRosterEntryInfo> entries = testService.getLprRosterEntriesByLprRoster("A", contextInfo);
         assertEquals(9, entries.size());
@@ -365,13 +350,12 @@ public class TestLprRosterServiceImplConformanceExtendedCrud extends TestLprRost
         }
 
         entries = testService.getLprRosterEntriesByLprRoster("D", contextInfo);
-        assertEquals(0, entries.size());
+        assertTrue(entries.isEmpty());
 	}
 	
 	/* Method Name: getLprRosterEntriesByLprRosterAndLpr */
 	@Test
-	public void test_getLprRosterEntriesByLprRosterAndLpr() 
-	throws 	InvalidParameterException	,MissingParameterException	,OperationFailedException	,PermissionDeniedException	{
+	public void test_getLprRosterEntriesByLprRosterAndLpr() throws Exception {
         loadData();
         List<LprRosterEntryInfo> entries = testService.getLprRosterEntriesByLprRosterAndLpr("C", "19", contextInfo);
         assertEquals(2, entries.size());
@@ -379,8 +363,8 @@ public class TestLprRosterServiceImplConformanceExtendedCrud extends TestLprRost
         assertContainsId("20", entries);
 
         entries = testService.getLprRosterEntriesByLprRosterAndLpr("C", "1", contextInfo);
-        assertEquals(0, entries.size());
-	}
+        assertTrue(entries.isEmpty());
+    }
 	
 	/* Method Name: searchForLprRosterEntryIds */
 	@Test
@@ -402,8 +386,7 @@ public class TestLprRosterServiceImplConformanceExtendedCrud extends TestLprRost
 	
 	/* Method Name: moveLprRosterEntryToPosition */
 	@Test
-	public void test_moveLprRosterEntryToPosition() 
-	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	,PermissionDeniedException	{
+	public void test_moveLprRosterEntryToPosition() throws Exception {
         loadData();
         testService.moveLprRosterEntryToPosition("9", 9, contextInfo);
         List<LprRosterEntryInfo> entries = testService.getLprRosterEntriesByLprRoster("A", contextInfo);
@@ -432,8 +415,7 @@ public class TestLprRosterServiceImplConformanceExtendedCrud extends TestLprRost
 	
 	/* Method Name: reorderLprRosterEntries */
 	@Test
-	public void test_reorderLprRosterEntries() 
-	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	,PermissionDeniedException	{
+	public void test_reorderLprRosterEntries() throws Exception {
         loadData();
         List<String> newOrder = new ArrayList<String>();
         newOrder.add("3");
@@ -479,12 +461,8 @@ public class TestLprRosterServiceImplConformanceExtendedCrud extends TestLprRost
         fail("list does not contain id " + id);
     }
 
-    private void loadData() throws OperationFailedException{
-        try {
-            dataLoader.beforeTest();
-        } catch (Exception e) {
-            throw new OperationFailedException("failed to load data", e);
-        }
+    private void loadData() throws Exception{
+        dataLoader.beforeTest();
     }
 	
 }

@@ -15,15 +15,15 @@
  */
 package org.kuali.student.enrollment.class2.courseoffering.service.impl;
 
-import org.apache.log4j.Logger;
 import org.kuali.rice.krad.lookup.LookupForm;
 import org.kuali.rice.krad.lookup.LookupableImpl;
 import org.kuali.student.enrollment.class2.courseoffering.util.CourseOfferingManagementUtil;
 import org.kuali.student.r2.common.dto.ContextInfo;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.core.fee.dto.EnrollmentFeeInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class EnrollmentFeeInfoLookupableImpl extends LookupableImpl {
 
-    private static final Logger LOG = Logger.getLogger(EnrollmentFeeInfoInquirableImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EnrollmentFeeInfoInquirableImpl.class);
 
     @Override
     public List<?> performSearch(LookupForm lookupForm, Map<String, String> searchCriteria, boolean bounded) {

@@ -30,14 +30,14 @@ import org.kuali.student.enrollment.class2.courseoffering.dto.CourseOfferingCopy
 import org.kuali.student.enrollment.class2.courseoffering.dto.CourseOfferingListSectionWrapper;
 import org.kuali.student.enrollment.class2.courseoffering.dto.CourseOfferingWrapper;
 import org.kuali.student.enrollment.class2.courseoffering.dto.ExistingCourseOffering;
-import org.kuali.student.enrollment.class2.courseoffering.service.impl.DefaultOptionKeysService;
-import org.kuali.student.enrollment.class2.courseoffering.service.impl.DefaultOptionKeysServiceImpl;
 import org.kuali.student.enrollment.courseoffering.dto.CourseOfferingInfo;
 import org.kuali.student.enrollment.courseofferingset.dto.SocRolloverResultItemInfo;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.common.util.constants.CourseOfferingServiceConstants;
 import org.kuali.student.r2.common.util.constants.CourseOfferingSetServiceConstants;
 import org.kuali.student.r2.common.util.constants.LuiServiceConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Properties;
@@ -49,7 +49,7 @@ import java.util.Properties;
  */
 public class CourseOfferingHandler {
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(CourseOfferingHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CourseOfferingHandler.class);
 
     public static void copyCourseOfferingCreateCopy(CourseOfferingManagementForm theForm) throws Exception {
 
@@ -156,8 +156,8 @@ public class CourseOfferingHandler {
         String coState = theCourseOffering.getStateKey();
         if (StringUtils.equals(coState, LuiServiceConstants.LUI_CO_STATE_OFFERED_KEY)
                 || StringUtils.equals(coState, LuiServiceConstants.LUI_CO_STATE_CANCELED_KEY)) {
-            LOG.error(String.format("Course offering [%s] cannot not be deleted because the state was [%s].",
-                    theCourseOffering.getCourseOfferingCode(), coState));
+            LOG.error("Course offering [{}] cannot not be deleted because the state was [{}].",
+                    theCourseOffering.getCourseOfferingCode(), coState);
             GlobalVariables.getMessageMap().putErrorForSectionId(CourseOfferingConstants.MANAGE_CO_LIST_SECTION,
                     CourseOfferingConstants.COURSEOFFERING_INVALID_STATE_FOR_DELETE);
             return  CourseOfferingConstants.MANAGE_CO_PAGE;
@@ -173,8 +173,8 @@ public class CourseOfferingHandler {
         for (ActivityOfferingWrapper ao : theForm.getActivityWrapperList()) {
             //  Verify AO state.
             if (!ao.isLegalToDelete()) {
-                LOG.error(String.format("Course Offering [%s] cannot be deleted because Activity Offering [%s] is in an invalid state for deleting.",
-                        theCourseOffering.getCourseOfferingCode(), ao.getActivityCode()));
+                LOG.error("Course Offering [{}] cannot be deleted because Activity Offering [{}] is in an invalid state for deleting.",
+                        theCourseOffering.getCourseOfferingCode(), ao.getActivityCode());
                 GlobalVariables.getMessageMap().putErrorForSectionId(CourseOfferingConstants.MANAGE_CO_LIST_SECTION,
                         CourseOfferingConstants.COURSEOFFERING_INVALID_AO_STATE_FOR_DELETE);
                 return CourseOfferingConstants.MANAGE_CO_PAGE;

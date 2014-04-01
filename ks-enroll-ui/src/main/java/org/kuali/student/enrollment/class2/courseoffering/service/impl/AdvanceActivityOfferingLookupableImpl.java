@@ -1,7 +1,6 @@
 package org.kuali.student.enrollment.class2.courseoffering.service.impl;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.criteria.PredicateFactory;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
 import org.kuali.rice.krad.lookup.LookupForm;
@@ -12,16 +11,17 @@ import org.kuali.student.enrollment.class2.courseoffering.util.ActivityOfferingC
 import org.kuali.student.enrollment.courseoffering.dto.ActivityOfferingInfo;
 import org.kuali.student.enrollment.courseoffering.dto.CourseOfferingInfo;
 import org.kuali.student.r2.common.dto.ContextInfo;
-import org.kuali.student.r2.common.util.ContextUtils;
+import org.kuali.student.common.util.security.ContextUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class AdvanceActivityOfferingLookupableImpl extends LookupableImpl {
 
-    private static final Logger LOG = Logger.getLogger(AdvanceActivityOfferingLookupableImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdvanceActivityOfferingLookupableImpl.class);
 
     @Override
     public List<?> performSearch(LookupForm lookupForm, Map<String, String> searchCriteria, boolean bounded) {
@@ -46,7 +46,7 @@ public class AdvanceActivityOfferingLookupableImpl extends LookupableImpl {
                     int firstTerm = 0;
                     // Always get first term
                     termId = termList.get(firstTerm).getId();
-                    LOG.info(">>> termId = " + termId);
+                    LOG.info(">>> termId = {}", termId);
                     if(termList.size()>1){
                         //logger.warn("AdvanceActivityOfferingLookupableImpl - find more than one term for specified termCode: " + termCode) ;
                         //System.out.println(">>Alert: find more than one term for specified termCode: "+termCode);

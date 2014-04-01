@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kuali.student.enrollment.class2.courseoffering.service.impl.CourseOfferingServiceTestDataLoader;
-import org.kuali.student.enrollment.class2.examoffering.service.facade.ExamOfferingServiceFacade;
 import org.kuali.student.enrollment.class2.examoffering.service.impl.ExamOfferingServiceTestDataLoader;
 import org.kuali.student.enrollment.courseoffering.dto.CourseOfferingInfo;
 import org.kuali.student.enrollment.courseoffering.service.CourseOfferingService;
@@ -53,7 +52,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -172,14 +171,15 @@ public class TestExamOfferingServiceFacadeImpl {
 
         List<ExamOfferingRelationInfo> newRelations = this.getExamOfferingService().getExamOfferingRelationsByFormatOffering(
                 CourseOfferingServiceTestDataLoader.CHEM123_LEC_AND_LAB_FORMAT_OFFERING_ID, contextInfo);
-        assertEquals(0, newRelations.size());
+        assertTrue(newRelations.isEmpty());
 
         for(ExamOfferingRelationInfo eoRelation : eoRelations){
             try{
                 ExamOffering eo = this.getExamOfferingService().getExamOffering(eoRelation.getExamOfferingId(), contextInfo);
-                fail("Service should throw does noet exist exception");
-            } catch (DoesNotExistException dne){
-                // do nothing.
+                fail("Service should throw does not exist exception");
+            } catch (DoesNotExistException dnee){
+                assertNotNull(dnee.getMessage());
+                assertEquals(eoRelation.getExamOfferingId(), dnee.getMessage());
             }
         }
     }
@@ -190,7 +190,7 @@ public class TestExamOfferingServiceFacadeImpl {
 
         List<String> optionKeys = new ArrayList<String>();
         this.getExamOfferingBusinessLogic().generateFinalExamOfferingsPerAO(CourseOfferingServiceTestDataLoader.CHEM123_COURSE_OFFERING_ID,
-                ExamOfferingServiceTestDataLoader.TERM_ONE_ID, ExamOfferingServiceTestDataLoader.PERIOD_ONE_ID, optionKeys, contextInfo);
+                ExamOfferingServiceTestDataLoader.TERM_ONE_ID, ExamOfferingServiceTestDataLoader.PERIOD_ONE_ID, optionKeys, contextInfo, true);
 
         List<ExamOfferingRelationInfo> eoRelations = this.getExamOfferingService().getExamOfferingRelationsByFormatOffering(
                 CourseOfferingServiceTestDataLoader.CHEM123_LEC_AND_LAB_FORMAT_OFFERING_ID, contextInfo);
@@ -210,14 +210,15 @@ public class TestExamOfferingServiceFacadeImpl {
 
         List<ExamOfferingRelationInfo> newRelations = this.getExamOfferingService().getExamOfferingRelationsByFormatOffering(
                 CourseOfferingServiceTestDataLoader.CHEM123_LEC_AND_LAB_FORMAT_OFFERING_ID, contextInfo);
-        assertEquals(0, newRelations.size());
+        assertTrue(newRelations.isEmpty());
 
         for(ExamOfferingRelationInfo eoRelation : eoRelations){
             try{
                 ExamOffering eo = this.getExamOfferingService().getExamOffering(eoRelation.getExamOfferingId(), contextInfo);
-                fail("Service should throw does noet exist exception");
-            } catch (DoesNotExistException dne){
-                // do nothing.
+                fail("Service should throw does not exist exception");
+            } catch (DoesNotExistException dnee){
+                assertNotNull(dnee.getMessage());
+                assertEquals(eoRelation.getExamOfferingId(), dnee.getMessage());
             }
         }
     }

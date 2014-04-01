@@ -74,8 +74,8 @@ public class LprEntity extends MetaEntity implements AttributeOwner<LprAttribute
     @Column(name = "ATP_ID")
     private String atpId;
 
-    @Column(name = "MASTER_LUI_ID")
-    private String masterLuiId;
+    @Column(name = "MASTER_LPR_ID")
+    private String masterLprId;
 
     @Column(name = "CREDITS")
     private String credits;
@@ -94,12 +94,20 @@ public class LprEntity extends MetaEntity implements AttributeOwner<LprAttribute
         this.setPersonId(dto.getPersonId());
         this.setPersonRelationTypeId(dto.getTypeKey());
         this.setAtpId(dto.getAtpId());
-        this.setMasterLuiId(dto.getMasterLprId());
+        this.setMasterLprId(dto.getMasterLprId());
         fromDto(dto);
     }
 
-    public void fromDto(Lpr dto) {
+    @Override
+    protected void onPrePersist() {
+        super.onPrePersist();
+        //This makes it so if no masterLPR id is set, it always defaults to the ID to avoid an additional call to update
+        if (masterLprId == null) {
+            setMasterLprId(this.getId());
+        }
+    }
 
+    public void fromDto(Lpr dto) {
         super.fromDTO(dto);
 
         if (dto.getCommitmentPercent() != null) {
@@ -108,28 +116,25 @@ public class LprEntity extends MetaEntity implements AttributeOwner<LprAttribute
         this.setExpirationDate(dto.getExpirationDate());
         this.setEffectiveDate(dto.getEffectiveDate());
         this.setPersonRelationStateId(dto.getStateKey());
+        this.setMasterLprId(dto.getMasterLprId());
 
-        //Set these fields on the LPR (makes access easier).
-        for(String rvgKey:dto.getResultValuesGroupKeys()){
-            if(rvgKey.startsWith(LrcServiceConstants.RESULT_GROUP_KEY_GRADE_BASE)){
-                this.setGradingOptionId(rvgKey);
-            }else if(rvgKey.startsWith(LrcServiceConstants.RESULT_GROUP_KEY_KUALI_CREDITTYPE_CREDIT_BASE)){
-                this.setCredits(rvgKey.substring(LrcServiceConstants.RESULT_GROUP_KEY_KUALI_CREDITTYPE_CREDIT_BASE.length()+1));
+        // Set these fields on the LPR (makes access easier).
+        for (String rvgKey:dto.getResultValuesGroupKeys()) {
+            if (rvgKey.startsWith(LrcServiceConstants.RESULT_GROUP_KEY_GRADE_BASE)) {
+                setGradingOptionId(rvgKey);
+            } else if (rvgKey.startsWith(LrcServiceConstants.RESULT_GROUP_KEY_KUALI_CREDITTYPE_CREDIT_BASE)) {
+                setCredits(rvgKey.substring(LrcServiceConstants.RESULT_GROUP_KEY_KUALI_CREDITTYPE_CREDIT_BASE.length() + 1));
             }
         }
 
         this.attributes.clear();
 
         for (Attribute attr : dto.getAttributes()) {
-
             this.attributes.add(new LprAttributeEntity(attr, this));
-
         }
 
         this.resultValueGroups.clear();
-
         this.resultValueGroups.addAll(dto.getResultValuesGroupKeys());
-
     }
 
     public String getPersonId() {
@@ -192,6 +197,8 @@ public class LprEntity extends MetaEntity implements AttributeOwner<LprAttribute
         lprInfo.setExpirationDate(expirationDate);
         lprInfo.setTypeKey(personRelationTypeId);
         lprInfo.setStateKey(personRelationStateId);
+        lprInfo.setMasterLprId(masterLprId);
+        lprInfo.setAtpId(atpId);
 
         // instead need to create a new JPA entity to hold the lpr to rvg
         // mapping
@@ -203,15 +210,11 @@ public class LprEntity extends MetaEntity implements AttributeOwner<LprAttribute
         }
 
         lprInfo.setResultValuesGroupKeys(rvGroupIds);
-
         lprInfo.setMeta(super.toDTO());
-
         List<AttributeInfo> atts = lprInfo.getAttributes();
 
         if (getAttributes() != null) {
-
             for (LprAttributeEntity lprAttr : getAttributes()) {
-
                 atts.add(lprAttr.toDto());
             }
         }
@@ -274,11 +277,11 @@ public class LprEntity extends MetaEntity implements AttributeOwner<LprAttribute
         this.gradingOptionId = gradingOptionId;
     }
 
-    public String getMasterLuiId() {
-        return masterLuiId;
+    public String getMasterLprId() {
+        return masterLprId;
     }
 
-    public void setMasterLuiId(String masterLuiId) {
-        this.masterLuiId = masterLuiId;
+    public void setMasterLprId(String masterLprId) {
+        this.masterLprId = masterLprId;
     }
 }

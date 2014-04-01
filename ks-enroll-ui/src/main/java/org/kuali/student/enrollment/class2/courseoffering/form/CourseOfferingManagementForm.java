@@ -18,6 +18,7 @@ package org.kuali.student.enrollment.class2.courseoffering.form;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.kuali.student.common.uif.form.KSUifForm;
+import org.kuali.student.enrollment.class2.acal.dto.ExamPeriodWrapper;
 import org.kuali.student.enrollment.class2.courseoffering.dto.ExamOfferingClusterWrapper;
 import org.kuali.student.enrollment.class2.courseoffering.dto.ActivityOfferingClusterWrapper;
 import org.kuali.student.enrollment.class2.courseoffering.dto.ActivityOfferingWrapper;
@@ -27,10 +28,12 @@ import org.kuali.student.enrollment.class2.courseoffering.dto.CourseOfferingList
 import org.kuali.student.enrollment.class2.courseoffering.dto.CourseOfferingWrapper;
 import org.kuali.student.enrollment.class2.courseoffering.dto.ExamOfferingWrapper;
 import org.kuali.student.enrollment.class2.courseoffering.dto.RegistrationGroupWrapper;
+import org.kuali.student.enrollment.class2.courseoffering.dto.ScheduleWrapper;
 import org.kuali.student.enrollment.class2.scheduleofclasses.form.ActivityOfferingDisplayUI;
 import org.kuali.student.enrollment.class2.scheduleofclasses.form.CourseOfferingDisplayUI;
 import org.kuali.student.enrollment.courseoffering.dto.FormatOfferingInfo;
 import org.kuali.student.enrollment.examoffering.dto.ExamOfferingRelationInfo;
+import org.kuali.student.r2.core.acal.dto.ExamPeriodInfo;
 import org.kuali.student.r2.core.acal.dto.TermInfo;
 
 import java.util.ArrayList;
@@ -209,6 +212,7 @@ public class CourseOfferingManagementForm extends KSUifForm implements ActivityO
     private List<ExamOfferingClusterWrapper> eoClusterResultList;
     private List<ExamOfferingClusterWrapper> eoCancelClusterList;
 
+    private ExamPeriodWrapper examPeriodWrapper;
 
     public boolean getHasAOCluster() {
         return hasAOCluster;
@@ -875,5 +879,13 @@ public class CourseOfferingManagementForm extends KSUifForm implements ActivityO
 
     public void setEoCancelClusterList(List<ExamOfferingClusterWrapper> eoCancelClusterList) {
         this.eoCancelClusterList = eoCancelClusterList;
+    }
+
+    public ExamPeriodWrapper getExamPeriodWrapper() {
+        return examPeriodWrapper;
+    }
+
+    public void setExamPeriodWrapper(ExamPeriodWrapper examPeriodWrapper) {
+        this.examPeriodWrapper = examPeriodWrapper;
     }
 }
