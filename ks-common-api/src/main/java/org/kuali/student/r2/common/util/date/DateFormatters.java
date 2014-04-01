@@ -42,6 +42,7 @@ public class DateFormatters {
     public static final String DEFAULT_MONTH_YEAR_TIME_DATE_FORMAT = "MM-dd-yyyy hh:mm a";            // 11-08-2012 02:52 pm
     public static final String DEFAULT_YEAR_MONTH_24HOUR_MILLISECONDS_FORMAT = "yyyy-MM-dd HH:mm:ss.S";                  // 2012-08-11 02:52:26.9
     public static final String QUERY_SERVICE_TIMESTAMP_FORMAT = "EEE MMM dd hh:mm:ss zzz yyyy";
+    public static final String MONTH_DATE_YEAR_HOUR_MIN_CONCAT_AMPM_FORMAT = "MMMM dd, yyyy - hh:mmaaa";    //February 24, 2014 - 05:55PM
 
     /**
      * DO NOT USE THIS CONSTANT unless you absolutely have to and for Date->String only.
@@ -57,6 +58,7 @@ public class DateFormatters {
     public static final String DAY_MONTH_DATE_FORMAT = "EEEE, MMMM d";                                // Thursday, November 8
     public static final String DAY_MONTH_DATE_YEAR_FORMAT = "EEEE, MMMM d YYYY";                      // Thursday, November 8 2012
     public static final String MONTH_DAY_FORMAT = "M/d";                                              // 11/8
+    public static final String EXAM_OFFERING_VIEW_EXAM_OFFERING_DATE_FORMAT = "MMMMM d, yyyy";        // November 8, 2012
 
     // Fast Thread Safe Formatter. Use this instead of SimpleDateFormat
     public static final KSDateTimeFormatter STATE_CHANGE_DATE_FORMATTER = new KSDateTimeFormatter(STATE_CHANGE_DATE_FORMAT);
@@ -86,4 +88,6 @@ public class DateFormatters {
     public static final KSDateTimeFormatter DAY_MONTH_DATE_FORMATTER = new KSDateTimeFormatter(DAY_MONTH_DATE_FORMAT);
     public static final KSDateTimeFormatter DAY_MONTH_DATE_YEAR_FORMATTER = new KSDateTimeFormatter(DAY_MONTH_DATE_YEAR_FORMAT);
     public static final KSDateTimeFormatter MONTH_DAY_FORMATTER = new KSDateTimeFormatter(MONTH_DAY_FORMAT);
+    public static final KSDateTimeFormatter MONTH_DATE_YEAR_HOUR_MIN_CONCAT_AMPM_FORMATTER = new KSDateTimeFormatter(MONTH_DATE_YEAR_HOUR_MIN_CONCAT_AMPM_FORMAT);
+    public static final KSDateTimeFormatter EXAM_OFFERING_VIEW_EXAM_OFFERING_DATE_FORMATTER = new KSDateTimeFormatter(EXAM_OFFERING_VIEW_EXAM_OFFERING_DATE_FORMAT);
 }

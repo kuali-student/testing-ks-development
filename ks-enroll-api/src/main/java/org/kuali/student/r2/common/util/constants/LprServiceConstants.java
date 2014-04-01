@@ -14,6 +14,8 @@ import org.kuali.student.enrollment.lpr.dto.LprInfo;
 import org.kuali.student.enrollment.lpr.service.LprService;
 import org.kuali.student.r2.common.constants.CommonServiceConstants;
 
+import javax.xml.namespace.QName;
+
 /**
  * Constants used by for LprService
  * 
@@ -28,6 +30,10 @@ public class LprServiceConstants {
     public static final String SERVICE_NAME_LOCAL_PART = LprService.class.getSimpleName();
     public static final String REF_OBJECT_URI_LUI_PERSON_RELATION = NAMESPACE + "/"
             + LprInfo.class.getSimpleName();
+    // Called as
+    // CourseRegistrationService service =
+    //     (CourseRegistrationService) GlobalResourceLoader.getService(CourseRegistrationServiceConstants.Q_NAME);
+    public static final QName Q_NAME = new QName(NAMESPACE, SERVICE_NAME_LOCAL_PART);
     /**
      * Types and known groups of types
      */
@@ -40,6 +46,9 @@ public class LprServiceConstants {
     public static final String REGISTRANT_CO_TYPE_KEY = "kuali.lpr.type.registrant.course.offering";
     public static final String REGISTRANT_AO_TYPE_KEY = "kuali.lpr.type.registrant.activity.offering";
     public static final String REGISTRANT_RG_TYPE_KEY = "kuali.lpr.type.registrant.registration.group";
+    public static final String WAITLIST_FO_TYPE_KEY = "kuali.lpr.type.waitlist.format.offering";
+    public static final String WAITLIST_AO_TYPE_KEY = "kuali.lpr.type.waitlist.activity.offering";
+    public static final String WAITLIST_RG_TYPE_KEY = "kuali.lpr.type.waitlist.registration.group";
     public static final String ENROLLEE_TYPE_KEY = "kuali.lpr.type.enrollee";
     public static final String ADVISOR_TYPE_KEY = "kuali.lpr.type.advisor";
 
@@ -68,12 +77,27 @@ public class LprServiceConstants {
     public static final String LPRTRANS_FAILED_STATE_KEY = "kuali.lpr.trans.state.failed";
     public static final String LPRTRANS_DISCARDED_STATE_KEY = "kuali.lpr.trans.state.discarded";
 
+    // transaction item waitlist messages
+    public static final String LPRTRANS_ITEM_WAITLIST_STUDENT_REMOVED_MESSAGE = "Student removed from waitlist";
+    public static final String LPRTRANS_ITEM_WAITLIST_OPTIONS_UPDATED_MESSAGE = "Waitlist options were updated";
+    public static final String LPRTRANS_ITEM_WAITLISTED_MESSAGE = "Waitlisted";
+    public static final String LPRTRANS_ITEM_WAITLIST_FULL_MESSAGE = "No seats available. (Waitlist full)";
+    public static final String LPRTRANS_ITEM_WAITLIST_NOT_OFFERED_MESSAGE = "No seats available. (Waitlist not offered)";
+
+    // transaction item course action messages
+    public static final String LPRTRANS_ITEM_COURSE_UPDATED_MESSAGE = "Course was updated";
+    public static final String LPRTRANS_ITEM_COURSE_DROPPED_MESSAGE = "Course was dropped";
+
+    // other messages
+    public static final String LPRTRANS_ITEM_SEAT_UNAVAILABLE_MESSAGE = "No seats available.";
+    public static final String LPRTRANS_ITEM_PERSON_REGISTERED_MESSAGE = "Registered";
+
     // transaction item states
     public static final String LPRTRANS_ITEM_NEW_STATE_KEY = "kuali.lpr.trans.item.state.new";
     public static final String LPRTRANS_ITEM_PROCESSING_STATE_KEY = "kuali.lpr.trans.item.state.processing";
     public static final String LPRTRANS_ITEM_SUCCEEDED_STATE_KEY = "kuali.lpr.trans.item.state.succeeded";
     public static final String LPRTRANS_ITEM_FAILED_STATE_KEY = "kuali.lpr.trans.item.state.failed";
-    
+
     public static final String[] COURSE_INSTRUCTOR_TYPE_KEYS = {INSTRUCTOR_MAIN_TYPE_KEY,
         INSTRUCTOR_ASSISTANT_TYPE_KEY, INSTRUCTOR_SUPPORT_TYPE_KEY};
     public static final String[] COURSE_STUDENT_TYPE_KEYS = {REGISTRANT_AO_TYPE_KEY,
@@ -85,7 +109,10 @@ public class LprServiceConstants {
     public static final String REQ_ITEM_DROP_TYPE_KEY = "kuali.course.registration.request.item.type.drop";
     public static final String REQ_ITEM_SWAP_TYPE_KEY = "kuali.course.registration.request.item.type.swap";
     public static final String REQ_ITEM_UPDATE_TYPE_KEY = "kuali.course.registration.request.item.type.update";
-    
+
+    public static final String REQ_ITEM_DROP_WAITLIST_TYPE_KEY = "kuali.course.registration.request.item.type.drop.waitlist";
+    public static final String REQ_ITEM_UPDATE_WAITLIST_TYPE_KEY = "kuali.course.registration.request.item.type.update.waitlist";
+
     public static final String REQ_ITEM_ADD_TO_WAITLIST_TYPE_KEY = "kuali.course.registration.request.item.type.add.to.waitlist";
     public static final String REQ_ITEM_ADD_TO_HOLD_UNTIL_LIST_TYPE_KEY = "kuali.course.registration.request.item.type.add.to.hold.until.list";
 
@@ -132,6 +159,8 @@ public class LprServiceConstants {
     public static final String DROPPED_STATE_KEY = "kuali.lpr.state.dropped.early";
     public static final String DROPPED_LATE_STATE_KEY = "kuali.lpr.state.dropped.late";
 
+    // To handle updates (which causes the expiration date to be set).
+    public static final String EXPIRED_LPR_STATE_KEY = "kuali.lpr.state.expired";
     /**
      * Instructor states
      */

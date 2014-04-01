@@ -37,7 +37,7 @@ import java.util.List;
                 "registrationRequestId", 
                 "personId", 
                 "registrationGroupId",
-                "existingCourseRegistrationId", 
+                "existingCourseRegistrationId",
                 "credits", 
                 "gradingOptionId", 
                 "okToWaitlist", 
