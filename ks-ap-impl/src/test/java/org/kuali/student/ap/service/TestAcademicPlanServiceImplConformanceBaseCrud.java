@@ -16,22 +16,14 @@
 package org.kuali.student.ap.service;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Resource;
-//import javax.ejb.EJB;
-//
-//import org.hibernate.ejb.event.EJB3AutoFlushEventListener;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
 import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
-import org.kuali.student.ap.academicplan.dto.PlanItemSetInfo;
 import org.kuali.student.ap.academicplan.service.AcademicPlanService;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
-//import org.kuali.student.ap.academicplan.service.AcademicPlanServiceImpl;
 import org.kuali.student.ap.academicplan.service.AcademicPlanServiceDecorator;
 import org.kuali.student.ap.academicplan.service.AcademicPlanServiceImpl;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
@@ -51,20 +43,24 @@ import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
 import org.kuali.student.r2.common.exceptions.ReadOnlyException;
 import org.kuali.student.r2.common.exceptions.VersionMismatchException;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+//import javax.ejb.EJB;
+//
+//import org.hibernate.ejb.event.EJB3AutoFlushEventListener;
+//import org.kuali.student.ap.academicplan.service.AcademicPlanServiceImpl;
 //import org.springframework.beans.factory.annotation.Autowire;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.UnexpectedRollbackException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -294,7 +290,7 @@ public abstract class TestAcademicPlanServiceImplConformanceBaseCrud {
 			{
 					// expected
 			}
-			
+
 	}
 	
 	/*
@@ -554,221 +550,6 @@ public abstract class TestAcademicPlanServiceImplConformanceBaseCrud {
 	public abstract void testCrudPlanItem_setDTOFieldsForTestReadAfterUpdate(PlanItemInfo expected);
 	
 	
-	// ****************************************************
-	//           PlanItemSetInfo
-	// ****************************************************
-	@Test
-	public void testCrudPlanItemSet()
-            throws DataValidationErrorException,
-            DoesNotExistException,
-            InvalidParameterException,
-            MissingParameterException,
-            OperationFailedException,
-            PermissionDeniedException,
-            ReadOnlyException,
-            VersionMismatchException,
-            DependentObjectsExistException, AlreadyExistsException {
-
-//NOTE: we are not using PlanItemSets yet...(perhaps will be in future work pulled in from myPlan)
-
-//			// -------------------------------------
-//			// test create
-//			// -------------------------------------
-//			PlanItemSetInfo planItemSet = new PlanItemSetInfo ();
-//            PlanItemSetInfo expected = new PlanItemSetInfo ();
-//
-//			// METHOD TO SET DTO FIELDS HERE FOR TEST CREATE
-//            testCrudPlanItemSet_setDTOFieldsForTestCreate (planItemSet);
-//			testCrudPlanItemSet_setDTOFieldsForTestCreate (expected);
-//
-//			new AttributeTester().add2ForCreate(expected.getAttributes());
-//
-//			// code to create actual
-//			PlanItemSetInfo actual = testService.createPlanItemSet ( planItemSet, contextInfo);
-//
-//			assertNotNull(actual.getId());
-//			new IdEntityTester().check(expected, actual);
-//
-//			// METHOD TO TEST DTO FIELDS HERE FOR TEST CREATE
-//			testCrudPlanItemSet_testDTOFieldsForTestCreateUpdate (expected, actual);
-//
-//			new AttributeTester().check(expected.getAttributes(), actual.getAttributes());
-//			new MetaTester().checkAfterCreate(actual.getMeta());
-//
-//			// -------------------------------------
-//			// test read
-//			// -------------------------------------
-//			expected = actual;
-//			actual = testService.getPlanItemSet ( actual.getId(), contextInfo);
-//			assertEquals(expected.getId(), actual.getId());
-//			new IdEntityTester().check(expected, actual);
-//
-//			// INSERT CODE FOR TESTING MORE DTO FIELDS HERE
-//			testCrudPlanItemSet_testDTOFieldsForTestCreateUpdate (expected, actual);
-//
-//			new AttributeTester().check(expected.getAttributes(), actual.getAttributes());
-//			new MetaTester().checkAfterGet(expected.getMeta(), actual.getMeta());
-//
-//			// -------------------------------------
-//			// test update
-//			// -------------------------------------
-//			PlanItemSetInfo original = new PlanItemSetInfo (actual);
-//			expected = new PlanItemSetInfo (actual);
-//
-//			expected.setStateKey(expected.getState() + "_Updated");
-//
-//			// METHOD TO INSERT CODE TO UPDATE DTO FIELDS HERE
-//			testCrudPlanItemSet_setDTOFieldsForTestUpdate (expected);
-//
-//			new AttributeTester().delete1Update1Add1ForUpdate(expected.getAttributes());
-//			// code to update
-//			actual = testService.updatePlanItemSet ( expected.getId(), planItemSet, contextInfo);
-//
-//			assertEquals(expected.getId(), actual.getId());
-//			new IdEntityTester().check(expected, actual);
-//
-//			// METHOD TO INSERT CODE FOR TESTING DTO FIELDS HERE
-//			testCrudPlanItemSet_testDTOFieldsForTestCreateUpdate (expected, actual);
-//
-//			new AttributeTester().check(expected.getAttributes(), actual.getAttributes());
-//			new MetaTester().checkAfterUpdate(expected.getMeta(), actual.getMeta());
-//
-//			// Test that VersionMissmatchException's are being detected
-//			boolean exception = false;
-//			try {
-//   			    testService.updatePlanItemSet ( original.getId(), planItemSet, contextInfo);
-//			}
-//			catch (VersionMismatchException e) {
-//   			    exception = true;			}
-//
-//			Assert.assertTrue("VersionMissmatchException was not detected!", exception);
-//
-//			// -------------------------------------
-//			// test read after update
-//			// -------------------------------------
-//
-//			expected = actual;
-//			// code to get actual
-//			actual = testService.getPlanItemSet ( actual.getId(), contextInfo);
-//
-//			assertEquals(expected.getId(), actual.getId());
-//			new IdEntityTester().check(expected, actual);
-//
-//			// INSERT METHOD CODE FOR TESTING DTO FIELDS HERE
-//			testCrudPlanItemSet_testDTOFieldsForTestReadAfterUpdate (expected, actual);
-//
-//			new AttributeTester().check(expected.getAttributes(), actual.getAttributes());
-//			new MetaTester().checkAfterGet(expected.getMeta(), actual.getMeta());
-//
-//			PlanItemSetInfo alphaDTO = actual;
-//
-//			// create a 2nd DTO
-//			PlanItemSetInfo betaDTO = new PlanItemSetInfo ();
-//
-//			// METHOD TO INSERT CODE TO SET MORE DTO FIELDS HERE
-//			testCrudPlanItemSet_setDTOFieldsForTestReadAfterUpdate (betaDTO);
-//
-//			betaDTO.setTypeKey("typeKeyBeta");
-//			betaDTO.setStateKey("stateKeyBeta");
-//			betaDTO = testService.createPlanItemSet ( planItemSet, contextInfo);
-//
-//			// -------------------------------------
-//			// test bulk get with no ids supplied
-//			// -------------------------------------
-//
-//			List<String> planItemSetIds = new ArrayList<String>();
-//			// code to get DTO by Ids
-//			List<PlanItemSetInfo> records = testService.getPlanItemSetsByIds ( planItemSetIds, contextInfo);
-//
-//			assertEquals(planItemSetIds.size(), records.size());
-//			assertEquals(0, planItemSetIds.size());
-//
-//			// -------------------------------------
-//			// test bulk get
-//			// -------------------------------------
-//			planItemSetIds = new ArrayList<String>();
-//			planItemSetIds.add(alphaDTO.getId());
-//			planItemSetIds.add(betaDTO.getId());
-//			// code to get DTO by Ids
-//			records = testService.getPlanItemSetsByIds ( planItemSetIds, contextInfo);
-//
-//			assertEquals(planItemSetIds.size(), records.size());
-//			for (PlanItemSetInfo record : records)
-//			{
-//					if (!planItemSetIds.remove(record.getId()))
-//					{
-//							fail(record.getId());
-//					}
-//			}
-//			assertEquals(0, planItemSetIds.size());
-//
-//			// -------------------------------------
-//			// test get by type
-//			// -------------------------------------
-//			// code to get by specific type "typeKey01"
-//			planItemSetIds = testService.getPlanItemSetIdsByType ("typeKey_Updated", contextInfo);
-//
-//			assertEquals(1, planItemSetIds.size());
-//			assertEquals(alphaDTO.getId(), planItemSetIds.get(0));
-//
-//			// test get by other type
-//			// code to get by specific type "typeKeyBeta"
-//			planItemSetIds = testService.getPlanItemSetIdsByType ("typeKeyBeta", contextInfo);
-//
-//			assertEquals(1, planItemSetIds.size());
-//			assertEquals(betaDTO.getId(), planItemSetIds.get(0));
-//
-//			// -------------------------------------
-//			// test delete
-//			// -------------------------------------
-//
-//			StatusInfo status = testService.deletePlanItemSet ( actual.getId(), contextInfo);
-//
-//			assertNotNull(status);
-//			assertTrue(status.getIsSuccess());
-//			try
-//			{
-//					PlanItemSetInfo record = testService.getPlanItemSet ( actual.getId(), contextInfo);
-//					fail("Did not receive DoesNotExistException when attempting to get already-deleted entity");
-//			}
-//			catch (DoesNotExistException dnee)
-//			{
-//					// expected
-//			}
-			
-	}
-	
-	/*
-		A method to set the fields for a PlanItemSet in a 'test create' section prior to calling the 'create' operation.
-	*/
-	public abstract void testCrudPlanItemSet_setDTOFieldsForTestCreate(PlanItemSetInfo expected);
-	
-	/*
-		A method to test the fields for a PlanItemSet. This is called after:
-		- creating a DTO, where actual is the DTO returned by the create operation, and expected is the dto passed in to the create operation
-		- reading a DTO after creating it, and actual is the read DTO, and expected is the dto that was created
-		- updating a DTO, where actual is DTO returned by the update operation, and expected is the dto that was passed in to the update operation
-	*/
-	public abstract void testCrudPlanItemSet_testDTOFieldsForTestCreateUpdate(PlanItemSetInfo expected, PlanItemSetInfo actual);
-	
-	/*
-		A method to set the fields for a PlanItemSet in a 'test update' section prior to calling the 'update' operation.
-	*/
-	public abstract void testCrudPlanItemSet_setDTOFieldsForTestUpdate(PlanItemSetInfo expected);
-	
-	/*
-		A method to test the fields for a PlanItemSet after an update operation, followed by a read operation,
-		where actual is the DTO returned by the read operation, and expected is the dto returned by the update operation.
-	*/
-	public abstract void testCrudPlanItemSet_testDTOFieldsForTestReadAfterUpdate(PlanItemSetInfo expected, PlanItemSetInfo actual);
-	
-	/*
-		A method to set the fields for a PlanItemSet in the 'test read after update' section.
-		This dto is another (second) dto object being created for other tests.
-	*/
-	public abstract void testCrudPlanItemSet_setDTOFieldsForTestReadAfterUpdate(PlanItemSetInfo expected);
-	
-	
 	// ========================================
 	// SERVICE OPS TESTED IN BASE TEST CLASS
 	// ========================================
@@ -780,18 +561,13 @@ public abstract class TestAcademicPlanServiceImplConformanceBaseCrud {
 			getPlanItem
 			getPlanItemsByIds
 			getPlanItemsInPlanByType
-			getPlanItemSet
-			getPlanItemSetsByIds
 			getLearningPlansForStudentByType
 			createLearningPlan
 			createPlanItem
-			createPlanItemSet
 			updateLearningPlan
 			updatePlanItem
-			updatePlanItemSet
 			deleteLearningPlan
 			deletePlanItem
-			deletePlanItemSet
 	*/
 	
 	// ========================================
@@ -808,7 +584,7 @@ public abstract class TestAcademicPlanServiceImplConformanceBaseCrud {
 	public abstract void test_getPlanItemsInPlan() 
 	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	;
 
-	/* Method Name: getPlanItemsInPlanByAtp */
+	/* Method Name: getPlanItemsInPlanByTermIdByCategory */
 	@Test
 	public abstract void test_getPlanItemsInPlanByAtp() 
 	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	;
@@ -816,11 +592,6 @@ public abstract class TestAcademicPlanServiceImplConformanceBaseCrud {
 	/* Method Name: getPlanItemsInPlanByRefObjectIdByRefObjectType */
 	@Test
 	public abstract void test_getPlanItemsInPlanByRefObjectIdByRefObjectType() 
-	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	;
-	
-	/* Method Name: getPlanItemsInSet */
-	@Test
-	public abstract void test_getPlanItemsInSet() 
 	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	;
 	
 	/* Method Name: validateLearningPlan */
@@ -832,11 +603,6 @@ public abstract class TestAcademicPlanServiceImplConformanceBaseCrud {
 	@Test
 	public abstract void test_validatePlanItem() 
 	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	,AlreadyExistsException, AlreadyExistsException;
-	
-	/* Method Name: validatePlanItemSet */
-	@Test
-	public abstract void test_validatePlanItemSet() 
-	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	;
 	
 }
 

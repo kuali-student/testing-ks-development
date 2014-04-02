@@ -26,7 +26,7 @@ import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
 import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
 import org.kuali.student.ap.academicplan.infc.LearningPlan;
 import org.kuali.student.ap.academicplan.service.AcademicPlanService;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
 import org.kuali.student.ap.framework.context.CourseHelper;
 import org.kuali.student.ap.framework.context.PlanConstants;
@@ -737,8 +737,6 @@ public class DefaultScheduleBuildStrategy implements ScheduleBuildStrategy,
 		try {
 			planItems = academicPlanService.getPlanItemsInPlan(learningPlanId,
 					context);
-		} catch (DoesNotExistException e) {
-			throw new IllegalArgumentException("CO lookup failure", e);
 		} catch (InvalidParameterException e) {
 			throw new IllegalArgumentException("CO lookup failure", e);
 		} catch (MissingParameterException e) {
@@ -791,8 +789,8 @@ public class DefaultScheduleBuildStrategy implements ScheduleBuildStrategy,
 			if (!PlanConstants.COURSE_TYPE.equals(planItem.getRefObjectType()))
 				continue;
 
-			List<String> periods = planItem.getPlanPeriods();
-			if (periods == null || !periods.contains(termId))
+			List<String> planTermIds = planItem.getPlanTermIds();
+			if (planTermIds == null || !planTermIds.contains(termId))
 				continue;
 
 			String acodeattr = planItem.getAttributeValue("activityCode");
@@ -883,9 +881,6 @@ public class DefaultScheduleBuildStrategy implements ScheduleBuildStrategy,
 							"No learning plans found for student " + studentId);
 				}
 				return KSCollectionUtils.getRequiredZeroElement(lps);
-			} catch (DoesNotExistException e) {
-				throw new IllegalArgumentException(
-						"No learning plan exists for student " + studentId, e);
 			} catch (InvalidParameterException e) {
 				throw new IllegalArgumentException(
 						"Invalid student ID or learning plan type " + studentId

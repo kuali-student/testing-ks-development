@@ -3,7 +3,7 @@ package org.kuali.student.ap.coursesearch.util;
 import java.util.List;
 
 import org.junit.Test;
-import org.kuali.student.ap.framework.course.CourseSearchItem;
+import org.kuali.student.ap.coursesearch.CourseSearchItem;
 import org.kuali.student.ap.coursesearch.dataobject.CourseSearchItemImpl;
 import org.kuali.student.ap.coursesearch.dataobject.FacetItem;
 

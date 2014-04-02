@@ -3,14 +3,12 @@ package org.kuali.student.ap.coursesearch.controller;
 import org.kuali.rice.core.api.config.property.ConfigContext;
 import org.kuali.rice.core.api.criteria.Predicate;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
-import org.kuali.rice.krad.util.GlobalVariables;
-import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
 import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
 import org.kuali.student.ap.academicplan.infc.LearningPlan;
 import org.kuali.student.ap.academicplan.infc.PlanItem;
 import org.kuali.student.ap.academicplan.service.AcademicPlanService;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.coursesearch.dataobject.CourseSearchItemImpl;
 import org.kuali.student.ap.coursesearch.dataobject.FacetItem;
 import org.kuali.student.ap.coursesearch.form.CourseSearchFormImpl;
@@ -21,10 +19,10 @@ import org.kuali.student.ap.coursesearch.util.GenEduReqFacet;
 import org.kuali.student.ap.coursesearch.util.TermsFacet;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
 import org.kuali.student.ap.framework.context.CourseSearchConstants;
-import org.kuali.student.ap.framework.course.CourseSearchForm;
-import org.kuali.student.ap.framework.course.CourseSearchItem;
-import org.kuali.student.ap.framework.course.CourseSearchStrategy;
-import org.kuali.student.ap.framework.course.Credit;
+import org.kuali.student.ap.coursesearch.CourseSearchForm;
+import org.kuali.student.ap.coursesearch.CourseSearchItem;
+import org.kuali.student.ap.coursesearch.CourseSearchStrategy;
+import org.kuali.student.ap.coursesearch.Credit;
 import org.kuali.student.ap.framework.util.KsapHelperUtil;
 import org.kuali.student.enrollment.courseoffering.dto.CourseOfferingInfo;
 import org.kuali.student.r2.common.dto.ContextInfo;
@@ -665,9 +663,6 @@ public class CourseSearchStrategyImpl implements CourseSearchStrategy {
 			learningPlanList = academicPlanService
 					.getLearningPlansForStudentByType(studentID, planTypeKey,
 							context);
-		} catch (DoesNotExistException e) {
-			throw new IllegalArgumentException("Learning plan does not exist",
-					e);
 		} catch (InvalidParameterException e) {
 			throw new IllegalArgumentException("LP lookup error", e);
 		} catch (MissingParameterException e) {
@@ -683,9 +678,6 @@ public class CourseSearchStrategyImpl implements CourseSearchStrategy {
 			try {
 				planItemList = academicPlanService.getPlanItemsInPlan(
 						learningPlanID, context);
-			} catch (DoesNotExistException e) {
-				throw new IllegalArgumentException(
-						"Learning plan items do not exist", e);
 			} catch (InvalidParameterException e) {
 				throw new IllegalArgumentException("LP lookup error", e);
 			} catch (MissingParameterException e) {

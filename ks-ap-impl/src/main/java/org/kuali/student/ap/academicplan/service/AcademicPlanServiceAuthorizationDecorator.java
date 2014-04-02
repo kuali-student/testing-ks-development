@@ -1,6 +1,7 @@
 package org.kuali.student.ap.academicplan.service;
 
 import org.kuali.rice.kim.api.permission.PermissionService;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
 import org.kuali.student.r2.common.dto.ContextInfo;
 import org.kuali.student.r2.common.exceptions.*;

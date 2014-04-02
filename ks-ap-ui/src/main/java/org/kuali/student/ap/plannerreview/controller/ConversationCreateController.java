@@ -20,7 +20,7 @@ import org.kuali.rice.krad.web.form.UifFormBase;
 import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
 import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
 import org.kuali.student.ap.academicplan.service.AcademicPlanService;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.coursesearch.service.impl.CourseDetailsInquiryHelperImpl;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
 import org.kuali.student.ap.framework.context.PlanConstants;
@@ -447,8 +447,6 @@ public class ConversationCreateController extends ConversationControllerBase {
 					getUserId(), PlanConstants.LEARNING_PLAN_TYPE_PLAN,
 					KsapFrameworkServiceLocator.getContext().getContextInfo());
             planId = KSCollectionUtils.getRequiredZeroElement(plans).getId();
-		} catch (DoesNotExistException e) {
-			throw new IllegalArgumentException("LP lookup failure", e);
 		} catch (InvalidParameterException e) {
 			throw new IllegalArgumentException("LP lookup failure", e);
 		} catch (MissingParameterException e) {
@@ -463,8 +461,6 @@ public class ConversationCreateController extends ConversationControllerBase {
 		try {
 			planItems = getAcademicPlanService().getPlanItemsInPlan(planId,
 					KsapFrameworkServiceLocator.getContext().getContextInfo());
-		} catch (DoesNotExistException e) {
-			throw new IllegalArgumentException("LP lookup failure", e);
 		} catch (InvalidParameterException e) {
 			throw new IllegalArgumentException("LP lookup failure", e);
 		} catch (MissingParameterException e) {

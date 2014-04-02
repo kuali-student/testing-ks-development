@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.kuali.student.ap.academicplan.infc.LearningPlan;
 import org.kuali.student.ap.academicplan.infc.PlanItem;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
 import org.kuali.student.ap.framework.context.PlanConstants;
 import org.kuali.student.ap.planner.PlanItemForm;
@@ -88,8 +88,8 @@ public final class PlanItemControllerHelper {
 		String expectedTermId = form.getTermId();
 		if (expectedTermId != null) {
             try{
-                String planPeriod = KSCollectionUtils.getRequiredZeroElement(planItem.getPlanPeriods());
-                if (!expectedTermId.equals(planPeriod)) {
+                String planTermId = KSCollectionUtils.getRequiredZeroElement(planItem.getPlanTermIds());
+                if (!expectedTermId.equals(planTermId)) {
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Plan item " + planItemId
                             + " not from expected term " + expectedCategory + ", found " + planItem.getTypeKey());
                     return null;

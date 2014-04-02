@@ -2,13 +2,13 @@ package org.kuali.student.ap.planner.support;
 
 import org.kuali.student.ap.academicplan.infc.LearningPlan;
 import org.kuali.student.ap.academicplan.infc.PlanItem;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
 import org.kuali.student.ap.framework.context.CourseHelper;
 import org.kuali.student.ap.framework.context.PlanConstants;
 import org.kuali.student.ap.framework.context.TermHelper;
-import org.kuali.student.ap.framework.course.CreditsFormatter;
-import org.kuali.student.ap.framework.course.CreditsFormatter.Range;
+import org.kuali.student.ap.coursesearch.CreditsFormatter;
+import org.kuali.student.ap.coursesearch.CreditsFormatter.Range;
 import org.kuali.student.ap.planner.PlannerForm;
 import org.kuali.student.ap.planner.PlannerItem;
 import org.kuali.student.ap.planner.PlannerTerm;
@@ -301,7 +301,7 @@ public class DefaultPlannerForm extends AbstractPlanItemForm implements
 		setCourseNote(descr != null && StringUtils.hasText(descr.getPlain()) ? descr
 				.getPlain() : null);
 
-		setCourseCredit(planItem.getCredit());
+		setCourseCredit(planItem.getCredits());
 	}
 
 	public List<PlannerTerm> getTerms() {
@@ -341,8 +341,6 @@ public class DefaultPlannerForm extends AbstractPlanItemForm implements
 								learningPlan.getId(),
 								KsapFrameworkServiceLocator.getContext()
 										.getContextInfo()));
-			} catch (DoesNotExistException e) {
-				throw new IllegalArgumentException("LP lookup failure", e);
 			} catch (InvalidParameterException e) {
 				throw new IllegalArgumentException("LP lookup failure", e);
 			} catch (MissingParameterException e) {
@@ -361,19 +359,19 @@ public class DefaultPlannerForm extends AbstractPlanItemForm implements
 
 				AcademicPlanServiceConstants.ItemCategory category = planItem.getCategory();
 				String refTypeKey = planItem.getRefObjectType();
-				List<String> planPeriods = planItem.getPlanPeriods();
+				List<String> planTermIds = planItem.getPlanTermIds();
 				if (!PlanConstants.COURSE_TYPE.equals(refTypeKey)
 						|| (!AcademicPlanServiceConstants.ItemCategory.CART
 								.equals(category)
 								&& !AcademicPlanServiceConstants.ItemCategory.PLANNED
 										.equals(category) && !AcademicPlanServiceConstants.ItemCategory.BACKUP
-									.equals(category)) || planPeriods == null
-						|| planPeriods.isEmpty()) {
+									.equals(category)) || planTermIds == null
+						|| planTermIds.isEmpty()) {
 					planItemIterator.remove();
 					continue;
 				}
 
-				termIds.addAll(planPeriods);
+				termIds.addAll(planTermIds);
 				courseIds.add(planItem.getRefObjectId());
 			}
 
@@ -397,7 +395,7 @@ public class DefaultPlannerForm extends AbstractPlanItemForm implements
 				Course course = courseHelper.getCourseInfo(planItem
 						.getRefObjectId());
 
-				for (String termId : planItem.getPlanPeriods()) {
+				for (String termId : planItem.getPlanTermIds()) {
 					Map<String, List<PlannerItem>> itemMap;
 					if (AcademicPlanServiceConstants.ItemCategory.CART
 							.equals(category))

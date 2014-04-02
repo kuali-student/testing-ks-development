@@ -14,7 +14,7 @@ import org.kuali.student.common.util.UUIDHelper;
 import org.kuali.student.ap.academicplan.dao.LearningPlanDao;
 import org.kuali.student.ap.academicplan.model.LearningPlanEntity;
 import org.kuali.student.ap.academicplan.model.LearningPlanRichTextEntity;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 
 @PersistenceFileLocation("classpath:META-INF/lp-persistence.xml")
 public class LearningPlanDaoTest extends AbstractTransactionalDaoTest {

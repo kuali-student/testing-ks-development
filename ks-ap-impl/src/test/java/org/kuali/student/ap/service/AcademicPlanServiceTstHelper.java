@@ -1,6 +1,6 @@
 package org.kuali.student.ap.service;
 
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
 import org.kuali.student.r2.common.util.RichTextHelper;
 import org.kuali.student.r2.core.class1.type.dto.TypeInfo;

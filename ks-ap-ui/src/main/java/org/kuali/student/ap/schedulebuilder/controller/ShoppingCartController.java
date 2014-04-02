@@ -3,7 +3,7 @@ package org.kuali.student.ap.schedulebuilder.controller;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.web.controller.UifControllerBase;
 import org.kuali.rice.krad.web.form.UifFormBase;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
 import org.kuali.student.ap.framework.context.PlanConstants;
 import org.kuali.student.ap.planner.support.PlanItemControllerHelper;
@@ -251,10 +251,10 @@ public class ShoppingCartController extends UifControllerBase {
 					planItemInfo.setLearningPlanId(plan.getId());
 					planItemInfo.setRefObjectId(course.getId());
 					planItemInfo.setRefObjectType(PlanConstants.COURSE_TYPE);
-					List<String> planPeriods = new ArrayList<String>(
+					List<String> planTermIds = new ArrayList<String>(
 							1);
-					planPeriods.add(cartRequest.getTerm().getId());
-					planItemInfo.setPlanPeriods(planPeriods);
+					planTermIds.add(cartRequest.getTerm().getId());
+					planItemInfo.setPlanTermIds(planTermIds);
 					planItemInfo.setCredit(cartRequest.getCredits());
 
 					String campusCode = null;
@@ -337,7 +337,7 @@ public class ShoppingCartController extends UifControllerBase {
 						for (PlanItemInfo planItemInfo : planItemInfos) {
 							if (planItemInfo.getCategory().equals(
 									AcademicPlanServiceConstants.ItemCategory.CART)) {
-								if (!planItemInfo.getPlanPeriods().contains(
+								if (!planItemInfo.getPlanTermIds().contains(
 										cartRequest.getTerm().getId()))
 									continue;
 								String activityCodeString = planItemInfo

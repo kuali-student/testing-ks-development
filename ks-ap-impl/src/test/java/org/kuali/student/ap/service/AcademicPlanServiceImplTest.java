@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kuali.student.ap.academicplan.infc.PlanItem;
@@ -20,7 +19,7 @@ import org.kuali.student.ap.framework.context.support.DefaultKsapContext;
 import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
 import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
 import org.kuali.student.ap.academicplan.infc.LearningPlan;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.r2.common.dto.MetaInfo;
 import org.kuali.student.r2.common.dto.RichTextInfo;
 import org.kuali.student.r2.common.dto.ValidationResultInfo;
@@ -30,9 +29,7 @@ import org.kuali.student.r2.common.exceptions.DoesNotExistException;
 import org.kuali.student.r2.common.exceptions.InvalidParameterException;
 import org.kuali.student.r2.common.exceptions.MissingParameterException;
 import org.kuali.student.r2.common.exceptions.OperationFailedException;
-import org.kuali.student.r2.core.class1.atp.service.impl.DateUtil;
 import org.kuali.student.r2.lum.clu.CLUConstants;
-import org.kuali.student.r2.lum.lu.service.impl.CluDataLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -267,7 +264,7 @@ public class AcademicPlanServiceImplTest extends TestAcademicPlanServiceImplConf
 		planItem.setRefObjectId(courseId);
 		planItem.setRefObjectType(courseType);
 
-		// Type wishlist has no ATP associated with it so leave plan periods
+		// Type wishlist has no ATP associated with it so leave plan terms
 		// null.
 
 		planItem.setStateKey(AcademicPlanServiceConstants.LEARNING_PLAN_ITEM_ACTIVE_STATE_KEY);
@@ -316,10 +313,10 @@ public class AcademicPlanServiceImplTest extends TestAcademicPlanServiceImplConf
         planItem.setCategory(category);
 
 		// Set some ATP info since this is a planned course.
-		List<String> planPeriods = new ArrayList<String>();
-		planPeriods.add("20111");
-		planPeriods.add("20114");
-		planItem.setPlanPeriods(planPeriods);
+		List<String> planTermIds = new ArrayList<String>();
+		planTermIds.add("20111");
+		planTermIds.add("20114");
+		planItem.setPlanTermIds(planTermIds);
 
 		String courseId = "COURSE5";
 		String courseType = CLUConstants.CLU_TYPE_CREDIT_COURSE;
@@ -341,7 +338,7 @@ public class AcademicPlanServiceImplTest extends TestAcademicPlanServiceImplConf
 		assertEquals(courseType, newPlanItem.getRefObjectType());
         assertEquals(category  , newPlanItem.getCategory());
 
-		assertEquals(2, newPlanItem.getPlanPeriods().size());
+		assertEquals(2, newPlanItem.getPlanTermIds().size());
 
 		// Verify the object returned by getPlanItem().
 		PlanItem fetchedPlanItem = KsapFrameworkServiceLocator.getAcademicPlanService().getPlanItem(newPlanItem
@@ -357,11 +354,11 @@ public class AcademicPlanServiceImplTest extends TestAcademicPlanServiceImplConf
 		assertEquals(courseType, fetchedPlanItem.getRefObjectType());
         assertEquals(category  , fetchedPlanItem.getCategory());
 
-		assertEquals(2, fetchedPlanItem.getPlanPeriods().size());
+		assertEquals(2, fetchedPlanItem.getPlanTermIds().size());
 	}
 
 	@Test
-	public void updatePlanItemPlannedCoursePlanPeriods() throws Throwable {
+	public void updatePlanItemPlannedCoursePlanTermIds() throws Throwable {
 
 		String planId = "lp1";
 
@@ -379,10 +376,10 @@ public class AcademicPlanServiceImplTest extends TestAcademicPlanServiceImplConf
 		planItemInfo.setLearningPlanId(planId);
 
 		// Set some ATP info since this is a planned course.
-		List<String> planPeriods = new ArrayList<String>();
-		planPeriods.add("20111");
-		planPeriods.add("20114");
-		planItemInfo.setPlanPeriods(planPeriods);
+		List<String> planTermIds = new ArrayList<String>();
+		planTermIds.add("20111");
+		planTermIds.add("20114");
+		planItemInfo.setPlanTermIds(planTermIds);
 
 		String courseId = "c796aecc-7234-4482-993c-bf00b8088e84";
 		String courseType = CLUConstants.CLU_TYPE_CREDIT_COURSE;
@@ -415,7 +412,7 @@ public class AcademicPlanServiceImplTest extends TestAcademicPlanServiceImplConf
         assertEquals(planItemInfo.getCategory(), fetchedPlanItem.getCategory());
 		assertEquals(planItemInfo.getTypeKey(), fetchedPlanItem.getTypeKey());
 		assertEquals(planItemInfo.getStateKey(), fetchedPlanItem.getStateKey());
-		assertEquals(2, fetchedPlanItem.getPlanPeriods().size());
+		assertEquals(2, fetchedPlanItem.getPlanTermIds().size());
 		assertEquals("student1", fetchedPlanItem.getMeta().getUpdateId());
 		assertNotNull(fetchedPlanItem.getMeta().getUpdateTime());
 
@@ -423,8 +420,8 @@ public class AcademicPlanServiceImplTest extends TestAcademicPlanServiceImplConf
 		Date originalUpdateDate = newPlanItem.getMeta().getUpdateTime();
 
 		// Update the plan item and save.
-		fetchedPlanItem.getPlanPeriods().remove("20111");
-		assertEquals(1, fetchedPlanItem.getPlanPeriods().size());
+		fetchedPlanItem.getPlanTermIds().remove("20111");
+		assertEquals(1, fetchedPlanItem.getPlanTermIds().size());
 
         // NOTE: the following stmt is required to change the date in contextInfo...otherwise it is always the same
         //        for ea transaction  (it is used to set the updateDateTime)
@@ -442,8 +439,8 @@ public class AcademicPlanServiceImplTest extends TestAcademicPlanServiceImplConf
 		assertEquals(courseId, updatedPlanItem.getRefObjectId());
 		assertEquals(courseType, updatedPlanItem.getRefObjectType());
         assertEquals(category, updatedPlanItem.getCategory());
-		assertEquals(1, updatedPlanItem.getPlanPeriods().size());
-		assertTrue(updatedPlanItem.getPlanPeriods().contains("20114"));
+		assertEquals(1, updatedPlanItem.getPlanTermIds().size());
+		assertTrue(updatedPlanItem.getPlanTermIds().contains("20114"));
 		assertFalse(originalUpdateDate.equals(updatedPlanItem.getMeta()
 				.getUpdateTime()));
 	}
@@ -633,7 +630,8 @@ public class AcademicPlanServiceImplTest extends TestAcademicPlanServiceImplConf
 				validationResultInfos.get(0).getMessage());
 		assertEquals("refObjectId", validationResultInfos.get(0).getElement());
 		assertEquals(
-				"Plan Item category was ["+AcademicPlanServiceConstants.ItemCategory.PLANNED+"], but no plan periods were defined.",
+				"Plan Item category was ["+AcademicPlanServiceConstants.ItemCategory.PLANNED+"], " +
+                        "but no plan terms were defined.",
 				validationResultInfos.get(1).getMessage());
 		assertEquals("category", validationResultInfos.get(1).getElement());
 	}
@@ -659,7 +657,8 @@ public class AcademicPlanServiceImplTest extends TestAcademicPlanServiceImplConf
 				validationResultInfos.get(0).getMessage());
 		assertEquals("refObjectId", validationResultInfos.get(0).getElement());
 		assertEquals(
-				"Plan Item category was ["+ AcademicPlanServiceConstants.ItemCategory.BACKUP +"], but no plan periods were defined.",
+				"Plan Item category was ["+ AcademicPlanServiceConstants.ItemCategory.BACKUP +"], " +
+                        "but no plan terms were defined.",
 				validationResultInfos.get(1).getMessage());
 		assertEquals("category", validationResultInfos.get(1).getElement());
 	}

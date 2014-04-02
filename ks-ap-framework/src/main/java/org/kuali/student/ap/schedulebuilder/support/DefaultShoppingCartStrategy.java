@@ -1,6 +1,6 @@
 package org.kuali.student.ap.schedulebuilder.support;
 
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
 import org.kuali.student.ap.framework.context.CourseHelper;
 import org.kuali.student.ap.framework.context.PlanConstants;
@@ -19,7 +19,6 @@ import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
 import org.kuali.student.ap.academicplan.infc.PlanItem;
 import org.kuali.student.ap.academicplan.service.AcademicPlanService;
 import org.kuali.student.r2.common.dto.ContextInfo;
-import org.kuali.student.r2.common.exceptions.DoesNotExistException;
 import org.kuali.student.r2.common.exceptions.InvalidParameterException;
 import org.kuali.student.r2.common.exceptions.MissingParameterException;
 import org.kuali.student.r2.common.exceptions.OperationFailedException;
@@ -52,7 +51,7 @@ public class DefaultShoppingCartStrategy implements ShoppingCartStrategy,
 		ScheduleBuildStrategy scheduleBuildStrategy = KsapFrameworkServiceLocator
 				.getScheduleBuildStrategy();
 		assert PlanConstants.COURSE_TYPE.equals(planItem.getRefObjectType());
-		assert planItem.getPlanPeriods().contains(term.getId());
+		assert planItem.getPlanTermIds().contains(term.getId());
 
 		List<CourseOption> courseOptions = scheduleBuildStrategy
 				.getCourseOptions(
@@ -162,8 +161,6 @@ public class DefaultShoppingCartStrategy implements ShoppingCartStrategy,
 			planItems = academicPlanService.getPlanItemsInPlanByCategory(
 					learningPlanId, AcademicPlanServiceConstants.ItemCategory.CART,
 					context);
-		} catch (DoesNotExistException e) {
-			throw new IllegalArgumentException("CO lookup failure", e);
 		} catch (InvalidParameterException e) {
 			throw new IllegalArgumentException("CO lookup failure", e);
 		} catch (MissingParameterException e) {
@@ -176,8 +173,8 @@ public class DefaultShoppingCartStrategy implements ShoppingCartStrategy,
 			if (!PlanConstants.COURSE_TYPE.equals(planItem.getRefObjectType()))
 				continue;
 
-			List<String> periods = planItem.getPlanPeriods();
-			if (periods == null || !periods.contains(termInfo.getId()))
+			List<String> planTermIds = planItem.getPlanTermIds();
+			if (planTermIds == null || !planTermIds.contains(termInfo.getId()))
 				continue;
 
 			String acodeattr = planItem.getAttributeValue("activityCode");

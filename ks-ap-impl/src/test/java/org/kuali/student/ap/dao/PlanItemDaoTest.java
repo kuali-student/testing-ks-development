@@ -7,7 +7,7 @@ import org.kuali.student.common.test.spring.PersistenceFileLocation;
 import org.kuali.student.common.util.UUIDHelper;
 import org.kuali.student.ap.academicplan.dao.LearningPlanDao;
 import org.kuali.student.ap.academicplan.dao.PlanItemDao;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.academicplan.model.LearningPlanEntity;
 import org.kuali.student.ap.academicplan.model.PlanItemEntity;
 
@@ -37,20 +37,21 @@ public class PlanItemDaoTest extends AbstractTransactionalDaoTest {
 
         String planId = "lp1";
 
-        List<PlanItemEntity> planItems = planItemDao.getLearningPlanItems(planId, AcademicPlanServiceConstants.ItemCategory.WISHLIST);
+        List<PlanItemEntity> planItems = planItemDao.getLearningPlanItemsByCategory(planId,
+                AcademicPlanServiceConstants.ItemCategory.WISHLIST);
         assertEquals(4, planItems.size());
         for (PlanItemEntity pie : planItems) {
             assertEquals(AcademicPlanServiceConstants.ItemCategory.WISHLIST.toString(), pie.getCategory());
             assertEquals("student1", pie.getLearningPlan().getStudentId());
         }
 
-        planItems = planItemDao.getLearningPlanItems(planId, AcademicPlanServiceConstants.ItemCategory.PLANNED);
+        planItems = planItemDao.getLearningPlanItemsByCategory(planId, AcademicPlanServiceConstants.ItemCategory.PLANNED);
         assertEquals(3, planItems.size());
         for (PlanItemEntity pie : planItems) {
             assertEquals(AcademicPlanServiceConstants.ItemCategory.PLANNED.toString(), pie.getCategory());
             assertEquals("student1", pie.getLearningPlan().getStudentId());
         }
-        planItems = planItemDao.getLearningPlanItems(planId, AcademicPlanServiceConstants.ItemCategory.BACKUP);
+        planItems = planItemDao.getLearningPlanItemsByCategory(planId, AcademicPlanServiceConstants.ItemCategory.BACKUP);
         assertEquals(1, planItems.size());
         for (PlanItemEntity pie : planItems) {
             assertEquals(AcademicPlanServiceConstants.ItemCategory.BACKUP.toString(), pie.getCategory());
@@ -65,12 +66,13 @@ public class PlanItemDaoTest extends AbstractTransactionalDaoTest {
         String refObjectType1 = "kuali.lu.type.CreditCourse";
         String refObjectType2 = "kuali.lu.type.NonCreditCourse";
 
-        List<PlanItemEntity> planItems = planItemDao.getLearningPlanItemsByRefObjectId(planId, refObjectId, refObjectType1);
+        List<PlanItemEntity> planItems = planItemDao.getLearningPlanItemsByRefObjectIdByRefType(planId, refObjectId,
+                refObjectType1);
         assertEquals(1, planItems.size());
         assertEquals(refObjectId, planItems.get(0).getRefObjectId());
         assertEquals(refObjectType1, planItems.get(0).getRefObjectTypeKey());
 
-        planItems = planItemDao.getLearningPlanItemsByRefObjectId(planId, refObjectId, refObjectType2);
+        planItems = planItemDao.getLearningPlanItemsByRefObjectIdByRefType(planId, refObjectId, refObjectType2);
         assertEquals(1, planItems.size());
         assertEquals(refObjectId, planItems.get(0).getRefObjectId());
         assertEquals(refObjectType2, planItems.get(0).getRefObjectTypeKey());
@@ -92,8 +94,8 @@ public class PlanItemDaoTest extends AbstractTransactionalDaoTest {
         PlanItemEntity pie = planItemDao.find(id);
         assertNotNull(pie);
         assertEquals(id, pie.getId());
-        assertEquals(1, pie.getPlanPeriods().size());
-        assertTrue(pie.getPlanPeriods().contains("testTermId3"));
+        assertEquals(1, pie.getPlanTermIds().size());
+        assertTrue(pie.getPlanTermIds().contains("testTermId3"));
     }
 
     @Test
@@ -102,12 +104,12 @@ public class PlanItemDaoTest extends AbstractTransactionalDaoTest {
         PlanItemEntity pie = planItemDao.find(id);
         assertNotNull(pie);
         assertEquals(id, pie.getId());
-        assertEquals(3, pie.getPlanPeriods().size());
-        Set<String> atpIds = pie.getPlanPeriods();
+        assertEquals(3, pie.getPlanTermIds().size());
+        Set<String> atpIds = pie.getPlanTermIds();
 
-        assertTrue(pie.getPlanPeriods().contains("testTermId1"));
-        assertTrue(pie.getPlanPeriods().contains("testTermId2"));
-        assertTrue(pie.getPlanPeriods().contains("testTermId3"));
+        assertTrue(pie.getPlanTermIds().contains("testTermId1"));
+        assertTrue(pie.getPlanTermIds().contains("testTermId2"));
+        assertTrue(pie.getPlanTermIds().contains("testTermId3"));
     }
 
     @Test
@@ -116,8 +118,8 @@ public class PlanItemDaoTest extends AbstractTransactionalDaoTest {
         PlanItemEntity pie = planItemDao.find(id);
         assertNotNull(pie);
         assertEquals(id, pie.getId());
-        assertNotNull(pie.getPlanPeriods());
-        assertTrue(pie.getPlanPeriods().isEmpty());
+        assertNotNull(pie.getPlanTermIds());
+        assertTrue(pie.getPlanTermIds().isEmpty());
     }
 
     @Test
@@ -166,7 +168,7 @@ public class PlanItemDaoTest extends AbstractTransactionalDaoTest {
         Set<String> atps = new HashSet<String>();
         atps.add("atp1");
         atps.add("atp2");
-        pie.setPlanPeriods(atps);
+        pie.setPlanTermIds(atps);
 
         planItemDao.persist(pie);
 
@@ -179,7 +181,7 @@ public class PlanItemDaoTest extends AbstractTransactionalDaoTest {
         assertEquals(pie.getRefObjectTypeKey(), newPie.getRefObjectTypeKey());
         assertEquals(pie.getCategory(),newPie.getCategory());
 
-        atps = newPie.getPlanPeriods();
+        atps = newPie.getPlanTermIds();
         assertNotNull(atps);
         assertEquals(2, atps.size());
         assertTrue(atps.contains("atp1"));
@@ -204,7 +206,7 @@ public class PlanItemDaoTest extends AbstractTransactionalDaoTest {
         Set<String> atps = new HashSet<String>();
         atps.add("atp1");
         atps.add("atp2");
-        pie.setPlanPeriods(atps);
+        pie.setPlanTermIds(atps);
 
         planItemDao.persist(pie);
 
@@ -217,7 +219,7 @@ public class PlanItemDaoTest extends AbstractTransactionalDaoTest {
         assertEquals(pie.getRefObjectTypeKey(), newPie.getRefObjectTypeKey());
         assertEquals(pie.getCategory(),newPie.getCategory());
 
-        atps = newPie.getPlanPeriods();
+        atps = newPie.getPlanTermIds();
         assertNotNull(atps);
         assertEquals(2, atps.size());
         assertTrue(atps.contains("atp1"));

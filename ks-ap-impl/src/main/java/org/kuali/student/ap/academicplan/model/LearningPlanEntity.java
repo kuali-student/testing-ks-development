@@ -1,22 +1,15 @@
 package org.kuali.student.ap.academicplan.model;
 
 import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceImpl;
-import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
-import org.kuali.student.enrollment.class1.lui.model.LuiAttributeEntity;
-import org.kuali.student.r2.common.assembler.TransformUtility;
 import org.kuali.student.r2.common.dto.AttributeInfo;
-import org.kuali.student.r2.common.dto.ContextInfo;
 import org.kuali.student.r2.common.dto.RichTextInfo;
 import org.kuali.student.r2.common.entity.AttributeOwner;
 import org.kuali.student.r2.common.entity.MetaEntity;
-import org.kuali.student.r2.common.exceptions.DoesNotExistException;
 import org.kuali.student.r2.common.exceptions.InvalidParameterException;
 import org.kuali.student.r2.common.exceptions.MissingParameterException;
 import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
 import org.kuali.student.r2.common.infc.Attribute;
-import org.kuali.student.r2.core.class1.type.dto.TypeInfo;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -172,7 +165,7 @@ public class LearningPlanEntity extends MetaEntity implements AttributeOwner<Lea
         setTypeId(learningPlan.getTypeKey());
         setStateKey(learningPlan.getStateKey());
         setStudentId(learningPlan.getStudentId());
-        setShared(learningPlan.isShared());
+        setShared(learningPlan.getShared());
 
         //TODO: KSAP-1015 - move description to LearningPlan & PlanItem
 

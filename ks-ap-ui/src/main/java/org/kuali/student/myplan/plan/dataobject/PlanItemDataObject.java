@@ -38,7 +38,7 @@ public class PlanItemDataObject implements Serializable {
 
         // At the application level we are only dealing with single ATP per plan item
         try{
-            itemDO.setAtp(KSCollectionUtils.getRequiredZeroElement(item.getPlanPeriods()));
+            itemDO.setAtp(KSCollectionUtils.getRequiredZeroElement(item.getPlanTermIds()));
             YearTerm termYear = KsapFrameworkServiceLocator.getTermHelper().getYearTerm(itemDO.getAtp());
             itemDO.setTermName(termYear.getTermName());
             itemDO.setYear(termYear.getYear());
@@ -61,7 +61,7 @@ public class PlanItemDataObject implements Serializable {
         		itemDO.activityCode = value;
         }
 
-        if(item.getCredit()!=null)itemDO.setCreditPref(item.getCredit().toString());
+        if(item.getCredits()!=null)itemDO.setCreditPref(item.getCredits().toString());
 
         return itemDO;
     }

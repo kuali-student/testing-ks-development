@@ -1,9 +1,9 @@
 package org.kuali.student.ap.academicplan.service;
 
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.academicplan.dao.PlanItemDao;
 import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
 import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
-import org.kuali.student.ap.academicplan.dto.PlanItemSetInfo;
 import org.kuali.student.ap.academicplan.model.PlanItemEntity;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
 import org.kuali.student.r2.common.datadictionary.DataDictionaryValidator;
@@ -52,46 +52,36 @@ public class AcademicPlanServiceValidationDecorator extends
 	}
 
     @Override
-    public List<LearningPlanInfo> getLearningPlansByIds(@WebParam(name = "learningPlanIds") List<String> learningPlanIds, @WebParam(name = "contextInfo") ContextInfo contextInfo) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
-        return getNextDecorator().getLearningPlansByIds(learningPlanIds, contextInfo);
+    public List<LearningPlanInfo> getLearningPlansByIds(@WebParam(name = "learningPlanIds") List<String> learningPlanIds, @WebParam(name = "contextInfo") ContextInfo context) throws InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
+        return getNextDecorator().getLearningPlansByIds(learningPlanIds, context);
     }
 
     @Override
-    public List<PlanItemInfo> getPlanItemsByIds(@WebParam(name = "planItemIds") List<String> planItemIds, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
+    public List<PlanItemInfo> getPlanItemsByIds(@WebParam(name = "planItemIds") List<String> planItemIds, @WebParam(name = "context") ContextInfo context) throws InvalidParameterException, MissingParameterException, OperationFailedException {
         return getNextDecorator().getPlanItemsByIds(planItemIds, context);
     }
 
     @Override
-	public List<PlanItemInfo> getPlanItemsInPlan(String learningPlanId,
-			ContextInfo context) throws DoesNotExistException,
-			InvalidParameterException, MissingParameterException,
-			OperationFailedException {
+    public List<PlanItemInfo> getPlanItemsInPlan(String learningPlanId,
+			ContextInfo context) throws InvalidParameterException, MissingParameterException, OperationFailedException {
 		return getNextDecorator().getPlanItemsInPlan(learningPlanId, context);
 	}
 
 	@Override
-	public List<PlanItemInfo> getPlanItemsInPlanByRefObjectIdByRefObjectType(
+    public List<PlanItemInfo> getPlanItemsInPlanByRefObjectIdByRefObjectType(
 			String learningPlanId, String refObjectId, String refObjectType,
-			ContextInfo context) throws DoesNotExistException,
-			InvalidParameterException, MissingParameterException,
-			OperationFailedException {
+			ContextInfo context) throws InvalidParameterException, MissingParameterException, OperationFailedException {
 		return getNextDecorator()
 				.getPlanItemsInPlanByRefObjectIdByRefObjectType(learningPlanId,
 						refObjectId, refObjectType, context);
 	}
 
     @Override
-    public List<PlanItemSetInfo> getPlanItemSetsByIds(@WebParam(name = "planItemSetIds") List<String> planItemSetIds, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
-        return getNextDecorator().getPlanItemSetsByIds(planItemSetIds, context);
-    }
-
-	@Override
-	public List<LearningPlanInfo> getLearningPlansForStudentByType(
+    public List<LearningPlanInfo> getLearningPlansForStudentByType(
 			String studentId, String planTypeKey, ContextInfo context)
-			throws DoesNotExistException, InvalidParameterException,
-			MissingParameterException, OperationFailedException {
+            throws InvalidParameterException, MissingParameterException, OperationFailedException {
 		return getNextDecorator().getLearningPlansForStudentByType(studentId,
-				planTypeKey, context);
+                planTypeKey, context);
 	}
 
 	@Override
@@ -105,11 +95,9 @@ public class AcademicPlanServiceValidationDecorator extends
 	}
 
 	@Override
-	public PlanItemInfo createPlanItem(PlanItemInfo planItem,
-			ContextInfo context) throws AlreadyExistsException,
-            DataValidationErrorException, InvalidParameterException,
-            MissingParameterException, OperationFailedException,
-            PermissionDeniedException, VersionMismatchException {
+    public PlanItemInfo createPlanItem(PlanItemInfo planItem,
+            ContextInfo context) throws AlreadyExistsException, DataValidationErrorException,
+    InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
 		fullValidation(planItem, context);
 
         try {
@@ -150,7 +138,7 @@ public class AcademicPlanServiceValidationDecorator extends
 		List<ValidationResultInfo> errors = null;
 		try {
 			errors = validateInfo(validator, validationType,
-					learningPlanInfo, context);
+                    learningPlanInfo, context);
 
 			List<ValidationResultInfo> nextDecoratorErrors = getNextDecorator()
 					.validateLearningPlan(validationType, learningPlanInfo,
@@ -190,19 +178,20 @@ public class AcademicPlanServiceValidationDecorator extends
                     ValidationResult.ErrorLevel.ERROR));
         }
 
-        //  Make sure a plan period exists if category is planned course.
+        //  Make sure a plan term exists if category is planned course.
         //note: the DD validation will catch this null & report an error for it...
         //      BIT we just need to avoid this block when it is null to avoid a NP exception
         if (planItemInfo.getCategory()!=null) {
             if (planItemInfo.getCategory().equals(AcademicPlanServiceConstants.ItemCategory.PLANNED)
                     || planItemInfo.getCategory().equals(AcademicPlanServiceConstants.ItemCategory.BACKUP)) {
-                if (planItemInfo.getPlanPeriods() == null || planItemInfo.getPlanPeriods().size() == 0) {
+                if (planItemInfo.getPlanTermIds() == null || planItemInfo.getPlanTermIds().size() == 0) {
                     validationResultInfos.add(makeValidationResultInfo(
-                        String.format("Plan Item category was [%s], but no plan periods were defined.",
+                        String.format("Plan Item category was [%s], but no plan terms were defined.",
                                 planItemInfo.getCategory()), "category", ValidationResult.ErrorLevel.ERROR));
                 } else {
-                    //  Make sure the plan periods are valid. Note: There should never be more than one item in the collection.
-                    for (String atpId : planItemInfo.getPlanPeriods()) {
+                    //  Make sure the plan terms are valid. Note: There should never be more than one item in the
+                    // collection.
+                    for (String atpId : planItemInfo.getPlanTermIds()) {
                         boolean valid = false;
                         try {
                             valid = isValidTerm(atpId);
@@ -244,32 +233,7 @@ public class AcademicPlanServiceValidationDecorator extends
 		return validationResultInfos;
 	}
 
-	@Override
-	public List<ValidationResultInfo> validatePlanItemSet(
-			String validationType, PlanItemSetInfo planItemSetInfo,
-			ContextInfo context) throws DoesNotExistException,
-			InvalidParameterException, MissingParameterException,
-			OperationFailedException {
-		List<ValidationResultInfo> errors = null;
-		try {
-			errors = validateInfo(validator, validationType,
-					planItemSetInfo, context);
-
-			List<ValidationResultInfo> nextDecoratorErrors = getNextDecorator()
-					.validatePlanItemSet(validationType, planItemSetInfo,
-							context);
-
-			if (null != nextDecoratorErrors) {
-				errors.addAll(nextDecoratorErrors);
-			}
-		} catch (DoesNotExistException ex) {
-			throw new OperationFailedException(
-					"Error validating plan item set.", ex);
-		}
-		return errors;
-	}
-
-	/**
+    /**
 	 * Data dictionary validation for LearningPlanInfo.
 	 */
 	private List<ValidationResultInfo> fullValidation(LearningPlanInfo learningPlanInfo,
@@ -336,12 +300,10 @@ public class AcademicPlanServiceValidationDecorator extends
 	}
 
 	@Override
-	public PlanItemInfo updatePlanItem(String planItemId,
+    public PlanItemInfo updatePlanItem(String planItemId,
 			PlanItemInfo planItem, ContextInfo context)
-            throws DoesNotExistException, DataValidationErrorException,
-            InvalidParameterException, MissingParameterException,
-            OperationFailedException, PermissionDeniedException,
-            AlreadyExistsException, VersionMismatchException {
+    throws DataValidationErrorException, InvalidParameterException, MissingParameterException,
+    OperationFailedException, PermissionDeniedException, DoesNotExistException, VersionMismatchException {
 
 		// Since this is an update we can ignore AlreadyExistsExceptions. That
 		// is the last validation which is performed.
@@ -384,14 +346,14 @@ public class AcademicPlanServiceValidationDecorator extends
          * then only the course id has to match to make it a duplicate. If the
          * type is planned course then the ATP must match as well.
          */
-        List<PlanItemEntity> planItems = this.planItemDao.getLearningPlanItems(planItemId, category);
+        List<PlanItemEntity> planItems = this.planItemDao.getLearningPlanItemsByCategory(planItemId, category);
         for (PlanItemEntity p : planItems) {
             if (p.getRefObjectId().equals(courseId)) {
                 if (category.equals(AcademicPlanServiceConstants.ItemCategory.PLANNED)
                         || category.equals(AcademicPlanServiceConstants.ItemCategory.BACKUP)
                         || category.equals(AcademicPlanServiceConstants.ItemCategory.CART)) {
-                    for (String atpId : planItem.getPlanPeriods()) {
-                        if (p.getPlanPeriods().contains(atpId)) {
+                    for (String atpId : planItem.getPlanTermIds()) {
+                        if (p.getPlanTermIds().contains(atpId)) {
                             throw new AlreadyExistsException(String.format(
                                     "A plan item for plan [%s], course id [%s], and term [%s] already exists.", p
                                     .getLearningPlan().getId(), courseId, atpId));

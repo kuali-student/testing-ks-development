@@ -13,7 +13,7 @@ import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
 import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
 import org.kuali.student.ap.academicplan.service.AcademicPlanService;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.coursesearch.dataobject.ActivityOfferingItem;
 import org.kuali.student.ap.coursesearch.service.impl.CourseDetailsInquiryHelperImpl;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
@@ -222,13 +222,13 @@ public class SingleQuarterInquiryHelperImpl extends KualiInquirableImpl {
 					.getPlanItemsInPlan(learningPlanID, context);
 
 			for (PlanItemInfo planItem : planItemList) {
-				String planPeriod;
+				String planTrmIds;
                 try{
-                    planPeriod = KSCollectionUtils.getRequiredZeroElement(planItem.getPlanPeriods());
+                    planTrmIds = KSCollectionUtils.getRequiredZeroElement(planItem.getPlanTermIds());
                 }catch(OperationFailedException e){
-                    planPeriod = "NULL";
+                    planTrmIds = "NULL";
                 }
-                if (planPeriod.equalsIgnoreCase(termId)
+                if (planTrmIds.equalsIgnoreCase(termId)
 						&& planItem.getRefObjectType().equalsIgnoreCase(
 								PlanConstants.COURSE_TYPE)) {
 					PlannedCourseDataObject plannedCourseDO = new PlannedCourseDataObject();

@@ -2,7 +2,7 @@ package org.kuali.student.ap.framework.context.support;
 
 import org.kuali.rice.core.api.config.property.ConfigContext;
 import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
 import org.kuali.student.ap.framework.context.PlanConstants;
 import org.kuali.student.ap.framework.context.PlanHelper;

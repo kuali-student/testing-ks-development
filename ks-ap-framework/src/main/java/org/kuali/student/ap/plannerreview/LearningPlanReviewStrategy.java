@@ -34,7 +34,7 @@ public interface LearningPlanReviewStrategy {
 	 * 
 	 * <p>
 	 * The resulting learning plan will have a type of
-	 * {@link org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants.LEARNING_PLAN_TYPE_PLAN_REVIEW}
+	 * {@link org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants.LEARNING_PLAN_TYPE_PLAN_REVIEW}
 	 * </p>
 	 * 
 	 * @param request

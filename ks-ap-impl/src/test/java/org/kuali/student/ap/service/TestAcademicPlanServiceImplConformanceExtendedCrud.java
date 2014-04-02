@@ -18,10 +18,9 @@ package org.kuali.student.ap.service;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
 import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
-import org.kuali.student.ap.academicplan.dto.PlanItemSetInfo;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
 import org.kuali.student.common.test.util.RichTextTester;
 import org.kuali.student.r2.common.dto.MetaInfo;
 import org.kuali.student.r2.common.exceptions.AlreadyExistsException;
@@ -41,7 +40,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -83,7 +81,7 @@ public abstract class TestAcademicPlanServiceImplConformanceExtendedCrud extends
 		assertEquals (expected.getStudentId(), actual.getStudentId());
 		assertEquals (expected.getTypeKey(), actual.getTypeKey());
 		assertEquals (expected.getStateKey(), actual.getStateKey());
-		assertEquals (expected.isShared(), actual.isShared());
+		assertEquals (expected.getShared(), actual.getShared());
 		new RichTextTester().check(expected.getDescr(), actual.getDescr());
 	}
 	
@@ -106,7 +104,7 @@ public abstract class TestAcademicPlanServiceImplConformanceExtendedCrud extends
 		assertEquals (expected.getId(), actual.getId());
 		assertEquals (expected.getTypeKey(), actual.getTypeKey());
 		assertEquals (expected.getStateKey(), actual.getStateKey());
-		assertEquals (expected.isShared(), actual.isShared());
+		assertEquals (expected.getShared(), actual.getShared());
 		new RichTextTester().check(expected.getDescr(), actual.getDescr());
 	}
 	
@@ -132,10 +130,10 @@ public abstract class TestAcademicPlanServiceImplConformanceExtendedCrud extends
 	{
 		expected.setRefObjectId("refObjectId01");
 		expected.setRefObjectType("refObjectType01");
-        List<String> planPeriods= new ArrayList<String>();
-        planPeriods.add("planPeriods01");
-        planPeriods.add("planPeriods02");
-		expected.setPlanPeriods(planPeriods);
+        List<String> planTermIds= new ArrayList<String>();
+        planTermIds.add("planTermId01");
+        planTermIds.add("planTermid02");
+		expected.setPlanTermIds(planTermIds);
         expected.setCredit(new BigDecimal("3.10"));
 		expected.setCategory(AcademicPlanServiceConstants.ItemCategory.PLANNED);
 		expected.setTypeKey("typeKey01");
@@ -154,10 +152,10 @@ public abstract class TestAcademicPlanServiceImplConformanceExtendedCrud extends
 		assertEquals (expected.getRefObjectId(), actual.getRefObjectId());
 		assertEquals (expected.getRefObjectType(), actual.getRefObjectType());
 		assertEquals (expected.getLearningPlanId(), actual.getLearningPlanId());
-        Collections.sort(expected.getPlanPeriods());
-        Collections.sort(actual.getPlanPeriods());
-		assertEquals (expected.getPlanPeriods(), actual.getPlanPeriods());
-        assertEquals(expected.getCredit(), actual.getCredit());
+        Collections.sort(expected.getPlanTermIds());
+        Collections.sort(actual.getPlanTermIds());
+		assertEquals (expected.getPlanTermIds(), actual.getPlanTermIds());
+        assertEquals(expected.getCredits(), actual.getCredits());
 		assertEquals(expected.getCategory(), actual.getCategory());
 		assertEquals (expected.getTypeKey(), actual.getTypeKey());
 		assertEquals (expected.getStateKey(), actual.getStateKey());
@@ -171,8 +169,8 @@ public abstract class TestAcademicPlanServiceImplConformanceExtendedCrud extends
 	{
 		expected.setRefObjectId("refObjectId_Updated");
 		expected.setRefObjectType("refObjectType_Updated");
-        expected.getPlanPeriods().remove("planPeriods01");
-        expected.getPlanPeriods().add("planPeriods03");
+        expected.getPlanTermIds().remove("planTermId01");
+        expected.getPlanTermIds().add("planTermId03");
 		expected.setCredit(new BigDecimal("4.10"));
         expected.setCategory(AcademicPlanServiceConstants.ItemCategory.BACKUP);
 		expected.setStateKey("stateKey_Updated");
@@ -188,11 +186,11 @@ public abstract class TestAcademicPlanServiceImplConformanceExtendedCrud extends
 		assertEquals (expected.getRefObjectId(), actual.getRefObjectId());
 		assertEquals (expected.getRefObjectType(), actual.getRefObjectType());
 		assertEquals (expected.getLearningPlanId(), actual.getLearningPlanId());
-        Collections.sort(expected.getPlanPeriods());
-        Collections.sort(actual.getPlanPeriods());
-		assertEquals (expected.getPlanPeriods(), actual.getPlanPeriods());
+        Collections.sort(expected.getPlanTermIds());
+        Collections.sort(actual.getPlanTermIds());
+		assertEquals (expected.getPlanTermIds(), actual.getPlanTermIds());
 		assertEquals (expected.getId(), actual.getId());
-		assertEquals (expected.getCredit(), actual.getCredit());
+		assertEquals (expected.getCredits(), actual.getCredits());
 		assertEquals (expected.getCategory(), actual.getCategory());
 		assertEquals (expected.getTypeKey(), actual.getTypeKey());
 		assertEquals (expected.getStateKey(), actual.getStateKey());
@@ -208,91 +206,10 @@ public abstract class TestAcademicPlanServiceImplConformanceExtendedCrud extends
 		expected.setRefObjectId("refObjectId_Updated");
 		expected.setRefObjectType("refObjectType_Updated");
 		expected.setLearningPlanId("learningPlanId_Updated");
-        expected.getPlanPeriods().add("planPeriods02");
-        expected.getPlanPeriods().add("planPeriods03");
+        expected.getPlanTermIds().add("planTermId02");
+        expected.getPlanTermIds().add("planTermId03");
         expected.setCredit(new BigDecimal("4.10"));
         expected.setCategory(AcademicPlanServiceConstants.ItemCategory.BACKUP);
-	}
-	
-	
-	// ****************************************************
-	//           PlanItemSetInfo
-	// ****************************************************
-	
-	/*
-		A method to set the fields for a PlanItemSet in a 'test create' section prior to calling the 'create' operation.
-	*/
-	public void testCrudPlanItemSet_setDTOFieldsForTestCreate(PlanItemSetInfo expected) 
-	{
-//NOTE: we are not using PlanItemSets yet...(perhaps will be in future work pulled in from myPlan)
-//		>>>fix: *TYPE = StringList* expected.setPlanItemIds("planItemIds01");
-//		>>>fix: *TYPE = Integer* expected.setInterestedInItemsCount("interestedInItemsCount01");
-//		>>>fix: *TYPE = boolean* expected.setInterestedInAllItems("interestedInAllItems01");
-        
-//		expected.setTypeKey("typeKey01");
-//		expected.setStateKey("stateKey01");
-//		expected.setDescr(RichTextHelper.buildRichTextInfo("descr01", "descr01"));
-	}
-	
-	/*
-		A method to test the fields for a PlanItemSet. This is called after:
-		- creating a DTO, where actual is the DTO returned by the create operation, and expected is the dto passed in to the create operation
-		- reading a DTO after creating it, and actual is the read DTO, and expected is the dto that was created
-		- updating a DTO, where actual is DTO returned by the update operation, and expected is the dto that was passed in to the update operation
-	*/
-	public void testCrudPlanItemSet_testDTOFieldsForTestCreateUpdate(PlanItemSetInfo expected, PlanItemSetInfo actual) 
-	{
-//NOTE: we are not using PlanItemSets yet...(perhaps will be in future work pulled in from myPlan)
-//		>>>fix: *TYPE = StringList* assertEquals (expected.getPlanItemIds(), actual.getPlanItemIds());
-//		>>>fix: *TYPE = Integer* assertEquals (expected.getInterestedInItemsCount(), actual.getInterestedInItemsCount());
-//		>>>fix: *TYPE = boolean* assertEquals (expected.isInterestedInAllItems(), actual.isInterestedInAllItems());
-        
-//		assertEquals (expected.getTypeKey(), actual.getTypeKey());
-//		assertEquals (expected.getStateKey(), actual.getStateKey());
-//		new RichTextTester().check(expected.getDescr(), actual.getDescr());
-	}
-	
-	/*
-		A method to set the fields for a PlanItemSet in a 'test update' section prior to calling the 'update' operation.
-	*/
-	public void testCrudPlanItemSet_setDTOFieldsForTestUpdate(PlanItemSetInfo expected) 
-	{
-//NOTE: we are not using PlanItemSets yet...(perhaps will be in future work pulled in from myPlan)
-//		>>>fix: *TYPE = StringList* expected.setPlanItemIds("planItemIds_Updated");
-//		>>>fix: *TYPE = Integer* expected.setInterestedInItemsCount("interestedInItemsCount_Updated");
-//		>>>fix: *TYPE = boolean* expected.setInterestedInAllItems("interestedInAllItems_Updated");
-        
-//		expected.setTypeKey("typeKey_Updated");
-//		expected.setStateKey("stateKey_Updated");
-//		expected.setDescr(RichTextHelper.buildRichTextInfo("descr_Updated", "descr_Updated"));
-	}
-	
-	/*
-		A method to test the fields for a PlanItemSet after an update operation, followed by a read operation,
-		where actual is the DTO returned by the read operation, and expected is the dto returned by the update operation.
-	*/
-	public void testCrudPlanItemSet_testDTOFieldsForTestReadAfterUpdate(PlanItemSetInfo expected, PlanItemSetInfo actual) 
-	{
-//NOTE: we are not using PlanItemSets yet...(perhaps will be in future work pulled in from myPlan)
-//		>>>fix: *TYPE = StringList* assertEquals (expected.getPlanItemIds(), actual.getPlanItemIds());
-//		>>>fix: *TYPE = Integer* assertEquals (expected.getInterestedInItemsCount(), actual.getInterestedInItemsCount());
-//		>>>fix: *TYPE = boolean* assertEquals (expected.isInterestedInAllItems(), actual.isInterestedInAllItems());
-//		assertEquals (expected.getId(), actual.getId());
-//		assertEquals (expected.getTypeKey(), actual.getTypeKey());
-//		assertEquals (expected.getStateKey(), actual.getStateKey());
-//		new RichTextTester().check(expected.getDescr(), actual.getDescr());
-	}
-	
-	/*
-		A method to set the fields for a PlanItemSet in the 'test read after update' section.
-		This dto is another (second) dto object being created for other tests.
-	*/
-	public void testCrudPlanItemSet_setDTOFieldsForTestReadAfterUpdate(PlanItemSetInfo expected) 
-	{
-//NOTE: we are not using PlanItemSets yet...(perhaps will be in future work pulled in from myPlan)
-//		>>>fix: *TYPE = StringList* expected.setPlanItemIds("planItemIds_Updated");
-//		>>>fix: *TYPE = Integer* expected.setInterestedInItemsCount("interestedInItemsCount_Updated");
-//		>>>fix: *TYPE = boolean* expected.setInterestedInAllItems("interestedInAllItems_Updated");
 	}
 	
 	
@@ -312,7 +229,7 @@ public abstract class TestAcademicPlanServiceImplConformanceExtendedCrud extends
 	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	{
 	}
 	
-	/* Method Name: getPlanItemsInPlanByAtp */
+	/* Method Name: getPlanItemsInPlanByTermIdByCategory */
 	@Test
 	public void test_getPlanItemsInPlanByAtp() 
 	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	{
@@ -321,12 +238,6 @@ public abstract class TestAcademicPlanServiceImplConformanceExtendedCrud extends
 	/* Method Name: getPlanItemsInPlanByRefObjectIdByRefObjectType */
 	@Test
 	public void test_getPlanItemsInPlanByRefObjectIdByRefObjectType() 
-	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	{
-	}
-	
-	/* Method Name: getPlanItemsInSet */
-	@Test
-	public void test_getPlanItemsInSet() 
 	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	{
 	}
 	
@@ -340,12 +251,6 @@ public abstract class TestAcademicPlanServiceImplConformanceExtendedCrud extends
 	@Test
 	public void test_validatePlanItem() 
 	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	,AlreadyExistsException {
-	}
-	
-	/* Method Name: validatePlanItemSet */
-	@Test
-	public void test_validatePlanItemSet() 
-	throws 	DoesNotExistException	,InvalidParameterException	,MissingParameterException	,OperationFailedException	{
 	}
 	
 }

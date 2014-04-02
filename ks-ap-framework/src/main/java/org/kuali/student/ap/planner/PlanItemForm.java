@@ -1,6 +1,6 @@
 package org.kuali.student.ap.planner;
 
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.common.infc.HasUniqueId;
 import org.kuali.student.r2.core.acal.infc.Term;
 import org.kuali.student.ap.academicplan.infc.LearningPlan;

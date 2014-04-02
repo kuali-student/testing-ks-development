@@ -1,6 +1,6 @@
 package org.kuali.student.ap.framework.context;
 
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.r2.core.constants.AtpServiceConstants;
 import org.kuali.student.r2.lum.clu.CLUConstants;
 

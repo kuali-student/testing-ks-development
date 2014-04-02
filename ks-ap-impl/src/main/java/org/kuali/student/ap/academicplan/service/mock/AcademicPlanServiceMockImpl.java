@@ -8,9 +8,8 @@ import javax.jws.WebParam;
 
 import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
 import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
-import org.kuali.student.ap.academicplan.dto.PlanItemSetInfo;
 import org.kuali.student.ap.academicplan.service.AcademicPlanService;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.r2.common.dto.ContextInfo;
 import org.kuali.student.r2.common.dto.MetaInfo;
 import org.kuali.student.r2.common.dto.RichTextInfo;
@@ -32,7 +31,7 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
     }
 
     @Override
-    public List<LearningPlanInfo> getLearningPlansByIds(@WebParam(name = "learningPlanIds") List<String> learningPlanIds, @WebParam(name = "contextInfo") ContextInfo contextInfo) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
+    public List<LearningPlanInfo> getLearningPlansByIds(@WebParam(name = "learningPlanIds") List<String> learningPlanIds, @WebParam(name = "contextInfo") ContextInfo context) throws InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -47,7 +46,7 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
         List<String> atpList = new ArrayList<String>();
         String atp = "19843";
         atpList.add( atp );
-        plan.setPlanPeriods( atpList );
+        plan.setPlanTermIds(atpList);
         plan.setCategory(AcademicPlanServiceConstants.ItemCategory.PLANNED);
         plan.setTypeKey(AcademicPlanServiceConstants.LEARNING_PLAN_ITEM_TYPE);
 
@@ -55,22 +54,22 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
     }
 
     @Override
-    public List<PlanItemInfo> getPlanItemsByIds(@WebParam(name = "planItemIds") List<String> planItemIds, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
+    public List<PlanItemInfo> getPlanItemsByIds(@WebParam(name = "planItemIds") List<String> planItemIds, @WebParam(name = "context") ContextInfo context) throws InvalidParameterException, MissingParameterException, OperationFailedException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public List<PlanItemInfo> getPlanItemsInPlanByType(@WebParam(name = "learningPlanId") String learningPlanId, @WebParam(name = "planItemTypeKey") String planItemTypeKey, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
+    public List<PlanItemInfo> getPlanItemsInPlanByType(@WebParam(name = "learningPlanId") String learningPlanId, @WebParam(name = "planItemTypeKey") String planItemTypeKey, @WebParam(name = "context") ContextInfo context) throws InvalidParameterException, MissingParameterException, OperationFailedException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public List<PlanItemInfo> getPlanItemsInPlanByCategory(@WebParam(name = "learningPlanId") String learningPlanId, @WebParam(name = "category") AcademicPlanServiceConstants.ItemCategory category, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
+    public List<PlanItemInfo> getPlanItemsInPlanByCategory(@WebParam(name = "learningPlanId") String learningPlanId, @WebParam(name = "category") AcademicPlanServiceConstants.ItemCategory category, @WebParam(name = "context") ContextInfo context) throws InvalidParameterException, MissingParameterException, OperationFailedException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public List<PlanItemInfo> getPlanItemsInPlan(@WebParam(name = "learningPlanId") String learningPlanId, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
+    public List<PlanItemInfo> getPlanItemsInPlan(@WebParam(name = "learningPlanId") String learningPlanId, @WebParam(name = "context") ContextInfo context) throws InvalidParameterException, MissingParameterException, OperationFailedException {
         MetaInfo meta = new MetaInfo();
         meta.setCreateId("create1");
         meta.setCreateTime(new Date());
@@ -91,7 +90,7 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
             plan.setRefObjectType( type );
             List<String> atps = new ArrayList<String>();
             atps.add("19843");
-            plan.setPlanPeriods( atps );
+            plan.setPlanTermIds(atps);
             plan.setCategory(AcademicPlanServiceConstants.ItemCategory.PLANNED);
             plan.setTypeKey(AcademicPlanServiceConstants.LEARNING_PLAN_ITEM_TYPE);
             plan.setMeta(meta);
@@ -113,7 +112,7 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
             List<String> atpList = new ArrayList<String>();
             String atp = "19843";
             atpList.add( atp );
-            plan.setPlanPeriods( atpList );
+            plan.setPlanTermIds(atpList);
             plan.setCategory(AcademicPlanServiceConstants.ItemCategory.PLANNED);
             plan.setTypeKey(AcademicPlanServiceConstants.LEARNING_PLAN_ITEM_TYPE);
             plan.setMeta(meta);
@@ -134,7 +133,7 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
             plan.setRefObjectType( type );
             List<String> atps = new ArrayList<String>();
             atps.add("19843");
-            plan.setPlanPeriods( atps );
+            plan.setPlanTermIds(atps);
             plan.setCategory(AcademicPlanServiceConstants.ItemCategory.PLANNED);
             plan.setTypeKey(AcademicPlanServiceConstants.LEARNING_PLAN_ITEM_TYPE);
             plan.setMeta(meta);
@@ -155,7 +154,7 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
             plan.setRefObjectType( type );
             List<String> atps = new ArrayList<String>();
             atps.add("19843");
-            plan.setPlanPeriods( atps );
+            plan.setPlanTermIds(atps);
             plan.setCategory(AcademicPlanServiceConstants.ItemCategory.PLANNED);
             plan.setTypeKey(AcademicPlanServiceConstants.LEARNING_PLAN_ITEM_TYPE);
             plan.setMeta(meta);
@@ -176,7 +175,7 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
             plan.setRefObjectType( type );
             List<String> atps = new ArrayList<String>();
             atps.add("19843");
-            plan.setPlanPeriods( atps );
+            plan.setPlanTermIds(atps);
             plan.setCategory(AcademicPlanServiceConstants.ItemCategory.PLANNED);
             plan.setTypeKey(AcademicPlanServiceConstants.LEARNING_PLAN_ITEM_TYPE);
             plan.setMeta(meta);
@@ -190,33 +189,20 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
     }
 
     @Override
-    public List<PlanItemInfo> getPlanItemsInPlanByAtp(@WebParam(name = "learningPlanId") String learningPlanId, @WebParam(name = "atpKey") String atpKey, @WebParam(name = "category") AcademicPlanServiceConstants.ItemCategory category, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
+    public List<PlanItemInfo> getPlanItemsInPlanByTermIdByCategory(@WebParam(name = "learningPlanId") String
+                                                                               learningPlanId,
+                                                                   @WebParam(name = "termId") String termId, @WebParam(name = "category") AcademicPlanServiceConstants.ItemCategory category, @WebParam(name = "context") ContextInfo context) throws InvalidParameterException, MissingParameterException, OperationFailedException {
         return null;  //To change body of implemnted methods use File | Settings | File Templates.
     }
 
     @Override
-    public List<PlanItemInfo> getPlanItemsInPlanByRefObjectIdByRefObjectType(@WebParam(name = "learningPlanId") String learningPlanId, @WebParam(name = "refObjectId") String refObjectId, @WebParam(name = "refObjectType") String refObjectType, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
+    public List<PlanItemInfo> getPlanItemsInPlanByRefObjectIdByRefObjectType(@WebParam(name = "learningPlanId") String learningPlanId, @WebParam(name = "refObjectId") String refObjectId, @WebParam(name = "refObjectType") String refObjectType, @WebParam(name = "context") ContextInfo context) throws InvalidParameterException, MissingParameterException, OperationFailedException {
         List<PlanItemInfo> planItemInfos=new ArrayList<PlanItemInfo>();
         return planItemInfos;
     }
 
     @Override
-    public PlanItemSetInfo getPlanItemSet(@WebParam(name = "planItemSetId") String planItemSetId, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public List<PlanItemInfo> getPlanItemsInSet(@WebParam(name = "planItemSetId") String planItemSetId, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public List<PlanItemSetInfo> getPlanItemSetsByIds(@WebParam(name = "planItemSetIds") List<String> planItemSetIds, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public List<LearningPlanInfo> getLearningPlansForStudentByType(@WebParam(name = "studentId") String studentId, @WebParam(name = "planTypeKey") String planTypeKey, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
+    public List<LearningPlanInfo> getLearningPlansForStudentByType(@WebParam(name = "studentId") String studentId, @WebParam(name = "planTypeKey") String planTypeKey, @WebParam(name = "context") ContextInfo context) throws InvalidParameterException, MissingParameterException, OperationFailedException {
         List<LearningPlanInfo> list = new ArrayList<LearningPlanInfo>();
         LearningPlanInfo plan = new LearningPlanInfo();
         plan.setStudentId( studentId );
@@ -246,7 +232,7 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
         plan.setRefObjectType( type );
         List<String> atps = new ArrayList<String>();
         atps.add("19843");
-        plan.setPlanPeriods( atps );
+        plan.setPlanTermIds(atps);
         plan.setCategory(AcademicPlanServiceConstants.ItemCategory.PLANNED);
         plan.setTypeKey(AcademicPlanServiceConstants.LEARNING_PLAN_ITEM_TYPE);
 
@@ -257,22 +243,12 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
     }
 
     @Override
-    public PlanItemSetInfo createPlanItemSet(@WebParam(name = "planItemSet") PlanItemSetInfo planItemSet, @WebParam(name = "context") ContextInfo context) throws AlreadyExistsException, DataValidationErrorException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public LearningPlanInfo updateLearningPlan(@WebParam(name = "learningPlanId") String learningPlanId, @WebParam(name = "learningPlan") LearningPlanInfo learningPlan, @WebParam(name = "context") ContextInfo context) throws DataValidationErrorException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, DoesNotExistException, VersionMismatchException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public PlanItemInfo updatePlanItem(@WebParam(name = "planItemId") String planItemId, @WebParam(name = "planItem") PlanItemInfo planItem, @WebParam(name = "context") ContextInfo context) throws DataValidationErrorException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, DoesNotExistException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public PlanItemSetInfo updatePlanItemSet(@WebParam(name = "planItemSetId") String planItemSetId, @WebParam(name = "planItemSet") PlanItemSetInfo planItemSet, @WebParam(name = "context") ContextInfo context) throws AlreadyExistsException, DataValidationErrorException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, VersionMismatchException {
+    public PlanItemInfo updatePlanItem(@WebParam(name = "planItemId") String planItemId, @WebParam(name = "planItem") PlanItemInfo planItem, @WebParam(name = "context") ContextInfo context) throws DataValidationErrorException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException, DoesNotExistException, VersionMismatchException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -287,11 +263,6 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
     }
 
     @Override
-    public StatusInfo deletePlanItemSet(@WebParam(name = "planItemSetId") String planItemSetId, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException, PermissionDeniedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public List<ValidationResultInfo> validateLearningPlan(@WebParam(name = "validationType") String validationType, @WebParam(name = "learningPlanInfo") LearningPlanInfo learningPlanInfo, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -301,8 +272,4 @@ public class AcademicPlanServiceMockImpl implements AcademicPlanService {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    @Override
-    public List<ValidationResultInfo> validatePlanItemSet(@WebParam(name = "validationType") String validationType, @WebParam(name = "planItemSetInfo") PlanItemSetInfo planItemSetInfo, @WebParam(name = "context") ContextInfo context) throws DoesNotExistException, InvalidParameterException, MissingParameterException, OperationFailedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
 }

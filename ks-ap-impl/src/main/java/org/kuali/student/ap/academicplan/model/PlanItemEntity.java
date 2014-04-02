@@ -3,21 +3,16 @@ package org.kuali.student.ap.academicplan.model;
 import com.sun.istack.NotNull;
 import org.kuali.student.ap.academicplan.dao.LearningPlanDao;
 import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceImpl;
-import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
-import org.kuali.student.r2.common.assembler.TransformUtility;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.r2.common.dto.AttributeInfo;
 import org.kuali.student.r2.common.dto.RichTextInfo;
 import org.kuali.student.r2.common.entity.AttributeOwner;
 import org.kuali.student.r2.common.entity.MetaEntity;
 import org.kuali.student.r2.common.exceptions.InvalidParameterException;
 import org.kuali.student.r2.common.infc.Attribute;
-import org.kuali.student.r2.core.scheduling.model.ScheduleRequestAttributeEntity;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -87,7 +82,7 @@ public class PlanItemEntity extends MetaEntity implements AttributeOwner<PlanIte
         joinColumns=@JoinColumn(name="PLAN_ITEM_ID"),
             uniqueConstraints = @UniqueConstraint(columnNames={"PLAN_ITEM_ID", "ATP_ID"}))
     @Column(name="ATP_ID")
-    private Set<String> planPeriods;
+    private Set<String> planTermIds;
 
     @Column(name = "CREDIT")
     private BigDecimal credit;
@@ -152,12 +147,12 @@ public class PlanItemEntity extends MetaEntity implements AttributeOwner<PlanIte
         this.descr = descr;
     }
 
-    public Set<String> getPlanPeriods() {
-        return planPeriods;
+    public Set<String> getPlanTermIds() {
+        return planTermIds;
     }
 
-    public void setPlanPeriods(Set<String> planPeriods) {
-        this.planPeriods = planPeriods;
+    public void setPlanTermIds(Set<String> planTermIds) {
+        this.planTermIds = planTermIds;
     }
 
     public BigDecimal getCredit() {
@@ -190,11 +185,11 @@ public class PlanItemEntity extends MetaEntity implements AttributeOwner<PlanIte
      *
      * @return
      */
-    public boolean addPlanPeriod(String atpId) {
+    public boolean addPlanTermId(String atpId) {
         if (atpId == null || atpId.trim().equals("")) {
             return false;
         }
-        return this.planPeriods.add(atpId);
+        return this.planTermIds.add(atpId);
     }
 
     /**
@@ -203,8 +198,8 @@ public class PlanItemEntity extends MetaEntity implements AttributeOwner<PlanIte
      * @param atpId
      * @return
      */
-    public boolean removePlanPeriod(String atpId) {
-        return this.planPeriods.remove(atpId);
+    public boolean removePlanTermId(String atpId) {
+        return this.planTermIds.remove(atpId);
     }
 
     /**
@@ -230,7 +225,7 @@ public class PlanItemEntity extends MetaEntity implements AttributeOwner<PlanIte
         dto.setMeta(super.toDTO());
 
         //  Convert the Set to a List.
-        dto.setPlanPeriods(new ArrayList<String>(this.getPlanPeriods()));
+        dto.setPlanTermIds(new ArrayList<String>(this.getPlanTermIds()));
 
         List<AttributeInfo> attributes = new ArrayList<AttributeInfo>();
         if (getAttributes() != null) {
@@ -264,7 +259,7 @@ public class PlanItemEntity extends MetaEntity implements AttributeOwner<PlanIte
         setRefObjectTypeKey(planItem.getRefObjectType());
         setTypeId(planItem.getTypeKey());
         setStateKey(planItem.getStateKey());
-        setCredit(planItem.getCredit());
+        setCredit(planItem.getCredits());
         setCategory(planItem.getCategory().toString());
 
         //  Update text entity.
@@ -281,10 +276,10 @@ public class PlanItemEntity extends MetaEntity implements AttributeOwner<PlanIte
             }
         }
 
-        //  Update plan periods.
-        if (planItem.getPlanPeriods() != null) {
+        //  Update plan term ids.
+        if (planItem.getPlanTermIds() != null) {
             //  Convert from List to Set.
-            setPlanPeriods(new HashSet<String>(planItem.getPlanPeriods()));
+            setPlanTermIds(new HashSet<String>(planItem.getPlanTermIds()));
         }
 
         //  Load entity attributes

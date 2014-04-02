@@ -1,7 +1,7 @@
 package org.kuali.student.ap.planner.support;
 
 import org.kuali.rice.krad.web.form.UifFormBase;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
 import org.kuali.student.ap.framework.context.PlanConstants;
 import org.kuali.student.ap.planner.PlanItemForm;
@@ -182,8 +182,6 @@ public abstract class AbstractPlanItemForm extends UifFormBase implements PlanIt
 							.getAcademicPlanService().getPlanItemsInPlanByRefObjectIdByRefObjectType(plan.getId(),
 									planItem == null ? courseId : planItem.getRefObjectId(), PlanConstants.COURSE_TYPE,
 									KsapFrameworkServiceLocator.getContext().getContextInfo()));
-				} catch (DoesNotExistException e) {
-					throw new IllegalArgumentException("LP lookup error", e);
 				} catch (InvalidParameterException e) {
 					throw new IllegalArgumentException("LP lookup error", e);
 				} catch (MissingParameterException e) {

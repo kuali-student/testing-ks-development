@@ -14,15 +14,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
 import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
 import org.kuali.student.ap.academicplan.infc.PlanItem;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.framework.config.KsapFrameworkServiceLocator;
 import org.kuali.student.ap.framework.context.CourseHelper;
 import org.kuali.student.ap.framework.context.PlanConstants;
 import org.kuali.student.ap.framework.context.TermHelper;
-import org.kuali.student.ap.framework.course.CreditsFormatter;
-import org.kuali.student.ap.framework.course.CreditsFormatter.Range;
+import org.kuali.student.ap.coursesearch.CreditsFormatter;
+import org.kuali.student.ap.coursesearch.CreditsFormatter.Range;
 import org.kuali.student.common.collection.KSCollectionUtils;
-import org.kuali.student.r2.common.exceptions.DoesNotExistException;
 import org.kuali.student.r2.common.exceptions.InvalidParameterException;
 import org.kuali.student.r2.common.exceptions.MissingParameterException;
 import org.kuali.student.r2.common.exceptions.OperationFailedException;
@@ -67,14 +66,12 @@ public class PlanEventUtils {
 		List<PlanItemInfo> planItems;
 		try {
 			planItems = KsapFrameworkServiceLocator.getAcademicPlanService()
-					.getPlanItemsInPlanByAtp(
-							plan.getId(),
-							termId,
+					.getPlanItemsInPlanByTermIdByCategory(
+                            plan.getId(),
+                            termId,
                             category,
-							KsapFrameworkServiceLocator.getContext()
-									.getContextInfo());
-		} catch (DoesNotExistException e) {
-			throw new IllegalArgumentException("LP lookup error", e);
+                            KsapFrameworkServiceLocator.getContext()
+                                    .getContextInfo());
 		} catch (InvalidParameterException e) {
 			throw new IllegalArgumentException("LP lookup error", e);
 		} catch (MissingParameterException e) {
@@ -87,7 +84,7 @@ public class PlanEventUtils {
 			if (!PlanConstants.COURSE_TYPE.equals(planItem.getRefObjectType()))
 				continue;
 
-			BigDecimal credit = planItem.getCredit();
+			BigDecimal credit = planItem.getCredits();
 			if (credit != null) {
 				plannedTotalMin = plannedTotalMin.add(credit);
 				plannedTotalMax = plannedTotalMax.add(credit);
@@ -159,9 +156,9 @@ public class PlanEventUtils {
         addEvent.add("planItemId", planItem.getId());
         addEvent.add("courseId", course.getId());
         addEvent.add("courseTitle", course.getCourseTitle());
-        if (planItem.getCredit() != null) {
+        if (planItem.getCredits() != null) {
             addEvent.add("credits", CreditsFormatter.trimCredits(planItem
-                    .getCredit().toString()));
+                    .getCredits().toString()));
         } else {
             addEvent.add("credits", CreditsFormatter.formatCredits(course));
         }
@@ -189,9 +186,9 @@ public class PlanEventUtils {
         String category = planItem.getCategory().toString().toLowerCase();
         String menusuffix = "";
 
-        List<String> planPeriods = planItem.getPlanPeriods();
+        List<String> planTermIds = planItem.getPlanTermIds();
         try{
-            String termId = KSCollectionUtils.getRequiredZeroElement(planPeriods);
+            String termId = KSCollectionUtils.getRequiredZeroElement(planTermIds);
 
             Term term = termHelper.getTerm(termId);
             assert term != null : "Invalid term " + termId + " in plan item "
@@ -235,7 +232,7 @@ public class PlanEventUtils {
                 AcademicPlanServiceConstants.ItemCategory.CART)) {
             try{
                 removeEvent.add("termId",
-                    KSCollectionUtils.getRequiredZeroElement(planItem.getPlanPeriods()).replace('.', '-'));
+                    KSCollectionUtils.getRequiredZeroElement(planItem.getPlanTermIds()).replace('.', '-'));
             }catch(OperationFailedException e){
                 LOG.warn("No term id found during remove",e);
             }
@@ -252,9 +249,9 @@ public class PlanEventUtils {
         JsonObjectBuilder updateCreditsEvent = Json.createObjectBuilder();
         updateCreditsEvent.add("uniqueId", uniqueId);
 
-        if (planItem.getCredit() != null) {
+        if (planItem.getCredits() != null) {
             updateCreditsEvent.add("credit", CreditsFormatter
-                    .trimCredits(planItem.getCredit().toString()));
+                    .trimCredits(planItem.getCredits().toString()));
         } else {
             Course course = KsapFrameworkServiceLocator.getCourseHelper()
                     .getCourseInfo(planItem.getRefObjectId());
@@ -343,9 +340,9 @@ public class PlanEventUtils {
 		addEvent.add("planItemId", planItem.getId());
 		addEvent.add("courseId", course.getId());
 		addEvent.add("courseTitle", course.getCourseTitle());
-		if (planItem.getCredit() != null) {
+		if (planItem.getCredits() != null) {
 			addEvent.add("credits", CreditsFormatter.trimCredits(planItem
-					.getCredit().toString()));
+					.getCredits().toString()));
 		} else {
 			addEvent.add("credits", CreditsFormatter.formatCredits(course));
 		}
@@ -380,9 +377,9 @@ public class PlanEventUtils {
 		String category = planItem.getCategory().toString().toLowerCase();
 		String menusuffix = "";
 
-		List<String> planPeriods = planItem.getPlanPeriods();
+		List<String> planTermIds = planItem.getPlanTermIds();
 		try{
-			String termId = KSCollectionUtils.getRequiredZeroElement(planPeriods);
+			String termId = KSCollectionUtils.getRequiredZeroElement(planTermIds);
 
 			Term term = termHelper.getTerm(termId);
 			assert term != null : "Invalid term " + termId + " in plan item "
@@ -425,7 +422,7 @@ public class PlanEventUtils {
 						AcademicPlanServiceConstants.ItemCategory.CART)) {
             try{
 			    removeEvent.add("termId",
-                        KSCollectionUtils.getRequiredZeroElement(planItem.getPlanPeriods()).replace('.', '-'));
+                        KSCollectionUtils.getRequiredZeroElement(planItem.getPlanTermIds()).replace('.', '-'));
             }catch(OperationFailedException e){
                 LOG.warn("No term found during remove", e);
             }
@@ -441,9 +438,9 @@ public class PlanEventUtils {
 		JsonObjectBuilder updatePlanItemEvent = Json.createObjectBuilder();
         updatePlanItemEvent.add("uniqueId", uniqueId);
 
-		if (planItem.getCredit() != null) {
+		if (planItem.getCredits() != null) {
             updatePlanItemEvent.add("credit", CreditsFormatter
-					.trimCredits(planItem.getCredit().toString()));
+					.trimCredits(planItem.getCredits().toString()));
 		} else {
 			Course course = KsapFrameworkServiceLocator.getCourseHelper()
 					.getCourseInfo(planItem.getRefObjectId());
@@ -539,9 +536,9 @@ public class PlanEventUtils {
         addEvent.add("courseId", course.getId());
         addEvent.add("courseCd",course.getCode());
         addEvent.add("courseTitle", course.getCourseTitle());
-        if (planItem.getCredit() != null) {
+        if (planItem.getCredits() != null) {
             addEvent.add("credits", CreditsFormatter.trimCredits(planItem
-                    .getCredit().toString()));
+                    .getCredits().toString()));
         } else {
             addEvent.add("credits", CreditsFormatter.formatCredits(course));
         }

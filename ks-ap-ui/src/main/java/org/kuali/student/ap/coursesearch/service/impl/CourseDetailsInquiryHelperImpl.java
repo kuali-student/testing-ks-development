@@ -5,7 +5,7 @@ import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
 import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
 import org.kuali.student.ap.academicplan.infc.PlanItem;
 import org.kuali.student.ap.academicplan.service.AcademicPlanService;
-import org.kuali.student.ap.academicplan.service.AcademicPlanServiceConstants;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.coursesearch.dataobject.ActivityOfferingItem;
 import org.kuali.student.ap.coursesearch.dataobject.CourseDetails;
 import org.kuali.student.ap.coursesearch.dataobject.CourseOfferingInstitution;
@@ -17,7 +17,7 @@ import org.kuali.student.ap.framework.context.CourseSearchConstants;
 import org.kuali.student.ap.framework.context.PlanConstants;
 import org.kuali.student.ap.framework.context.TermHelper;
 import org.kuali.student.ap.framework.context.YearTerm;
-import org.kuali.student.ap.framework.course.CreditsFormatter;
+import org.kuali.student.ap.coursesearch.CreditsFormatter;
 import org.kuali.student.ap.utils.CourseLinkBuilder;
 import org.kuali.student.enrollment.academicrecord.dto.StudentCourseRecordInfo;
 import org.kuali.student.enrollment.courseoffering.dto.ActivityOfferingDisplayInfo;
@@ -321,8 +321,6 @@ public class CourseDetailsInquiryHelperImpl extends KualiInquirableImpl {
 					}
 				}
 			}
-		} catch (org.kuali.student.r2.common.exceptions.DoesNotExistException e) {
-			// Ignore and not load any plan data
 		} catch (Exception e1) {
 			LOG.error(String.format("Error loading plan information for course: %s", course.getCode()), e1);
 		}
@@ -398,11 +396,11 @@ public class CourseDetailsInquiryHelperImpl extends KualiInquirableImpl {
 						learningPlan.getId(), KsapFrameworkServiceLocator.getContext().getContextInfo());
 				if (null != planItems) {
 					for (PlanItem item : planItems) {
-						for (String planPeriod : item.getPlanPeriods()) {
-							Map<String, PlanItem> planMap = planItemsByTerm.get(planPeriod);
+						for (String planTermId : item.getPlanTermIds()) {
+							Map<String, PlanItem> planMap = planItemsByTerm.get(planTermId);
 							if (null == planMap) {
 								planMap = new HashMap<String, PlanItem>();
-								planItemsByTerm.put(planPeriod, planMap);
+								planItemsByTerm.put(planTermId, planMap);
 							}
 
 							planMap.put(item.getRefObjectId(), item);
@@ -410,9 +408,6 @@ public class CourseDetailsInquiryHelperImpl extends KualiInquirableImpl {
 					}
 				}
 			}
-		} catch (DoesNotExistException e) {
-			LOG.warn(String.format("Student %s has not plan", studentId), e);
-			return Collections.emptyMap();
 		} catch (InvalidParameterException e) {
 			throw new IllegalArgumentException("LP lookup failure ", e);
 		} catch (MissingParameterException e) {
