@@ -54,18 +54,9 @@
   </bean> -->
 
   <bean id="Uif-KS-IconInputField" parent="Uif-KS-IconInputField-parentBean" abstract="true"/>
-  <bean id="Uif-KS-IconInputField-parentBean" abstract="true" parent="Uif-InputField-parentBean" scope="prototype">
-      <!--<property name="requiredMessage.messageText" value="?"/> -->
+  <bean id="Uif-KS-IconInputField-parentBean" abstract="true" parent="Uif-InputField" scope="prototype">
+      <property name="fieldLabel.requiredIndicator" value=""/>
       <property name="fieldLabel.labelText" value="test"/> <!-- TODO: This is a workaround needed as KRAD not rendering the label if this is empty -->
-      <property name="fieldLabel.richLabelMessage">
-          <bean parent="Uif-KS-IconLabelMessage"/>
-      </property>
-  </bean>
-
-  <bean id="Uif-KS-IconInputField-LabelTop" parent="Uif-KS-IconInputField-LabelTop-parentBean" abstract="true"/>
-  <bean id="Uif-KS-IconInputField-LabelTop-parentBean" abstract="true" parent="Uif-InputField-LabelTop-parentBean" scope="prototype">
-      <!--<property name="fieldLabel.requiredMessage.messageText" value="?"/>   -->
-      <property name="fieldLabel.labelText" value="test"/> <!-- TODO: (KSCM-) This is a workaround needed as KRAD not rendering the label if it is empty -->
       <property name="fieldLabel.richLabelMessage">
           <bean parent="Uif-KS-IconLabelMessage"/>
       </property>
@@ -90,24 +81,5 @@
           </list>
       </property>
   </bean>
-
-    <!-- Override the default theme to include all the cm specific css/js.
-         This will load only if ks-cm profile is active.
-    -->
-    <bean id="KSTheme" abstract="true" parent="KSTheme-CM-parentBean"/>
-
-    <bean id="KSTheme-CM-parentBean" parent="KSTheme-parentBean">
-        <property name="minCssSourceFiles">
-            <list merge="true">
-                <value>themes/ksboot/stylesheets/cm.css</value>
-            </list>
-        </property>
-        <property name="minScriptSourceFiles">
-            <list merge="true">
-                <value>themes/ksboot/scripts/cm.js</value>
-                <value>themes/ksboot/scripts/jquery.jqEasyCharCounter.custom.js</value>
-            </list>
-        </property>
-    </bean>
 
 </beans>

@@ -93,7 +93,7 @@
         <property name="validationMessages.displayMessages" value="false" />
         <property name="items">
             <list>
-                <bean id="KS-CourseView-gradingOptions" parent="Uif-InputField-LabelTop" p:propertyName="courseInfo.gradingOptions" >
+                <bean id="KS-CourseView-gradingOptions" parent="KS-Uif-InputField-LabelTop" p:propertyName="courseInfo.gradingOptions" >
                     <property name="control">
                         <bean parent="Uif-VerticalCheckboxesControl" />
                     </property>
@@ -124,9 +124,12 @@
                             </property>
                         </bean>
                     </property>
+                    <!-- Rice 2.4 upgrade : removing fieldLabel.requiredMessage -->
+<!--
                     <property name="fieldLabel.requiredMessage">
                         <bean parent="CM-StateAware-RequiredMessage" />
                     </property>
+-->
                 </bean>
             </list>
         </property>
@@ -177,9 +180,12 @@
                             </property>
                         </bean>
                     </property>
+                    <!-- Rice 2.4 upgrade : removing fieldLabel.requiredMessage -->
+<!--
                     <property name="fieldLabel.requiredMessage">
                         <bean parent="CM-StateAware-RequiredMessage" />
                     </property>
+-->
                 </bean>
                 <bean id="KS-FinalExamRationale" parent="KS-Uif-InputField-LabelTop"
                       p:label="Final Exam Rationale" p:required="true"
@@ -200,9 +206,12 @@
                 <value>cm_requiredMessage_sectionHeader</value>
             </list>
         </property>
+        <!-- Rice 2.4 upgrade : removing as required message is no longer available -->
+<!--
         <property name="instructionalMessage">
             <bean parent="CM-StateAware-RequiredMessage" />
         </property>
+-->
         <property name="collectionObjectClass" value="org.kuali.student.cm.course.form.ResultValuesGroupInfoWrapper" />
         <property name="addLineActions">
             <list>
