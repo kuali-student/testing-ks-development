@@ -91,7 +91,7 @@
                 <bean parent="KS-Uif-InputField-LabelTop" p:propertyName="populationInfo.name" p:label="Name"
                       p:fieldLabel.renderColon="false" p:required="true">
                     <property name="control">
-                        <bean parent="Uif-TextControl" p:size="40" />
+                        <bean parent="KS-Uif-TextControl" p:size="40" />
                     </property>
                 </bean>
                 <bean parent="KS-Uif-InputField-LabelTop" p:propertyName="populationInfo.descr.plain" p:label="Description"
@@ -106,9 +106,9 @@
                         <bean parent="Uif-HorizontalRadioControl" p:options-ref="populationStateKeyName-options"/>
                     </property>
                 </bean>
-                <bean parent="Uif-InputField" p:propertyName="populationRuleInfo.ruleId" p:label="Rule">
+                <bean parent="KS-Uif-InputField" p:propertyName="populationRuleInfo.ruleId" p:label="Rule">
                     <property name="control">
-                        <bean parent="Uif-DropdownControl" p:options-ref="populationRuleAgendaIds-options"/>
+                        <bean parent="KS-Uif-DropdownControl" p:options-ref="populationRuleAgendaIds-options"/>
                     </property>
                 </bean>
             </list>
@@ -122,7 +122,7 @@
                 <bean parent="KS-Uif-InputField-LabelTop" p:escapeHtmlInPropertyValue="false" p:propertyName="populationInfo.name" p:label="Name"
                       p:required="true">
                     <property name="control">
-                        <bean parent="Uif-TextControl" p:size="40" />
+                        <bean parent="KS-Uif-TextControl" p:size="40" />
                     </property>
                 </bean>
                 <bean parent="KS-Uif-InputField-LabelTop" p:escapeHtmlInPropertyValue="false" p:propertyName="populationInfo.descr.plain" p:label="Description"
@@ -164,7 +164,7 @@
                       p:progressiveRender="@{#dp.operationType eq 'kuali.population.rule.type.exclusion'}"
                       p:additionalCssClasses="ks-uif-quickFinder">
                     <property name="control">
-                        <bean parent="Uif-TextControl" p:size="40" p:ReadOnly="true" />
+                        <bean parent="KS-Uif-TextControl" p:size="40" p:ReadOnly="true" />
                     </property>
 
                     <property name="quickfinder">
@@ -218,10 +218,10 @@
                     </property>  -->
                     <property name="addLineItems">
                         <list>
-                            <bean parent="Uif-InputField" p:fieldLabel.render="false" p:propertyName="name"
+                            <bean parent="KS-Uif-InputField" p:fieldLabel.render="false" p:propertyName="name"
                                   p:additionalCssClasses="ks-uif-quickFinder" p:required="true">
                                 <property name="control">
-                                    <bean parent="Uif-TextControl" p:size="40" p:ReadOnly="false" />
+                                    <bean parent="KS-Uif-TextControl" p:size="40" p:ReadOnly="false" />
                                 </property>
                                 <property name="quickfinder">
                                     <bean parent="Uif-QuickFinder">
@@ -244,10 +244,10 @@
                     </property>
                     <property name="items">
                         <list>
-                            <bean parent="Uif-DataField" p:fieldLabel.render="false" p:propertyName="name"
+                            <bean parent="KS-Uif-DataField" p:fieldLabel.render="false" p:propertyName="name"
                                   p:style="font-weight:bold;" p:required="true">
                             </bean>
-                            <bean parent="Uif-DataField" p:render="false" p:propertyName="id" p:required="true"/>
+                            <bean parent="KS-Uif-DataField" p:render="false" p:propertyName="id" p:required="true"/>
 
 
                         </list>

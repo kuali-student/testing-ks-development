@@ -61,12 +61,12 @@
                                     <list>
                                         <bean parent="KS-Uif-InputField-LabelTop" p:label="Hold Name" p:propertyName="name" >
                                             <property name="control">
-                                                <bean parent="Uif-TextControl" p:size="20"/>
+                                                <bean parent="KS-Uif-TextControl" p:size="20"/>
                                             </property>
                                         </bean>
                                         <bean parent="KS-Uif-InputField-LabelTop" p:label="Category Name" p:propertyName="typeKey" >
                                             <property name="control">
-                                                    <bean parent="Uif-DropdownControl"/>
+                                                    <bean parent="KS-Uif-DropdownControl"/>
                                             </property>
                                             <property name="optionsFinder">
                                                 <bean class="org.kuali.student.enrollment.class1.hold.keyvalues.HoldIssueInfoTypeKeyValues"/>
@@ -79,7 +79,7 @@
                                         </bean>
                                         <bean parent="KS-Uif-InputField-LabelTop"  p:label="Owning Organization"  p:propertyName="orgName" p:style="font-weight:bold;white-space:nowrap;">
                                             <property name="control">
-                                                <bean parent="Uif-TextControl" p:size="16" p:disabled="true"/>
+                                                <bean parent="KS-Uif-TextControl" p:size="16" p:disabled="true"/>
                                             </property>
                                             <property name="quickfinder">
                                                 <bean parent="Uif-QuickFinder">
@@ -156,31 +156,31 @@
         </property>
         <property name="items">
             <list>
-                <bean parent="Uif-DataField"
+                <bean parent="KS-Uif-DataField"
                       p:label="Hold Name"
                       p:propertyName="name" />
-                <bean parent="Uif-InputField" p:label="Category Name" p:propertyName="typeKey"  p:readOnly="true">
+                <bean parent="KS-Uif-InputField" p:label="Category Name" p:propertyName="typeKey"  p:readOnly="true">
                     <property name="control">
-                        <bean parent="Uif-DropdownControl" />
+                        <bean parent="KS-Uif-DropdownControl" />
                     </property>
                     <property name="optionsFinder">
                         <bean id="HoldIssueTypes" class="org.kuali.student.enrollment.class1.hold.keyvalues.HoldIssueInfoTypeKeyValues" />
                     </property>
                 </bean>
-                <bean parent="Uif-DataField"
+                <bean parent="KS-Uif-DataField"
                       p:label="Hold Description"
                       p:propertyName="descr.plain"/>
-                <bean parent="Uif-InputField" p:label="Owning Organization" p:propertyName="organizationId" p:readOnly="true">
+                <bean parent="KS-Uif-InputField" p:label="Owning Organization" p:propertyName="organizationId" p:readOnly="true">
                     <property name="control">
-                        <bean parent="Uif-DropdownControl" />
+                        <bean parent="KS-Uif-DropdownControl" />
                     </property>
                     <property name="optionsFinder">
                         <bean id="HoldOrgNames" class="org.kuali.student.enrollment.class1.util.OrgInfoNameKeyValues" />
                     </property>
                 </bean>
-                <bean parent="Uif-InputField" p:label="State" p:propertyName="stateKey"  p:readOnly="true">
+                <bean parent="KS-Uif-InputField" p:label="State" p:propertyName="stateKey"  p:readOnly="true">
                     <property name="control">
-                        <bean parent="Uif-DropdownControl" />
+                        <bean parent="KS-Uif-DropdownControl" />
                     </property>
                     <property name="optionsFinder">
                         <bean id="HoldIssueStates" class="org.kuali.student.enrollment.class1.hold.keyvalues.HoldIssueInfoStateKeyValues" />

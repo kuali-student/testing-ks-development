@@ -194,8 +194,6 @@ angular.module('regCartApp')
                 credits: newCredits,
                 gradingOptionId: newGrading
             }, function (newCartItem) {
-                console.log($scope);
-                console.log(JSON.stringify(newCartItem));
                 cartItem.credits = newCartItem.credits;
                 console.log('old: ' + cartItem.grading + ' To: ' + newCartItem.grading);
                 cartItem.grading = newCartItem.grading;
@@ -203,10 +201,31 @@ angular.module('regCartApp')
                 cartItem.status = '';
                 cartItem.actionLinks = newCartItem.actionLinks;
                 $scope.creditTotal = creditTotal();
-                $scope.userMessage = {txt: 'Updated Successfully', type: 'success'};
+                cartItem.alertMessage = {txt: 'Changes saved successfully', type: 'success'};
             });
-
         };
+
+        $scope.addCartItemToWaitlist = function (cartItem) {
+            console.log('Adding cart item to waitlist... ');
+            ScheduleService.registerForRegistrationGroup().query({
+                courseCode: cartItem.courseCode,
+                regGroupId: cartItem.regGroupId,
+                allowWaitlist: true
+            }, function () {
+                cartItem.status = 'success';
+                cartItem.waitlistedStatus = 'true';
+                cartItem.statusMessage = 'If a seat becomes available you will be registered automatically'
+            });
+        };
+
+        $scope.removeAlertMessage = function (cartItem){
+            cartItem.alertMessage = null;
+        }
+
+        $scope.removeUserMessage = function() {
+            $scope.userMessage.txt = null;
+            $scope.userMessage.linkText = null;
+        }
 
         $scope.register = function () {
             CartService.submitCart().query({

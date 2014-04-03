@@ -188,7 +188,7 @@
                 </bean>
                 <!-- bean id="parent_term_type" parent="KS-Uif-InputField-LabelTop" p:propertyName="parentTerm" p:label="Parent Term" p:render="@{#isAddLine}" p:refreshWhenChangedPropertyNames="#lp.termType">
                     <property name="control">
-                        <bean parent="Uif-DropdownControl"/>
+                        <bean parent="KS-Uif-DropdownControl"/>
                     </property>
                     <property name="optionsFinder">
                         <bean class="org.kuali.student.enrollment.class2.acal.keyvalue.AcademicTermParentTypeKeyValues" p:addBlankOption="false"/>
@@ -521,7 +521,7 @@
                         <bean parent="KS-BasicDatePatternConstraint"/>
                     </property>
                 </bean>
-                <bean parent="Uif-DataField" p:propertyName="endDateUI" p:render="@{#view.readOnly}"
+                <bean parent="KS-Uif-DataField" p:propertyName="endDateUI" p:render="@{#view.readOnly}"
                       p:label="End Date"/>
                 <bean id="key_date_end_time" parent="KS-Uif-InputField" p:propertyName="endTime"
                       p:render="@{!#view.readOnly}" p:label="End Time">
@@ -572,7 +572,7 @@
 
         <property name="items">
             <list>
-                <bean id="exam_date_type" parent="Uif-DataField" p:propertyName="examPeriodNameUI" p:style="font-weight:bold;"/>
+                <bean id="exam_date_type" parent="KS-Uif-DataField" p:propertyName="examPeriodNameUI" p:style="font-weight:bold;"/>
                 <bean id="exam_date_start_date" parent="KS-Uif-InputField" p:propertyName="startDate"
                       p:render="@{!#view.readOnly}" p:label="Start Date">
                     <property name="control">
@@ -582,7 +582,7 @@
                         <bean parent="KS-BasicDatePatternConstraint"/>
                     </property>
                 </bean>
-                <bean parent="Uif-DataField" p:propertyName="startDateUI" p:render="@{#view.readOnly}"
+                <bean parent="KS-Uif-DataField" p:propertyName="startDateUI" p:render="@{#view.readOnly}"
                       p:label="Start Date"/>
                 <bean id="exam_date_end_date" parent="KS-Uif-InputField" p:propertyName="endDate"
                       p:render="@{!#view.readOnly}" p:label="End Date">
@@ -593,7 +593,7 @@
                         <bean parent="KS-BasicDatePatternConstraint"/>
                     </property>
                 </bean>
-                <bean parent="Uif-DataField" p:propertyName="endDateUI" p:render="@{#view.readOnly}"
+                <bean parent="KS-Uif-DataField" p:propertyName="endDateUI" p:render="@{#view.readOnly}"
                       p:label="End Date"/>
 
                 <bean parent="KS-Uif-InputField" p:id="exclude_Saturday"

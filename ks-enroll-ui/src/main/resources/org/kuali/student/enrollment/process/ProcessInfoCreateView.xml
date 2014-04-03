@@ -42,14 +42,14 @@
                 <bean parent="KS-Uif-InputField-LabelTop" p:label="Process Name" p:propertyName="name"
                       p:id="processName" p:required="true">
                     <property name="control">
-                        <bean parent="Uif-TextControl" p:size="25" p:disabled="@{isSaveSuccess}"/>
+                        <bean parent="KS-Uif-TextControl" p:size="25" p:disabled="@{isSaveSuccess}"/>
                     </property>
 
                 </bean>
                 <bean parent="KS-Uif-InputField-LabelTop" p:label="Process Category" p:propertyName="typeKey"
                       p:required="true">
                     <property name="control">
-                        <bean parent="Uif-DropdownControl" p:disabled="@{isSaveSuccess}"/>
+                        <bean parent="KS-Uif-DropdownControl" p:disabled="@{isSaveSuccess}"/>
                     </property>
                     <property name="optionsFinder">
                         <bean class="org.kuali.student.enrollment.class1.process.keyvalues.ProcessInfoTypeKeyValues"/>
@@ -64,7 +64,7 @@
                 </bean>
                 <bean parent="KS-Uif-InputField-LabelTop" p:label="Owning Organization" p:propertyName="orgName" p:required="true">
                     <property name="control">
-                        <bean parent="Uif-TextControl" p:size="20" p:disabled="true"/>
+                        <bean parent="KS-Uif-TextControl" p:size="20" p:disabled="true"/>
                     </property>
                     <property name="quickfinder">
                         <bean parent="Uif-QuickFinder">

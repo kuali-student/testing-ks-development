@@ -36,7 +36,7 @@
                         <list>
                             <bean parent="KS-Uif-InputField-LabelTop" p:propertyName="termType" p:label="Term" p:required="true">
                                 <property name="control">
-                                    <bean parent="Uif-DropdownControl"/>
+                                    <bean parent="KS-Uif-DropdownControl"/>
                                 </property>
 
                                 <property name="optionsFinder">
@@ -46,7 +46,7 @@
 
                             <bean parent="KS-Uif-InputField-LabelTop" p:propertyName="termYear" p:label="Year" p:required="true">
                                 <property name="control">
-                                    <bean parent="Uif-TextControl" p:size="4"/>
+                                    <bean parent="KS-Uif-TextControl" p:size="4"/>
                                 </property>
 
                                 <property name="validCharactersConstraint">

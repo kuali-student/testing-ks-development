@@ -84,14 +84,14 @@
         </property>
         <property name="resultFields">
             <list>
-                <bean parent="Uif-DataField" p:propertyName="populationInfo.name">
+                <bean parent="KS-Uif-DataField" p:propertyName="populationInfo.name">
                     <property name="inquiry">
                         <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.student.enrollment.class2.population.dto.PopulationWrapper" p:inquiryParameters="id" />
                     </property>
                 </bean>
-                <bean parent="Uif-DataField" p:propertyName="populationInfo.descr.plain" p:label="Description"/>
-                <bean parent="Uif-DataField" p:propertyName="populationRuleTypeKeyName"  p:label="Type"/>
-                <bean parent="Uif-DataField" p:propertyName="populationStateKeyName"  p:label="State"/>
+                <bean parent="KS-Uif-DataField" p:propertyName="populationInfo.descr.plain" p:label="Description"/>
+                <bean parent="KS-Uif-DataField" p:propertyName="populationRuleTypeKeyName"  p:label="Type"/>
+                <bean parent="KS-Uif-DataField" p:propertyName="populationStateKeyName"  p:label="State"/>
             </list>
         </property>
         <property name="resultsGroup.lineActions">
@@ -168,7 +168,7 @@
                                 <property name="layoutManager.id" value="population_inquiry" />
                                 <property name="items">
                                     <list>
-                                        <bean parent="Uif-DataField" p:fieldLabel.render="false" p:propertyName="name" p:style="width:100%" p:id="popname_inquiry"/>
+                                        <bean parent="KS-Uif-DataField" p:fieldLabel.render="false" p:propertyName="name" p:style="width:100%" p:id="popname_inquiry"/>
                                     </list>
                                 </property>
                             </bean>

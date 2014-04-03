@@ -29,12 +29,12 @@
                         <list>
                             <bean parent="KS-Uif-InputField-LabelTop" p:label="Process Name" p:propertyName="name">
                                 <property name="control">
-                                    <bean parent="Uif-TextControl" p:size="20" p:disabled="true"/>
+                                    <bean parent="KS-Uif-TextControl" p:size="20" p:disabled="true"/>
                                 </property>
                             </bean>
                             <bean parent="KS-Uif-InputField-LabelTop" p:label="Process Category" p:propertyName="typeKey" >
                                 <property name="control">
-                                    <bean parent="Uif-TextControl" p:size="20" p:disabled="true"/>
+                                    <bean parent="KS-Uif-TextControl" p:size="20" p:disabled="true"/>
                                 </property>
                             </bean>
                             <bean parent="KS-Uif-InputField-LabelTop" p:label="Process Description" p:propertyName="descr" >
@@ -44,7 +44,7 @@
                             </bean>
                             <bean parent="KS-Uif-InputField-LabelTop" p:label="Owning Organization"  p:propertyName="orgName" p:style="font-weight:bold;white-space:nowrap;" >
                                 <property name="control">
-                                    <bean parent="Uif-TextControl" p:size="16" p:disabled="true"/>
+                                    <bean parent="KS-Uif-TextControl" p:size="16" p:disabled="true"/>
                                 </property>
                                 <property name="quickfinder">
                                     <bean parent="Uif-QuickFinder">
@@ -58,8 +58,8 @@
                                     </bean>
                                 </property>
                             </bean>
-                            <bean parent="Uif-DataField" p:propertyName="ownerOrgId" p:hidden="true" />
-                            <bean parent="KS-Uif-InputField-LabelTop" p:label="State" p:propertyName="stateKey">
+                            <bean parent="KS-Uif-DataField" p:propertyName="ownerOrgId" p:hidden="true" />
+                            <bean parent="KS-Uif-InputField" p:label="State" p:propertyName="stateKey">
                                 <property name="control">
                                     <bean parent="Uif-HorizontalRadioControl">
                                         <property name="options">

@@ -51,12 +51,12 @@
                                     <list>
                                         <bean parent="KS-Uif-InputField-LabelTop" p:label="Hold Name" p:propertyName="name">
                                             <property name="control">
-                                                <bean parent="Uif-TextControl" p:size="20" p:disabled="true"/>
+                                                <bean parent="KS-Uif-TextControl" p:size="20" p:disabled="true"/>
                                             </property>
                                         </bean>
                                         <bean parent="KS-Uif-InputField-LabelTop" p:label="Category Name" p:propertyName="typeKey">
                                             <property name="control">
-                                                <bean parent="Uif-DropdownControl" p:disabled="true"/>
+                                                <bean parent="KS-Uif-DropdownControl" p:disabled="true"/>
                                             </property>
                                             <property name="optionsFinder">
                                                 <bean class="org.kuali.student.enrollment.class1.hold.keyvalues.HoldIssueInfoTypeKeyValues" />
@@ -69,7 +69,7 @@
                                         </bean>
                                         <bean parent="KS-Uif-InputField-LabelTop" p:label="Owning Organization" p:propertyName="orgName">
                                             <property name="control">
-                                                <bean parent="Uif-TextControl" p:size="20" p:disabled="true"/>
+                                                <bean parent="KS-Uif-TextControl" p:size="20" p:disabled="true"/>
                                             </property>
                                         </bean>
                                         <bean parent="KS-Uif-InputField-LabelTop" p:label="State" p:propertyName="stateKey">

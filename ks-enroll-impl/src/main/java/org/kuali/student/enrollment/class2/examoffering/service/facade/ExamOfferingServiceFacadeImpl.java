@@ -3,6 +3,7 @@ package org.kuali.student.enrollment.class2.examoffering.service.facade;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.rice.core.api.criteria.PredicateFactory;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
+import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.enrollment.class2.courseofferingset.util.CourseOfferingSetUtil;
 import org.kuali.student.enrollment.class2.examoffering.krms.evaluator.ExamOfferingSlottingEvaluator;
 import org.kuali.student.enrollment.courseoffering.dto.ActivityOfferingInfo;
@@ -27,7 +28,6 @@ import org.kuali.student.r2.common.exceptions.OperationFailedException;
 import org.kuali.student.r2.common.exceptions.PermissionDeniedException;
 import org.kuali.student.r2.common.exceptions.ReadOnlyException;
 import org.kuali.student.r2.common.exceptions.VersionMismatchException;
-import org.kuali.student.common.util.security.ContextUtils;
 import org.kuali.student.r2.common.util.constants.CourseOfferingServiceConstants;
 import org.kuali.student.r2.common.util.constants.CourseOfferingSetServiceConstants;
 import org.kuali.student.r2.common.util.constants.ExamOfferingServiceConstants;
@@ -39,6 +39,9 @@ import org.kuali.student.r2.core.atp.service.AtpService;
 import org.kuali.student.r2.core.class1.type.dto.TypeInfo;
 import org.kuali.student.r2.core.class1.type.service.TypeService;
 import org.kuali.student.r2.core.constants.AtpServiceConstants;
+import org.kuali.student.r2.core.scheduling.dto.ScheduleRequestInfo;
+import org.kuali.student.r2.core.scheduling.dto.ScheduleRequestSetInfo;
+import org.kuali.student.r2.core.scheduling.service.SchedulingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +67,7 @@ public class ExamOfferingServiceFacadeImpl implements ExamOfferingServiceFacade 
     private CourseOfferingService courseOfferingService;
     private ExamOfferingService examOfferingService;
     private CourseOfferingSetService socService;
+    private SchedulingService schedulingService;
     private TypeService typeService;
     private boolean setLocation;
 
@@ -246,6 +250,9 @@ public class ExamOfferingServiceFacadeImpl implements ExamOfferingServiceFacade 
                 //Create a new Exam Offering
                 eo = createExamOffering(examPeriodId, ExamOfferingServiceConstants.EXAM_OFFERING_DRAFT_STATE_KEY, Driver.PER_CO.name(),
                         context);
+            } else if (!useFinalExamMatrix) {
+                //Remove RDL for Exam Offering
+                removeExamOfferingRDL(eo, context);
             }
             //pass
             if(this.getScheduleEvaluator()!=null && useFinalExamMatrix ){
@@ -263,6 +270,32 @@ public class ExamOfferingServiceFacadeImpl implements ExamOfferingServiceFacade 
             removeFinalExamOfferingsFromCO(foToEoRelations, context);
         }
 
+    }
+
+    /** Removes all SheduleRequestInfoSets and ScheduleRequestInfos for given Exam Offering
+     *
+     * @param examOfferingInfo
+     */
+    public void removeExamOfferingRDL(ExamOfferingInfo examOfferingInfo, ContextInfo context) {
+        List<ScheduleRequestSetInfo> scheduleRequestSetInfoList = null;
+        try {
+            scheduleRequestSetInfoList = getSchedulingService().getScheduleRequestSetsByRefObject(ExamOfferingServiceConstants.REF_OBJECT_URI_EXAM_OFFERING, examOfferingInfo.getId(), context);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if (!scheduleRequestSetInfoList.isEmpty() || scheduleRequestSetInfoList != null) {
+            try {
+                for (ScheduleRequestSetInfo scheduleRequestSetInfo : scheduleRequestSetInfoList) {
+                    List<ScheduleRequestInfo> scheduleRequestInfoList = getSchedulingService().getScheduleRequestsByScheduleRequestSet(scheduleRequestSetInfo.getId(), context);
+                    for (ScheduleRequestInfo scheduleRequestInfo : scheduleRequestInfoList) {
+                        getSchedulingService().deleteScheduleRequest(scheduleRequestInfo.getId(), context);
+                    }
+                    getSchedulingService().deleteScheduleRequestSet(scheduleRequestSetInfo.getId(), context);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
@@ -445,6 +478,10 @@ public class ExamOfferingServiceFacadeImpl implements ExamOfferingServiceFacade 
                     String eoState = this.getExamOfferingStateForActivityOffering(aoInfo);
                     eo = createFinalExamOfferingPerAO(foEntry.getKey().getId(), aoInfo, foEntry.getKey().getFinalExamLevelTypeKey(),
                             examPeriodId, eoState, termType, context);
+                }
+                else if (!useFinalExamMatrix) {
+                    //Remove RDL for Exam Offering
+                    removeExamOfferingRDL(eo, context);
                 }
 
                 if (this.getScheduleEvaluator() != null && useFinalExamMatrix) {
@@ -839,6 +876,14 @@ public class ExamOfferingServiceFacadeImpl implements ExamOfferingServiceFacade 
 
     public void setScheduleEvaluator(ExamOfferingSlottingEvaluator scheduleEvaluator) {
         this.scheduleEvaluator = scheduleEvaluator;
+    }
+
+    public SchedulingService getSchedulingService() {
+        return schedulingService;
+    }
+
+    public void setSchedulingService(SchedulingService schedulingService) {
+        this.schedulingService = schedulingService;
     }
 
     @Override

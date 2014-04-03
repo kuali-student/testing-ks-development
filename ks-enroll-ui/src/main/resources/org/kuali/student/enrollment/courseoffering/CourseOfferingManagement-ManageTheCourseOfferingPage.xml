@@ -116,9 +116,9 @@
         <property name="items">
             <list>
                 <ref bean="KS-CourseOfferingManagement-TitleAndCrossListInfoSection" />
-                <bean id="KS-Tab-Hidden-Input" parent="Uif-InputField" p:defaultValue="0" p:showLabel="false" p:propertyName="selectedTabId" p:hidden="true">
+                <bean id="KS-Tab-Hidden-Input" parent="KS-Uif-InputField" p:defaultValue="0" p:showLabel="false" p:propertyName="selectedTabId" p:hidden="true">
                     <property name="control">
-                        <bean parent="Uif-HiddenControl"/>
+                        <bean parent="KS-Uif-HiddenControl"/>
                     </property>
                 </bean>
                 <ref bean="KS-CourseOfferingManagement-ViewAOClustersSection"/>
@@ -149,7 +149,7 @@
                             <bean parent="Uif-HorizontalBoxSection">
                                 <property name="items">
                                     <list>
-                                        <bean parent="Uif-DataField" p:propertyName="coViewLinkWrapper" p:defaultValue="View">
+                                        <bean parent="KS-Uif-DataField" p:propertyName="coViewLinkWrapper" p:defaultValue="View">
                                             <property name="inquiry">
                                                 <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.student.enrollment.class2.courseoffering.dto.CourseOfferingEditWrapper" p:inquiryParameters="currentCourseOfferingWrapper.courseOfferingId" />
                                             </property>
