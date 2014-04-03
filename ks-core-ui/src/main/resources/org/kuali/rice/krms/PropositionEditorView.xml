@@ -32,9 +32,8 @@ limitations under the License.
                 <bean parent="KRMS-PropKey-HiddenField"/>
 
                 <bean parent="KS-Uif-InputField-LabelTop" p:propertyName="typeId"
-                      p:style="margin-left: 12pt" p:showLabel="true" p:label="Type" p:labelPlacement="TOP"
-                      p:maxLength="40">
-                    <property name="control">
+                      p:style="margin-left: 12pt" p:showLabel="true" p:label="Type" p:maxLength="40">
+                <property name="control">
                         <bean parent="KS-Uif-DropdownControl" p:cssClasses="categorySelect"/>
                     </property>
                     <property name="optionsFinder">
@@ -46,9 +45,8 @@ limitations under the License.
                 <bean parent="Uif-HorizontalBoxGroup">
                     <property name="items">
                         <list merge="true">
-
                             <bean parent="KS-Uif-InputField-LabelTop" p:propertyName="typeId"
-                                  p:style="margin-left: 12pt" p:showLabel="true" p:label="Type" p:labelPlacement="TOP"
+                                  p:style="margin-left: 12pt" p:showLabel="true" p:label="Type"
                                   p:maxLength="40">
                                 <property name="control">
                                     <bean parent="KS-Uif-DropdownControl" p:cssClasses="categorySelect"/>
