@@ -210,11 +210,13 @@ angular.module('regCartApp')
             ScheduleService.registerForRegistrationGroup().query({
                 courseCode: cartItem.courseCode,
                 regGroupId: cartItem.regGroupId,
+                gradingOption: cartItem.grading,
+                credits: cartItem.credits,
                 allowWaitlist: true
             }, function () {
                 cartItem.status = 'success';
-                cartItem.waitlistedStatus = 'true';
-                cartItem.statusMessage = 'If a seat becomes available you will be registered automatically'
+                cartItem.waitlistedStatus = true;
+                cartItem.statusMessage = GlobalVarsService.getCorrespondingMessageFromStatus('waitlisted');
             });
         };
 

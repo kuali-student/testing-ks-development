@@ -46,11 +46,12 @@
     //padding:0 10px;
 }
 
-.kscr-CardResult-detailsText--warning {
+.kscr-CardResult-detailsText--waitlist {
     border-top: 1px solid @warningBorder;
+    border-bottom: 1px solid @warningBorder;
     color: @warningText;
     padding: 10px 0px;
-    margin: 0em;
+    margin-bottom: 10px;
     width: 110%;
 }
 
@@ -65,6 +66,16 @@
 .kscr-Card-courseTimes{
    display: inline-flex;
    padding-left: 1em;
+}
+
+.kscr-ao-type {
+    float: left;
+    width: 75px;
+}
+
+.kscr-ao-time, .kscr-ao-location {
+    float: left;
+    width: 200px;
 }
 
 .kscr-Card-supportText{
@@ -83,7 +94,7 @@
 .kscr-Card-statusRemove a {
     float: right;
     display: inline;
-    color: @cardTextColor;
+    color: @removeIconColor;
     font-size: 1.2em;
 }
 
@@ -139,7 +150,7 @@
   }
 
 .kscr-cartResult-remove a {
-    color: inherit;
+    color: @removeIconColor;
     font-size: 1.2em;
 }
 
@@ -157,6 +168,10 @@
     border-top:none;
 }
 
+.panel-body {
+    padding-bottom: 5px;
+}
+
 .panel-title {
     font-size: 14px;
     font-family: @secondaryFontFamily;
@@ -165,8 +180,21 @@
 .panel-group  .panel{
     margin-bottom: 10px;
     border-width: 1px 1px 2px 1px;
+    -webkit-transition:  @transition;
+    transition:  @transition;
+    opacity:1;
 
 }
+
+.panel-group  .panel.ng-leave {
+    display:block!important;
+}
+
+.panel-group  .panel.ng-leave-active {
+    line-height:0;
+    opacity:0;
+}
+
 
 .kscr-course-container {
     position:relative;
@@ -190,6 +218,7 @@
 .kscr-cartResult-heading {
     background-color: inherit;
     float: left;
+    color: inherit;
 }
 
 .kscr-cartResult-icon {
@@ -272,9 +301,12 @@
 /**** End ****/
 
 .kscr-Card-reason{
-    padding-top: 10px;
+    display: flex;
 }
 
+.kscr-Card-reason-message{
+    padding-left: 4px;
+}
 
 .kscr-Card-title-alert{
     font-weight: bold;
@@ -302,4 +334,3 @@
 .util-Alert--information {
     color: @infoText; //#2A617D;
 }
-
