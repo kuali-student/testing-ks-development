@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2005-2013 The Kuali Foundation Licensed under the Educational Community License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.opensource.org/licenses/ecl2.php
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS
+    IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
+    governing permissions and limitations under the License. -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="KS-CourseView-ActiveDates-Section" parent="KS-CourseView-VerticalBoxSection">
+        <property name="headerText" value="Active Dates"/>
+        <property name="validationMessages.displayMessages" value="false" />
+        <property name="items">
+            <list>
+                <bean parent="Uif-KS-IconInputField-LabelTop" p:propertyName="courseInfo.startTerm" p:label="Start Term">
+                    <!-- Rice 2.4 upgrade : removing fieldLabel.requiredMessage -->
+<!--
+                    <property name="fieldLabel.requiredMessage">
+                        <bean parent="CM-StateAware-RequiredMessage" />
+                    </property>
+-->
+                    <property name="control">
+                        <bean parent="KS-Uif-DropdownControl" />
+                    </property>
+                    <property name="optionsFinder">
+                        <bean class="org.kuali.student.lum.lu.ui.course.keyvalues.DatesKeyValuesFinder" p:addBlankOption="true" />
+                    </property>
+                    <property name="fieldLabel.richLabelMessage.iconToolTipText"
+                              value="New Courses: This course will not necessarily be activated or offered this term, but will be eligible for scheduling on or after this term. Course Modifications: Any instances of the course offered on or after this term will reflect modifications."/>
+                </bean>
+
+                <bean parent="Uif-KS-IconInputField-LabelTop" p:propertyName="courseInfo.pilotCourse" p:label="Pilot Course"
+                      p:id="CourseView-ActiveDatesPage-PilotCourse" >
+                    <property name="cssClasses">
+                        <list merge="true">
+                            <value>admin-not-required-field</value>
+                        </list>
+                    </property>
+                    <property name="control">
+                        <bean parent="KS-Uif-CheckboxControl" p:checkboxLabel="Yes, this is a one-time/pilot course" />
+                    </property>
+                    <property name="fieldLabel.richLabelMessage.iconToolTipText" value="If this is a pilot course, you must select an End Term"/>
+                </bean>
+
+                <bean parent="Uif-KS-IconInputField-LabelTop" p:propertyName="courseInfo.endTerm" p:label="End Term"
+                      p:id="CourseView-ActiveDatesPage-EndTerm" >
+                    <property name="cssClasses">
+                        <list merge="true">
+                            <value>admin-not-required-field</value>
+                        </list>
+                    </property>
+                    <property name="refreshWhenChangedPropertyNames">
+                        <list>
+                            <value>document.newMaintainableObject.dataObject.courseInfo.startTerm</value>
+                            <value>document.newMaintainableObject.dataObject.courseInfo.pilotCourse</value>
+                        </list>
+                    </property>
+                    <property name="instructionalText" value="Last term in which the course can be offered" />
+                    <property name="control">
+                        <bean parent="KS-Uif-DropdownControl" p:disabled="@{!#dataObject.courseInfo.pilotCourse}" />
+                    </property>
+                    <property name="optionsFinder">
+                        <bean class="org.kuali.student.lum.lu.ui.course.keyvalues.DatesKeyValuesFinder"
+                              p:addBlankOption="true" />
+                    </property>
+                    <property name="fieldLabel.richLabelMessage.iconToolTipText"
+                              value="Most courses will not have an explicit end date. Exceptions are pilot courses or visiting instructor specific courses"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>
