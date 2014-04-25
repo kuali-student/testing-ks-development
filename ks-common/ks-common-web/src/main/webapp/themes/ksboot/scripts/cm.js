@@ -165,6 +165,28 @@ function reDisplayInstructor() {
     }
 }
 
+function reDisplayCrosslistedCourse() {
+    var crosslistComponent = jQuery("#crosslisted-course");
+    if (crosslistComponent.css('display') == "none") {
+        crosslistComponent.show();
+    }
+}
+
+function reDisplayJointlyOfferedCourse() {
+    var jointlyOfferedComponent = jQuery("#jointlyOffered-section");
+    if (jointlyOfferedComponent.css('display') == "none") {
+        jointlyOfferedComponent.show();
+    }
+}
+
+function reDisplayVersionCode() {
+    var versionComponent = jQuery("#version-code");
+    if (versionComponent.css('display') == "none") {
+        versionComponent.show();
+    }
+}
+
+
 /**
  * Checks if a particular scroll event handler has been bound to the window.
  * @param namespace The scroll event namespace.
@@ -517,7 +539,7 @@ function updateStickyHeaderText() {
  * @param index
  */
 function refreshOutcome(index) {
-    retrieveComponent('KS-CourseView-CourseLogisticsPage-Outcome-Widgets','refreshCourseLogistics','',{outComeIndex:index});
+    retrieveComponent('KS-CourseView-CourseLogisticsPage-Outcome-Widgets', 'refreshCourseLogistics', '', {outComeIndex:index});
 }
 
 function compareSubjectCodeInput(value, element) {
@@ -738,6 +760,11 @@ function showHideReviewProposalErrorFields(sectionId) {
 
 }
 
+/*Tried using jQuery("#kualiForm").validate().resetForm() to remove the validation results so that we can have the
+ page contents displayed without the validation results. But There is no effect after ran the method.
+ Then looping through all text areas and according to it has value or not to toggle the default border from the
+ validated result border.
+ */
 function highlightMissingElements(sectionId, showError) {
     var whiteBorderStyle = "border: rgb(255,255,255) !important;";
     var style = jQuery('#' + sectionId).find('table td textarea').attr("style");
@@ -754,29 +781,43 @@ function highlightMissingElements(sectionId, showError) {
 
     if (showError) {
         jQuery('#' + sectionId).find('table td textarea').each(function (index) {
-            jQuery(this).attr("style", originalStyle);
-            jQuery('#' + jQuery(this).GetBubblePopupID()).removeClass("alwaysHide");
+            var inputLength = 0;
+            var inputVal = jQuery('#' + this.id).val();
+            if (inputVal != null) {
+                inputLength = inputVal.length;
+            }
+            if (inputLength < 1) {
+                jQuery(this).attr("style", originalStyle);
+                jQuery('#' + jQuery(this).GetBubblePopupID()).removeClass("alwaysHide");
+            }
         });
     } else {
         jQuery('#' + sectionId).find('table td textarea').each(function (index) {
-            jQuery(this).attr("style", whiteBorder);
-            jQuery('#' + jQuery(this).GetBubblePopupID()).addClass("alwaysHide");
+            var inputLength = 0;
+            var inputVal = jQuery('#' + this.id).val();
+            if (inputVal != null) {
+                inputLength = inputVal.length;
+            }
+            if (inputLength < 1) {
+                jQuery(this).attr("style", whiteBorder);
+                jQuery('#' + jQuery(this).GetBubblePopupID()).addClass("alwaysHide");
+            }
         });
     }
 }
 
- jQuery.validator.addMethod("rangeMaxMinCheck",
-     function(value, element) {
-         return this.optional(element) || verifyMaxAndMinInput(value, element);
-     },
-     "Invalid range"
- );
+jQuery.validator.addMethod("rangeMaxMinCheck",
+    function (value, element) {
+        return this.optional(element) || verifyMaxAndMinInput(value, element);
+    },
+    "Invalid range"
+);
 
- function verifyMaxAndMinInput(value, element){
-     var res = value.split("-");
-     if (res.length != 2){
+function verifyMaxAndMinInput(value, element) {
+    var res = value.split("-");
+    if (res.length != 2) {
         return false;
-     }
-     return res[0] != '' && res[1] != '' && res[0] < res[1];
+    }
+    return res[0] != '' && res[1] != '' && res[0] < res[1];
 
- }
+}
