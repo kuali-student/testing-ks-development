@@ -1,0 +1,169 @@
+/*------------------- Colors ---------------------------*/
+//custom mobile colors
+@bodyColor:               #F4F4F4;
+@bodyColorDark:           #D7D7D7;
+@sectionColor:            #F4F4F4;
+@headerFontColor:         @whiteText;
+@supportHeading:          @lightGray;
+@cardBackgroundColor:     @whiteBackground;
+@cardBorderColor:         #E4E4E4;
+@whiteBackground:         #FFFFFF;
+
+@badgeColor:              @lightGray;
+
+// Text
+@whiteText:               #F8F8F8;
+@darkGray:                #333333;
+@lightGray:               #666666;
+@cardTextColor:           @lightGray;
+@primaryTextColor:        @darkGray;
+@secondaryTextColor:      @lightGray;
+@badgeTextColor:          #F2F2F2;
+
+@textColor: #000;
+@selectedText: @textColor;
+
+@menuHoverColor:          #EBEBEB;
+
+// Fading colors
+@backgroundColor--highlight: rgba(255, 255, 204, 0.5);    //#FFFFCC;
+@shadowColor--highlight: rgba(255, 255, 0, 0.5); //#FFFF00;
+@textColor--highlight: #ffff7f;
+
+// Highlight
+// -------------------------
+@highlightColor:           #FFFF99;
+
+// Links
+@linkColor:             #3366FF;
+@linkColorHover:        darken(@linkColor, 25%);
+
+// System Messages
+@successText:             #3B723B;
+@successBackground:       #dff0d8;
+@successBorder:           #D6E9C6;
+
+@infoText:                #2A617D;
+@infoBackground:          #D9EDF7;
+@infoBorder:              #BCE8F1;
+
+@warningText:             #83652E;
+@warningBackground:       #FCF8E3;
+@warningBorder:           #FBEED5;
+
+@errorText:               #A3403C;
+@errorBackground:         #F2DEDE;
+@errorBorder:             #EFD3D7;
+
+
+//Font Icon
+@removeIconColor:       #818185;
+
+// Borders
+@border-color: #AAAAAA;
+@border-light-color: #F2F2F2;
+@rightGroupRightAlignment: 0px;
+
+//Table
+@table-SelectedBackgroundColor: #C4C4C4;
+
+//Course search
+@courseSearchNoSeats:      @red;
+
+// Seats Colors
+@activityOfferingSelectedColor: @red;
+@noSeatAvailableColor:           @green;
+
+/*------------------- END KS NEW COLOR DEFINITIONS --------------------------*/
+
+/*------------------- BEGIN MISCELLANEOUS VARIABLES DEFINITIONS -------------------*/
+@horizontalLineBorder: 1px solid @border-light-color;
+// for dotted line border
+@dottedLineBorder: 1px dotted @border-color;
+/*------------------- END MISCELLANEOUS VARIABLES DEFINITIONS -------------------*/
+
+/*------------------- Calendar Colors -------------------*/
+@courseCardColor1:  #334D5C;
+@courseCardColor2:  #3d9c89;
+@courseCardColor3:  #E27A3F;
+@courseCardColor4:  #DF4949;
+@courseCardColor5:  #3498DB;
+@courseCardColor6:  #BF927D;
+@courseCardColor7:  #8F6579;
+@courseCardColor8:  #8E44AD;
+@courseCardColor9:  #5B7D48;
+@courseCardColor10: #3A6394;
+
+//Alt colors
+@courseCardColor11: #7b8c96;
+@courseCardColor12: #81bfb3;
+@courseCardColor13: #eca983;
+@courseCardColor14: #ea8989;
+@courseCardColor15: #7cbce8;
+@courseCardColor16: #d6b8ab;
+@courseCardColor17: #b79ba8;
+@courseCardColor18: #b686ca;
+@courseCardColor19: #95ab8b;
+@courseCardColor20: #809aba;
+
+/**
+ * Algorithm for defining the course color for a given index
+ * The current algorithm takes the base set of 20 colors and repeats variants of them up to 100.
+ * Calculations done manipulate the colors using the color wheel which has 360 degrees.
+ * This is useful for understanding color theory: http://www.tigercolor.com/color-lab/color-theory/color-theory-intro.htm
+ *
+ *     1 - 20  = Base set
+ *    21 - 40  = Complementary colors to base set (180 degree)
+ *    41 - 60  = Right Analogous colors to base set (30 degree)
+ *    61 - 80  = Left Analogous colors to base set (-30 degree)
+ *    81 - 100 = Complementary of Right Analogous colors of base set (210 degree)
+ *   101 - 120 = Complementary of Left Analogous colors of base set (150 degree)
+ *
+ * If you assume the base colors are at the bottom of a circle, it can be visualize as:
+ *  1. | - straight across
+ *  2. \ - shift right then across
+ *  3. / - shift left then across
+ */
+@courseCardColorCount: 120; // # of colors to calculate for
+
+.defineCourseColor(@n) when (@n =< 20) {
+    @tmp: 'courseCardColor@{n}';
+    @courseColor: @@tmp;
+}
+
+.defineCourseColor(@n) when (20 < @n) and (@n =< 40) {
+    @n1: @n - 20; // Reuse the first 20 colors
+    @tmp: 'courseCardColor@{n1}';
+    @courseColor: spin(@@tmp, 180);
+}
+
+.defineCourseColor(@n) when (40 < @n) and (@n =< 60) {
+    @n1: @n - 40; // Reuse the first 20 colors
+    @tmp: 'courseCardColor@{n1}';
+    @courseColor: spin(@@tmp, 30);
+}
+
+.defineCourseColor(@n) when (60 < @n) and (@n =< 80) {
+    @n1: @n - 60; // Reuse the first 20 colors
+    @tmp: 'courseCardColor@{n1}';
+    @courseColor: spin(@@tmp, 210);
+}
+
+.defineCourseColor(@n) when (80 < @n) and (@n =< 100) {
+    @n1: @n - 80; // Reuse the first 20 colors
+    @tmp: 'courseCardColor@{n1}';
+    @courseColor: spin(@@tmp, -30);
+}
+
+.defineCourseColor(@n) when (100 < @n) and (@n =< 120) {
+    @n1: @n - 100; // Reuse the first 20 colors
+    @tmp: 'courseCardColor@{n1}';
+    @courseColor: spin(@@tmp, 150);
+}
+
+// To handle fringe cases, default to the first defined color for everything else
+.defineCourseColor(@n) when (120 < @n) {
+    @courseColor: @courseCardColor1;
+}
+
+/*-------------------End Calendar Colors -------------------*/

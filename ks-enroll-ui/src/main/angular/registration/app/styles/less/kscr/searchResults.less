@@ -1,0 +1,172 @@
+.kscr-Search-results {
+  .util-Grid-cell;
+  color: @primaryTextColor;
+  font-family: @secondaryFontFamily;
+  .font-size(14);
+  font-weight: normal;
+  margin-right: 1rem;
+  position: relative;
+}
+
+.kscr-Search-results-heading {
+  padding: 0 0 0.5rem 1.5rem;
+  .util-Grid;
+  &--small {
+    text-align: right;
+  }
+}
+
+.kscr-Search-results-summary {
+  .util-Grid-cell(2);
+  padding-top: 0.2rem;
+}
+
+.kscr-Search-results-picker {
+  .util-Grid-cell;
+  text-align: right;
+}
+
+.kscr-Search-results-header {
+  color: @secondaryTextColor;
+  cursor: pointer;
+  font-family: @secondaryFontFamily;
+  .font-size(14);
+  font-weight: bold;
+  background-color: @cardBorderColor;
+  padding: 1rem 1.5rem 1rem 1.5rem;
+}
+
+.kscr-Search-results-cell {
+  padding: 1rem 1.5rem 1rem 1.5rem;
+  border-bottom: @horizontalLineBorder;
+}
+
+.kscr-Search-results--selected {
+  background: @table-SelectedBackgroundColor;
+}
+
+.kscr-Search-results-sortIcon {
+  background: url("../images/validation/icon-sort.png") no-repeat center center;
+  float: right;
+  height: 1.2rem;
+  margin: 0.5rem 0 0 0.5rem;
+  padding: 0 0 0 1.4rem;
+  width: 1.2rem;
+  &--up {
+    background: url("../images/validation/icon-sort-up.png") no-repeat center center;
+  }
+  &--down {
+    background: url("../images/validation/icon-sort-down.png") no-repeat center center;
+  }
+}
+
+.kscr-Search-results-table-head {
+  height: 3rem;
+}
+
+.kscr-Search--creditOptions div {
+  display: inline-flex;
+}
+
+.kscr-Search-results-card {
+  background-color: @cardBackgroundColor;
+  border-color: @cardBorderColor;
+  border-style: solid;
+  border-radius: 4px;
+  border-width: 1px 1px 2px;
+}
+
+.kscr-Search-results-table {
+  .kscr-Search-results-card;
+  width: 100%;
+  margin-bottom: 4rem;
+}
+
+.kscr-Search-results-paginate {
+  .util-Grid;
+  .kscr-Search-results-card;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding-top: 0.5rem;
+}
+
+.kscr-Search-results-pageBox {
+  .util-Grid-cell;
+  border-style: solid;
+  border-color: @cardBorderColor;
+  border-width: 0 1px 0 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  text-align: center;
+}
+
+.kscr-Search-results-pageBox a.hover {
+  text-decoration: none;
+}
+
+.kscr-Search-results-limits {
+  margin-left: 0.5rem;
+}
+
+.kscr-Search-result {
+  .kscr-Search-results-card;
+  margin: 1rem 0rem 0rem 1rem;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.kscr-Search-row {
+  &--clickable {
+    cursor: pointer;
+  }
+}
+
+.kscr-Search-checkbox {
+  cursor: pointer;
+}
+
+.kscr-Search-result-hidden {
+  display: none;
+}
+
+// small format styling
+@media screen and (max-width: @smallFormatMax) {
+  .kscr-Search-results-heading {
+    display: none;
+  }
+
+  .kscr-Search-results-table, .kscr-Search-results-paginate {
+    display: none;
+  }
+
+  .kscr-Search-results {
+    margin-bottom: 1rem;
+  }
+}
+
+// mid format styling
+@media screen and (max-width: @midFormatMax) {
+  .kscr-Search-results {
+    margin: 1.5rem 1rem 0 1rem;
+  }
+
+  .kscr-SearchDetails-activityOfferings .kscr-Search-results-table {
+    display: none;
+  }
+}
+
+// large format styling
+@media screen and (min-width: @largeFormatMin) {
+  .kscr-Search-results-container {
+    .util-Grid;
+  }
+
+  .kscr-Search-results-heading--small {
+    display: none;
+  }
+
+  .kscr-Search-results-list {
+    display: none;
+  }
+}
