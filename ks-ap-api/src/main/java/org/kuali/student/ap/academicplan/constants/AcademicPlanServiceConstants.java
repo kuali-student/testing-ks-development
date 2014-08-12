@@ -14,6 +14,9 @@
  */
 package org.kuali.student.ap.academicplan.constants;
 
+import org.kuali.student.ap.academicplan.dto.LearningPlanInfo;
+import org.kuali.student.ap.academicplan.dto.PlanItemInfo;
+import org.kuali.student.ap.academicplan.service.AcademicPlanService;
 import org.kuali.student.r2.common.constants.CommonServiceConstants;
 
 /**
@@ -24,7 +27,11 @@ import org.kuali.student.r2.common.constants.CommonServiceConstants;
  */
 public class AcademicPlanServiceConstants {
     public static final String NAMESPACE = CommonServiceConstants.REF_OBJECT_URI_GLOBAL_PREFIX + "acadplan";
-    public static final String SERVICE_NAME = "AcademicPlanService";
+    public static final String SERVICE_NAME = AcademicPlanService.class.getSimpleName();
+    public static final String REF_OBJECT_URI_ACADEMIC_PLAN_INFO = NAMESPACE + "/"
+            + LearningPlanInfo.class.getSimpleName();
+    public static final String REF_OBJECT_URI_ACADEMIC_PLAN_ITEM_INFO = NAMESPACE + "/"
+            + PlanItemInfo.class.getSimpleName();
     /**
      * Namespaces
      */
@@ -41,10 +48,13 @@ public class AcademicPlanServiceConstants {
     public static final String EXEC_SERVICE_METHOD = "Exec ";
 
 
-    public static final String LEARNING_PLAN_TYPE_PLAN = "kuali.academicplan.type.plan";
-    public static final String LEARNING_PLAN_TYPE_PLAN_TEMPLATE = "kuali.academicplan.type.plan.template";
-    public static final String LEARNING_PLAN_TYPE_PLAN_REVIEW = "kuali.academicplan.type.plan.review";
-    public static final String LEARNING_PLAN_ACTIVE_STATE_KEY  = "kuali.academicplan.plan.state.active";
+    public static final String LEARNING_PLAN_TYPE_PLAN =            "kuali.academicplan.type.plan";
+    public static final String LEARNING_PLAN_TYPE_PLAN_TEMPLATE =   "kuali.academicplan.type.plan.template";
+    public static final String LEARNING_PLAN_TYPE_PLAN_REVIEW =     "kuali.academicplan.type.plan.review";
+    public static final String LEARNING_PLAN_ACTIVE_STATE_KEY  =    "kuali.academicplan.plan.state.active";
+    public static final String LEARNING_PLAN_ITEM_TYPE =            "kuali.academicplan.type.planitem";
+    public static final String LEARNING_PLAN_ITEM_ACTIVE_STATE_KEY ="kuali.academicplan.planitem.state.active";
+
     public static final String ADVISOR_AFFILIATION_TYPE_KEY = "ADVSR";
 
     public static enum ItemCategory {
@@ -55,20 +65,7 @@ public class AcademicPlanServiceConstants {
         }
        }
 
-    public static final String LEARNING_PLAN_ITEM_TYPE = "kuali.academicplan.planitem";
-    public static final String LEARNING_PLAN_ITEM_ACTIVE_STATE_KEY = "kuali.academicplan.planitem.state.active";
     public static final String LEARNING_PLAN_ITEM_SHARED_TRUE_KEY = "true";
     public static final String LEARNING_PLAN_ITEM_SHARED_FALSE_KEY = "false";
-
-    
-    /* Placeholder Types */
-    public static final String PLACEHOLDER_MILESTONE = "org.kuali.student.ap.placeholder.milestone";
-    public static final String PLACEHOLDER_COURSE = "org.kuali.student.ap.placeholder.course";
-    public static final String PLACEHOLDER_SEARCH = "org.kuali.student.ap.placeholder.search";
-    public static final String PLACEHOLDER_LIST = "org.kuali.student.ap.placeholder.list";
-    public static final String PLACEHOLDER_ERROR = "org.kuali.student.ap.placeholder.error";
-
-	/* Degree Map invalid Status */
-    public static final String LEARNING_PLAN_INVALID_STATE_KEY  = "kuali.academicplan.plan.state.invalid";
 
 }

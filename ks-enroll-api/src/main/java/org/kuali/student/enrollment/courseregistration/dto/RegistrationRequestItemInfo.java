@@ -16,40 +16,46 @@
 
 package org.kuali.student.enrollment.courseregistration.dto;
 
-import org.kuali.rice.core.api.util.jaxb.KualiDecimalAdapter;
-import org.kuali.rice.core.api.util.type.KualiDecimal;
-import org.kuali.student.enrollment.courseregistration.infc.RegistrationRequestItem;
-import org.kuali.student.r2.common.dto.IdEntityInfo;
-import org.w3c.dom.Element;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.io.Serializable;
-import java.util.List;
+
+import org.kuali.rice.core.api.util.type.KualiDecimal;
+
+import org.kuali.student.enrollment.courseregistration.infc.RegistrationRequestItem;
+import org.kuali.student.r2.common.dto.IdEntityInfo;
+import org.kuali.student.r2.common.dto.ValidationResultInfo;
+import org.kuali.student.r2.common.infc.ValidationResult;
+
+import org.w3c.dom.Element;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "RegistrationRequestItemInfo", propOrder = {
-                "id", "name", "descr", "typeKey", "stateKey",
-                "registrationRequestId", 
-                "personId", 
-                "registrationGroupId",
-                "existingCourseRegistrationId",
-                "credits", 
-                "gradingOptionId", 
-                "okToWaitlist", 
-                "okToHoldUntilList", 
-                "meta", "attributes", "_futureElements"})
+        "id", "name", "descr", "typeKey", "stateKey",
+        "registrationRequestId",
+        "personId",
+        "registrationGroupId",
+        "existingCourseRegistrationId",
+        "credits",
+        "gradingOptionId",
+        "requestedEffectiveDate",
+        "okToWaitlist",
+        "okToHoldUntilList", "validationResults",
+        "meta", "attributes", "_futureElements"})
 
-public class RegistrationRequestItemInfo 
-    extends IdEntityInfo 
-    implements RegistrationRequestItem, Serializable {
+public class RegistrationRequestItemInfo
+        extends IdEntityInfo
+        implements RegistrationRequestItem, Serializable {
 
     private static final long serialVersionUID = 1L;
-  
+
     @XmlElement
     private String registrationRequestId;
 
@@ -63,17 +69,22 @@ public class RegistrationRequestItemInfo
     private String existingCourseRegistrationId;
 
     @XmlElement
-    @XmlJavaTypeAdapter(KualiDecimalAdapter.class)
     private KualiDecimal credits;
 
     @XmlElement
     private String gradingOptionId;
 
     @XmlElement
+    private Date requestedEffectiveDate;
+
+    @XmlElement
     private Boolean okToWaitlist;
 
     @XmlElement
     private Boolean okToHoldUntilList;
+
+    @XmlElement
+    private List<ValidationResultInfo> validationResults;
 
     @XmlAnyElement
     private List<Element> _futureElements;
@@ -103,8 +114,13 @@ public class RegistrationRequestItemInfo
                 this.credits = new KualiDecimal(registrationRequestItem.getCredits().bigDecimalValue());
             }
             this.gradingOptionId = registrationRequestItem.getGradingOptionId();
+            this.requestedEffectiveDate = registrationRequestItem.getRequestedEffectiveDate();
             this.okToWaitlist = registrationRequestItem.getOkToWaitlist();
             this.okToHoldUntilList = registrationRequestItem.getOkToHoldUntilList();
+            this.validationResults = new ArrayList<ValidationResultInfo>();
+            for(ValidationResult validationResult:registrationRequestItem.getValidationResults ()){
+                this.getValidationResults().add(new ValidationResultInfo(validationResult));
+            }
         }
     }
 
@@ -163,6 +179,15 @@ public class RegistrationRequestItemInfo
     }
 
     @Override
+    public Date getRequestedEffectiveDate() {
+        return requestedEffectiveDate;
+    }
+
+    public void setRequestedEffectiveDate(Date requestedEffectiveDate) {
+        this.requestedEffectiveDate = requestedEffectiveDate;
+    }
+
+    @Override
     public Boolean getOkToWaitlist() {
         return okToWaitlist;
     }
@@ -178,5 +203,18 @@ public class RegistrationRequestItemInfo
 
     public void setOkToHoldUntilList(Boolean okToHoldUntilList) {
         this.okToHoldUntilList = okToHoldUntilList;
+    }
+
+
+    @Override
+    public List<ValidationResultInfo> getValidationResults() {
+        if (validationResults == null) {
+            validationResults = new ArrayList<ValidationResultInfo>();
+        }
+        return validationResults;
+    }
+
+    public void setValidationResults(List<ValidationResultInfo> validationResults) {
+        this.validationResults = validationResults;
     }
 }

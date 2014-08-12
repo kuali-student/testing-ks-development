@@ -1,7 +1,5 @@
 package org.kuali.student.r2.core.constants;
 
-import org.kuali.rice.krms.api.engine.Term;
-
 /**
  * Created with IntelliJ IDEA.
  * User: SW Genis
@@ -174,6 +172,7 @@ public class KSKRMSServiceConstants {
     public static final String TERM_PARAMETER_TYPE_PROGRAM_CLU_KEY = "kuali.term.parameter.type.program.clu.id";
     public static final String TERM_PARAMETER_TYPE_PROGRAM_CLUSET_KEY = "kuali.term.parameter.type.program.cluSet.id";
     public static final String TERM_PARAMETER_TYPE_CLASS_STANDING_KEY = "kuali.term.parameter.type.classStanding";
+    public static final String TERM_PARAMETER_TYPE_TERM_KEYDATE_TYPE_KEY = "kuali.term.parameter.type.keydate.typekey";
 
     //note, this is a test as in assessment, not environment
     public static final String TERM_PARAMETER_TYPE_TEST_CLU_KEY = "kuali.term.parameter.type.test.clu.id";
@@ -189,6 +188,7 @@ public class KSKRMSServiceConstants {
 
     // term resolver types
     public static final String TERM_RESOLVER_TYPE_FINAL_EXAM = "kuali.krms.termresolver.type.final.exam";
+    public static final String TERM_RESOLVER_TYPE_COURSE_REQUISITES = "kuali.krms.termresolver.type.course";
 
     // action parameters
     public static final String ACTION_PARAMETER_TYPE_RDL_TBA = "tba";
@@ -267,6 +267,8 @@ public class KSKRMSServiceConstants {
     public static final String TERM_RESOLVER_MATCHINGCOURSE = "MatchingCourse";
     public static final String TERM_RESOLVER_MATCHINGCOURSESET = "MatchingCourseSet";
     public static final String TERM_RESOLVER_EXAM_FREEFORMTEXT = "ExamFreeFormText";
+    public static final String TERM_RESOLVER_CURRENT_COURSE_WITHIN_KEYDATE = "CurrentCourseWithinKeydate";
+    public static final String TERM_RESOLVER_DATE_IN_TERM_KEY_DATE = "DateInTermKeyDate";
 
     // natural language usage keys
     public static final String KRMS_NL_RULE_EDIT = "kuali.krms.edit";
@@ -279,8 +281,6 @@ public class KSKRMSServiceConstants {
     public static final String KRMS_NL_MATRIX = "kuali.krms.matrix";
 
     // term prerequisite
-    public static final String TERM_PREREQUISITE_CONTEXTINFO = "kuali.term.prerequisite.contextInfo";
-    public static final String TERM_PREREQUISITE_PERSON_ID = "kuali.term.prerequisite.personId";
     public static final String TERM_PREREQUISITE_CLU_ID = "kuali.term.prerequisite.cluId";
     public static final String TERM_PREREQUISITE_CO_ID = "kuali.term.prerequisite.courseOfferingId";
     public static final String TERM_PREREQUISITE_CO = "kuali.term.prerequisite.courseOffering";

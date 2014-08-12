@@ -36,6 +36,7 @@ public class CourseOfferingServiceConstants {
 
     public static final String NAMESPACE = CommonServiceConstants.REF_OBJECT_URI_GLOBAL_PREFIX + "courseOffering";
     public static final String SERVICE_NAME_LOCAL_PART = CourseOfferingService.class.getSimpleName();
+    public static final String CACHED_SERVICE_NAME_LOCAL_PART = CourseOfferingService.class.getSimpleName() + "Cached";
     public static final String REF_OBJECT_URI_COURSE_OFFERING = NAMESPACE + "/" + CourseOfferingInfo.class.getSimpleName();
     public static final String REF_OBJECT_URI_ACTIVITY_OFFERING = NAMESPACE + "/" + ActivityOfferingInfo.class.getSimpleName();
     public static final String REF_OBJECT_URI_REGISTRATION_GROUP = NAMESPACE + "/" + RegistrationGroupInfo.class.getSimpleName();
@@ -67,6 +68,7 @@ public class CourseOfferingServiceConstants {
     public static final String COLOCATED_SET_MAXIMUM_ENROLLMENT_ATTR = "kuali.attribute.colocatedset.max.enrollment";
     public static final String IS_MAX_ENROLLMENT_SHARED_ATTR = "kuali.attribute.colocatedset.is.max.enrollment.shared";
     public static final String IS_AO_APPROVED_FOR_NON_STANDARD_TIME_SLOTS = "kuali.attribute.nonstd.ts.indicator";
+    public static final String ACTIVITY_OFFERING_SCHEDULING_STATE_ATTR = "kuali.attribute.activity.offering.scheduling.state.key";
 
     // The type/states are defined in LuiServiceConstants.java
 

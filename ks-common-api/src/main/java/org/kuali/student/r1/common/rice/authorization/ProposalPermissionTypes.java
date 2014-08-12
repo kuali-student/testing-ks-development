@@ -15,33 +15,31 @@
 
 package org.kuali.student.r1.common.rice.authorization;
 
+import org.kuali.rice.kew.api.KewApiConstants;
+import org.kuali.rice.krad.util.KRADConstants;
+import org.kuali.student.r1.common.rice.StudentIdentityConstants;
+
 /**
- * Enum to be used for Permission types. Permission Type is analagous to a permission template.
+ * Enum to be used for Permission types (KRAD). Permission Type is analagous to a permission template.
  * 
  * When using permission types, permission checks will be performed using template names. 
  *
  */
-public enum PermissionType {
-	INITIATE("Initiate","KR-SYS","Initiate Document"),
-	OPEN("View","KS-SYS","Open Document (GWT)"),
-	EDIT("Edit","KS-SYS","Edit Document"),
-	ADD_COMMENT("Comment","KS-SYS","Comment on Document"),
-	ADD_ADHOC_REVIEWER("Add Reviewer","KS-SYS","Add Adhoc Reviewer"), 
-	WITHDRAW("Withdraw","KS-SYS","Withdraw Document"),
-	SECTION_MAINTENANCE("Section Maintenance","KS-SYS","Section Maintenance"), 
-	FIELD_ACCESS("Access Permission","KS-SYS","Access Permission"), 
-	SEARCH("Lookup",null,null),
-	REMOVE_ADHOC_REVIEWERS("Remove Reviewers","KS-SYS","Remove Reviewers"), 
-	BLANKET_APPROVE("Blanket Approve","KS-SYS","Blanket Approve"),
-	UPLOAD_DOCUMENTS("Upload","KS-SYS","Upload to Document"),
-	USE_SCREEN("Use Screen","KS-SYS","Use Screen"),
-	ADD_COLLABORATOR_ACTION("Add Collaborator Action","KS-SYS","Add Collaborator Action");
+public enum ProposalPermissionTypes {
 
-	private String label = "";
-	private String permissionNamespace = "";
-	private String permissionTemplateName = "";
+    INITIATE("Initiate", KRADConstants.KUALI_RICE_SYSTEM_NAMESPACE, KewApiConstants.INITIATE_PERMISSION),
+    OPEN("View", StudentIdentityConstants.KS_NAMESPACE_CD,"Open Document"),
+    EDIT("Edit",KRADConstants.KNS_NAMESPACE,"Edit Document"),
+    BLANKET_APPROVE("Blanket Approve",StudentIdentityConstants.KS_NAMESPACE_CD,"Blanket Approve"),
+    ADD_COMMENT("Comment",StudentIdentityConstants.KS_NAMESPACE_CD,"Add a Comment"),
+    EDIT_COMMENT("Edit Comment",StudentIdentityConstants.KS_NAMESPACE_CD,"Edit a Comment"),
+    DELETE_COMMENT("Delete Comment",StudentIdentityConstants.KS_NAMESPACE_CD,"Delete a Comment");
 
-	private PermissionType(String label, String permissionNamespace, String permissionTemplateName) {
+    private String label = "";
+    private String permissionNamespace = "";
+    private String permissionTemplateName = "";
+
+	private ProposalPermissionTypes(String label, String permissionNamespace, String permissionTemplateName) {
         this.label = label;
         this.permissionNamespace = permissionNamespace;
         this.permissionTemplateName = permissionTemplateName;
@@ -75,8 +73,8 @@ public enum PermissionType {
 		return permissionNamespace + "~" + permissionTemplateName;
 	}
 
-	public static PermissionType getByCode(String code) {
-		for (PermissionType type : PermissionType.values()) {
+	public static ProposalPermissionTypes getByCode(String code) {
+		for (ProposalPermissionTypes type : ProposalPermissionTypes.values()) {
 			if (type.getCode().equals(code)) {
 				return type;
 			}

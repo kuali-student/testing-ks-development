@@ -14,20 +14,13 @@
  */
 package org.kuali.student.ap.academicplan.dto;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
-
 import org.kuali.student.ap.academicplan.infc.LearningPlan;
 import org.kuali.student.r2.common.dto.IdEntityInfo;
 import org.kuali.student.r2.common.dto.RichTextInfo;
 import org.w3c.dom.Element;
+
+import javax.xml.bind.annotation.*;
+import java.util.List;
 
 /**
  * LearningPlan message structure
@@ -37,86 +30,48 @@ import org.w3c.dom.Element;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "LearningPlanInfo", propOrder = { "studentId", "id", "typeKey",
-		"stateKey", "shared", "programId", "effectiveDate", "expirationDate",
-		"name", "descr", "meta", "attributes", "_futureElements" })
+@XmlType(name = "LearningPlanInfo", propOrder = {"studentId", "id", "typeKey", "stateKey", "shared", "name", "descr", "meta", "attributes", "_futureElements"})
 public class LearningPlanInfo extends IdEntityInfo implements LearningPlan {
 
-	private static final long serialVersionUID = -754256998953998213L;
+    @XmlElement
+    private String studentId;
 
-	@XmlElement
-	private String studentId;
+    @XmlElement
+    private Boolean shared;
 
-	@XmlElement
-	private Boolean shared;
+    @XmlAnyElement
+    private List<Element> _futureElements;
 
-	@XmlAttribute
-	private String programId;
 
-	@XmlAttribute
-	private Date effectiveDate;
+    public LearningPlanInfo() {
+    }
 
-	@XmlAttribute
-	private Date expirationDate;
+    public LearningPlanInfo(LearningPlan plan) {
+        super(plan);
 
-	@XmlAnyElement
-	private List<Element> _futureElements;
+        if(null != plan) {
+            this.setId(plan.getId());
+            this.studentId = plan.getStudentId();
+            this.setDescr((null != plan.getDescr()) ? new RichTextInfo(plan.getDescr()) : null);
+            this.setShared(plan.getShared());
+        }
+    }
 
-	public LearningPlanInfo() {
-	}
+    @Override
+    public String getStudentId() {
+        return studentId;
+    }
 
-	public LearningPlanInfo(LearningPlan plan) {
-		super(plan);
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
+    }
 
-		if (null != plan) {
-			this.setId(plan.getId());
-			this.studentId = plan.getStudentId();
-			this.setDescr((null != plan.getDescr()) ? new RichTextInfo(plan
-					.getDescr()) : null);
-			this.setShared(plan.getShared());
-		}
-	}
+    @Override
+    public Boolean getShared() {
+        return shared;
+    }
 
-	@Override
-	public String getStudentId() {
-		return studentId;
-	}
-
-	public void setStudentId(String studentId) {
-		this.studentId = studentId;
-	}
-
-	@Override
-	public Boolean getShared() {
-		return shared;
-	}
-
-	public void setShared(Boolean shared) {
-		this.shared = shared;
-	}
-	
-	public String getProgramId() {
-		return programId;
-	}
-
-	public void setProgramId(String credentialProgramId) {
-		this.programId = credentialProgramId;
-	}
-
-	public Date getEffectiveDate() {
-		return effectiveDate;
-	}
-
-	public void setEffectiveDate(Date effectiveDate) {
-		this.effectiveDate = effectiveDate;
-	}
-
-	public Date getExpirationDate() {
-		return expirationDate;
-	}
-
-	public void setExpirationDate(Date expirationDate) {
-		this.expirationDate = expirationDate;
-	}
-
+    public void setShared(Boolean shared) {
+        this.shared = shared;
+    }
 }

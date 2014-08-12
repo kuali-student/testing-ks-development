@@ -24,14 +24,12 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.ap.academicplan.infc.PlanItem;
+import org.kuali.student.ap.academicplan.constants.AcademicPlanServiceConstants;
 import org.kuali.student.r2.common.dto.AttributeInfo;
 import org.kuali.student.r2.common.dto.IdEntityInfo;
-import org.kuali.student.r2.common.dto.MetaInfo;
 import org.kuali.student.r2.common.dto.RichTextInfo;
 import org.kuali.student.r2.common.infc.Attribute;
-import org.kuali.student.r2.common.infc.Meta;
 import org.w3c.dom.Element;
 
 /**
@@ -65,7 +63,8 @@ public class PlanItemInfo extends IdEntityInfo implements PlanItem {
     @XmlElement
     private AcademicPlanServiceConstants.ItemCategory category;
 
-    @XmlAnyElement
+    @SuppressWarnings("unused")
+	@XmlAnyElement
     private List<Element> _futureElements;
 
     public PlanItemInfo() {
@@ -73,13 +72,10 @@ public class PlanItemInfo extends IdEntityInfo implements PlanItem {
     }
 
     public PlanItemInfo(PlanItem item) {
-        copy(item);
-    }
+        super(item);
 
-    public void copy(PlanItem item) {
         if(null != item) {
             this.setId(item.getId());
-            this.setName(item.getName());
 			this.setTypeKey(item.getTypeKey());
 			this.setStateKey(item.getStateKey());
             this.refObjectId = item.getRefObjectId();
@@ -94,10 +90,6 @@ public class PlanItemInfo extends IdEntityInfo implements PlanItem {
             }
 
             this.setDescr((null != item.getDescr()) ? new RichTextInfo(item.getDescr()) : null);
-            
-            Meta meta = item.getMeta();
-            if (meta != null)
-            	this.setMeta(new MetaInfo(meta));
 
 			List<? extends Attribute> attrs = item.getAttributes();
 			if (attrs != null) {

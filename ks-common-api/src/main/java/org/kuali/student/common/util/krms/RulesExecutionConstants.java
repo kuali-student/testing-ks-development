@@ -4,6 +4,9 @@ import org.kuali.rice.krms.api.engine.Term;
 
 public class RulesExecutionConstants {
 
+    private static final String personId = "kuali.term.prerequisite.personId";
+    private static final String contextInfo = "kuali.term.prerequisite.contextInfo";
+
     /**
      * Rule execution related Term's  
      */
@@ -27,27 +30,35 @@ public class RulesExecutionConstants {
     public static final Term COMPLETED_COURSE_TERM = new Term("completedCourse");
     // data
     public static final Term PROCESS_KEY_TERM = new Term("processKey");
-    public static final Term CONTEXT_INFO_TERM = new Term("contextInfo");
-    public static final Term PERSON_ID_TERM = new Term("personId");
+    public static final Term CONTEXT_INFO_TERM = new Term(contextInfo);
+    public static final Term PERSON_ID_TERM = new Term(personId);
     public static final Term REG_GROUP_ID_TERM = new Term("registrationGroupId");
     public static final Term REGISTRATION_REQUEST_ID_TERM = new Term("registrationRequestId");
+    public static final Term SIMULATED_REGISTRATIONS_TERM = new Term("simulatedRegistrations");
+    public static final Term EXISTING_REGISTRATIONS_TERM = new Term("existingRegistrations");
+    public static final Term EXISTING_WAITLISTED_REGISTRATIONS_TERM = new Term("existingWaitlistedRegistrations");
+    public static final Term REGISTRATION_REQUEST_ITEM_TERM = new Term("registrationRequestItem");
     public static final Term REGISTRATION_REQUEST_TERM = new Term("registrationRequest");
     public static final Term ATP_ID_TERM = new Term("atpId");
     public static final Term ATP_TERM = new Term("atp");
     public static final Term AS_OF_DATE_TERM = new Term("asOfDate");
     public static final Term RECORD_INSTRUCTION_SUCCESSES_TERM = new Term("shouldRecordInstructionSuccesses");
+    public static final Term REGISTRATION_GROUP_TERM = new Term("registrationGroup");
     // services
     public static final Term PROCESS_SERVICE_TERM = new Term("processService");
     public static final Term IDENTITY_SERVICE_TERM = new Term("identityService");
     public static final Term ATP_SERVICE_TERM = new Term("atpService");
     public static final Term EXEMPTION_SERVICE_TERM = new Term("exemptionService");
     public static final Term COURSE_REGISTRATION_SERVICE_TERM = new Term("courseRegistrationService");
+    public static final Term COURSE_WAIT_LIST_SERVICE_TERM = new Term("courseWaitListService");
     public static final Term COURSE_OFFERING_SERVICE_TERM = new Term("courseOfferingService");
+    public static final Term SCHEDULING_SERVICE_TERM = new Term("schedulingService");
     public static final Term COURSE_SERVICE_TERM = new Term("courseService");
     public static final Term POPULATION_SERVICE_TERM = new Term("populationService");
     public static final Term HOLD_SERVICE_TERM = new Term("holdService");
     public static final Term GES_SERVICE_TERM = new Term("gesService");
     // factories
+    public static final Term RULE_FACTORY_TERM = new Term("ruleFactory");
     public static final Term PROPOSITION_FACTORY_TERM = new Term("propositionFactory");
     public static final Term LOAD_CALCULATOR_RULE_FACTORY_TERM = new Term("loadCalculatorRuleFactory");
     // logic
