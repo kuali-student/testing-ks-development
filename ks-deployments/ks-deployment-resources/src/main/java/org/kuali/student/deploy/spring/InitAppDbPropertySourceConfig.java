@@ -65,7 +65,15 @@ public class InitAppDbPropertySourceConfig extends ProjectPropertySourceConfig {
 
 	protected String getAppConfigId(String baseConfigId) {
 		String artifactId = project.getArtifactId();
-		String contextId = SpringUtils.getProperty(env, CONFIG_ID_KEY, artifactId);
+		
+		// first resolve through project properties
+		String contextId = (String) project.getProperties().get(CONFIG_ID_KEY);
+		
+		if (contextId == null) {
+			// not found so look in the environment
+			contextId = SpringUtils.getProperty(env, CONFIG_ID_KEY, artifactId);
+		}
+		
 		// in case we are running in a configuration that does not have an artifactId,
 		// ensure that a context id is found
 		Assert.notNull(contextId);

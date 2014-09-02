@@ -10,112 +10,11 @@
     <packaging>pom</packaging>
     <name>KS Impex</name>
     <description>Kuali Student Impex</description>
-    <modules>
-        <module>ks-impex-app-db</module>
-        <module>ks-impex-rice-db</module>
-        <module>ks-impex-bundled-db</module>
-    </modules>
     <properties>
         <impex.metainf.context>org.kuali.common.util.metainf.spring.MpxConfig</impex.metainf.context>
         <impex.metainf.phase>prepare-package</impex.metainf.phase>
     </properties>
     <profiles>
-        <profile>
-            <!-- This profile builds the full KS database from the "system of record" set of Oracle sql files checked into SCM -->
-            <id>source-db</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.kuali.maven.plugins</groupId>
-                        <artifactId>spring-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>source-db</id>
-                                <goals>
-                                    <goal>load</goal>
-                                </goals>
-                                <phase>initialize</phase>
-                                <configuration>
-                                    <forceMojoExecution>true</forceMojoExecution>
-                                    <removeExistingPropertySources>true</removeExistingPropertySources>
-                                    <propertySourcesConfig>org.kuali.student.deploy.spring.SourceDbInitPropertySourceConfig</propertySourcesConfig>
-                                    <annotatedClass>org.kuali.common.jdbc.spring.SqlControllerExecutableConfig</annotatedClass>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <!-- Dump the db built from the Oracle SQL to disk -->
-            <id>dump</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.kuali.maven.plugins</groupId>
-                        <artifactId>spring-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>dump</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>load</goal>
-                                </goals>
-                                <configuration>
-                                    <forceMojoExecution>true</forceMojoExecution>
-                                    <propertySourcesConfig>org.kuali.student.deploy.spring.SourceDbDumpPropertySourceConfig</propertySourcesConfig>
-                                    <annotatedClass>org.kuali.common.impex.spring.DumpDatabaseExecutableConfig</annotatedClass>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>impexscm</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.kuali.maven.plugins</groupId>
-                        <artifactId>spring-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>impexscm</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>load</goal>
-                                </goals>
-                                <configuration>
-                                    <forceMojoExecution>true</forceMojoExecution>
-                                    <propertySourcesConfig>org.kuali.student.deploy.spring.SourceDbScmPropertySourceConfig</propertySourcesConfig>
-                                    <annotatedClass>org.kuali.student.deploy.spring.ScmUpdateExecutableConfig</annotatedClass>
-                                </configuration>
-                            </execution>
-                        </executions>
-                        <dependencies>
-                            <!-- Add in the module specific dependencies -->
-                            <dependency>
-                                <groupId>org.kuali.student.db</groupId>
-                                <artifactId>ks-impex-rice-db</artifactId>
-                                <version>${project.version}</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.kuali.student.db</groupId>
-                                <artifactId>ks-impex-app-db</artifactId>
-                                <version>${project.version}</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.kuali.student.db</groupId>
-                                <artifactId>ks-impex-bundled-db</artifactId>
-                                <version>${project.version}</version>
-                            </dependency>
-                        </dependencies>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <!-- Load a db from the schema SQL + mpx files generated by Impex -->
             <id>db</id>
@@ -146,19 +45,19 @@
                         <dependencies>
                             <!-- Add in the module specific dependencies -->
                             <dependency>
-                                <groupId>org.kuali.student.db</groupId>
+                                <groupId>org.kuali.student.db.impex</groupId>
                                 <artifactId>ks-impex-rice-db</artifactId>
-                                <version>${project.version}</version>
+                                <version>${ks-impex-db.version}</version>
                             </dependency>
                             <dependency>
-                                <groupId>org.kuali.student.db</groupId>
+                                <groupId>org.kuali.student.db.impex</groupId>
                                 <artifactId>ks-impex-app-db</artifactId>
-                                <version>${project.version}</version>
+                                <version>${ks-impex-db.version}</version>
                             </dependency>
                             <dependency>
-                                <groupId>org.kuali.student.db</groupId>
+                                <groupId>org.kuali.student.db.impex</groupId>
                                 <artifactId>ks-impex-bundled-db</artifactId>
-                                <version>${project.version}</version>
+                                <version>${ks-impex-db.version}</version>
                             </dependency>
                             <dependency>
                                 <groupId>org.kuali.common</groupId>
@@ -169,6 +68,31 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+        	<id>ks-impex-bundled-db</id>
+        	<properties>
+        		<impex.init.application.config>ks-impex-bundled-db</impex.init.application.config>
+        		<impex.schema.location>classpath:org/kuali/student/ks-impex-bundled-db/schema.xml</impex.schema.location>
+        	</properties>
+        </profile>
+        <profile>
+        	<id>ks-impex-app-db</id>
+        	<properties>
+        		<impex.groupId.path>org/kuali/student</impex.groupId.path>
+				<impex.artifactId>ks-impex-app-db</impex.artifactId>
+        		<impex.init.application.config>ks-impex-app-db</impex.init.application.config>
+        		<impex.schema.location>classpath:org/kuali/student/ks-impex-app-db/schema.xml</impex.schema.location>
+        	</properties>
+        </profile>
+        <profile>
+        	<id>ks-impex-rice-db</id>
+        	<properties>
+        		<impex.groupId.path>org/kuali/student</impex.groupId.path>
+				<impex.artifactId>ks-impex-rice-db</impex.artifactId>
+        		<impex.init.application.config>ks-impex-rice-db</impex.init.application.config>
+        		<impex.schema.location>classpath:org/kuali/student/ks-impex-rice-db/schema.xml</impex.schema.location>
+        	</properties>
         </profile>
         <profile>
             <id>local</id>

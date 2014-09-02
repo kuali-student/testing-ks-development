@@ -41,6 +41,7 @@
         <ks.deployments.version>2.1.1-FR2-M1-SNAPSHOT</ks.deployments.version>
         <ks.ap.version>0.8.0-FR2-M1-SNAPSHOT</ks.ap.version>
         <ks.fa.version>0.1.0-FR2-M1-SNAPSHOT</ks.fa.version>
+	<ks-impex-db.version>0.0.1-SNAPSHOT</ks-impex-db.version>
         <!-- 3rd party library/plugin version definitions -->
         <activemq.version>5.9.0</activemq.version>
         <antlr.runtime.version>3.1.1</antlr.runtime.version>
