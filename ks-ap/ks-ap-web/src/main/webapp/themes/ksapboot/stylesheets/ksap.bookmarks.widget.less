@@ -1,0 +1,49 @@
+// Bookmark Widget
+// --------------------------------------------------
+
+#bookmarks_widget {
+  margin-top: 90px;
+  margin-left: 20px;
+
+// Bookmark loading
+  .ksap-bookmark-widget-loading .blockElement {
+    position: inherit !important; //Declared inline
+    width: auto !important; //Declared inline
+    top: 0 !important; //Declared inline
+  }
+
+
+// Empty bookmark list message
+  .ksap-bookmark-widget-empty {
+    margin: 7px;
+  }
+
+// Bookmark list height and overflow
+  #bookmark_summary_layout {
+    max-height: 455px;
+    overflow-y: auto;
+  }
+
+// Bookmark list line items
+  li:hover {
+    background: #F5F5F5;
+  }
+  li .ksap-bookmark-widget-row {
+    border-bottom: 0;
+    border-top: 1px dotted #ccc;
+    padding: 5px;
+  }
+  li:first-child .ksap-bookmark-widget-row {
+    border-top: 0;
+  }
+  .ksap-bookmark-widget-row p {
+    padding-right: 3px;
+  }
+  .ksap-text-ellipsis {
+    padding-right: 6px;
+  }
+
+  .uif-sectionHeader {
+    min-height: 0px;
+  }
+}
