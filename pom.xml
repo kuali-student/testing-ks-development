@@ -41,7 +41,7 @@
         <ks.deployments.version>2.1.1-FR2-M1-SNAPSHOT</ks.deployments.version>
         <ks.ap.version>0.8.0-FR2-M1-SNAPSHOT</ks.ap.version>
         <ks.fa.version>0.1.0-FR2-M1-SNAPSHOT</ks.fa.version>
-	<ks-impex-db.version>0.0.1-SNAPSHOT</ks-impex-db.version>
+		<ks-impex-db.version>0.0.1-SNAPSHOT</ks-impex-db.version>
         <!-- 3rd party library/plugin version definitions -->
         <activemq.version>5.9.0</activemq.version>
         <antlr.runtime.version>3.1.1</antlr.runtime.version>
@@ -95,7 +95,7 @@
         <!-- Oracle values sync'd with the deploy environments -->
         <oracle.version>11.2.0.2</oracle.version>
         <oracle.artifactId>ojdbc6_g</oracle.artifactId>
-        <plugin.fusion.version>0.0.1</plugin.fusion.version>
+        <plugin.fusion.version>0.0.3</plugin.fusion.version>
         <plugin.sonar.version>2.4</plugin.sonar.version>
         <project.java.enforcer.version>[${project.java.min.version},1.8)</project.java.enforcer.version>
         <project.java.min.version>1.7.0-60</project.java.min.version>
@@ -149,6 +149,20 @@
         <metainf.sql.context>org.kuali.common.util.metainf.spring.SqlConfig</metainf.sql.context>
         <metainf.sql.propertySource>org.kuali.student.deploy.spring.SqlPropertySourceConfig</metainf.sql.propertySource>
         <kuali-impex.version>${impex.version}</kuali-impex.version>
+        
+        <!-- fusion-maven-plugin settings -->
+        
+        <fusion.tag.phase>none</fusion.tag.phase>
+		
+		<!--
+		 
+		   Set this to be the name of the variable containing the pull request number.
+		   
+		   Inside of the tag mojo the environment variable is retrieved using this key.
+		   
+		 -->
+		<fusion.tag.pull-request-number-property></fusion.tag.pull-request-number-property>
+		
     </properties>
     <profiles>
         <profile>
@@ -287,45 +301,64 @@
                 <plugin>
                     <groupId>org.kuali.maven.plugins</groupId>
                     <artifactId>fusion-maven-plugin</artifactId>
+                    <version>${plugin.fusion.version}</version>
                     <configuration>
                         <mappings>
                             <mapping>
                                 <module>ks-ap</module>
-				<branchName>enrollment_ks-ap_trunk</branchName>
+								<branchName>enrollment_ks-ap_trunk</branchName>
                                 <versionProperty>ks.ap.version</versionProperty>
                             </mapping>
                             <mapping>
                                 <module>ks-fa</module>
-				<branchName>enrollment_ks-fa_trunk</branchName>
+								<branchName>enrollment_ks-fa_trunk</branchName>
                                 <versionProperty>ks.fa.version</versionProperty>
                             </mapping>
                             <mapping>
                                 <module>ks-api</module>
-				<branchName>enrollment_ks-api_branches_2.0.0-Mx</branchName>
+								<branchName>enrollment_ks-api_branches_2.0.0-Mx</branchName>
                                 <versionProperty>ks.api.version</versionProperty>
                             </mapping>
                             <mapping>
                                 <module>ks-core</module>
-				<branchName>enrollment_ks-core_trunk</branchName>
+								<branchName>enrollment_ks-core_trunk</branchName>
                                 <versionProperty>ks.core.version</versionProperty>
                             </mapping>
                             <mapping>
                                 <module>ks-enroll</module>
-				<branchName>enrollment_ks-enroll_trunk</branchName>
+								<branchName>enrollment_ks-enroll_trunk</branchName>
                                 <versionProperty>ks.enroll.version</versionProperty>
                             </mapping>
                             <mapping>
                                 <module>ks-lum</module>
-				<branchName>enrollment_ks-lum_trunk</branchName>
+								<branchName>enrollment_ks-lum_trunk</branchName>
                                 <versionProperty>ks.lum.version</versionProperty>
                             </mapping>
                             <mapping>
                                 <module>ks-deployments</module>
-				<branchName>enrollment_ks-deployments_trunk</branchName>
+								<branchName>enrollment_ks-deployments_trunk</branchName>
                                 <versionProperty>ks.deployments.version</versionProperty>
                             </mapping>
                         </mappings>
                     </configuration>
+                    
+                    <executions>
+						<execution>
+							<id>tag</id>
+							<phase>${fusion.tag.phase}</phase>
+							<goals>
+								<goal>tag</goal>
+							</goals>
+							<configuration>
+								<tagStyle>BUILD_NUMBER</tagStyle>
+								<buildNumberProperty>${fusion.tag.pull-request-number-property}</buildNumberProperty>
+								<buildText>pull-request</buildText>
+								<linkedVersionPropertyNames>
+										<versionPropertyName>ks-impex-db.version</versionPropertyName>
+								</linkedVersionPropertyNames>
+							</configuration>
+						</execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <artifactId>maven-enforcer-plugin</artifactId>
