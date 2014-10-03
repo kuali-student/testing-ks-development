@@ -95,7 +95,7 @@
         <!-- Oracle values sync'd with the deploy environments -->
         <oracle.version>11.2.0.2</oracle.version>
         <oracle.artifactId>ojdbc6_g</oracle.artifactId>
-        <plugin.fusion.version>0.0.3</plugin.fusion.version>
+        <plugin.fusion.version>0.0.4-SNAPSHOT</plugin.fusion.version>
         <plugin.sonar.version>2.4</plugin.sonar.version>
         <project.java.enforcer.version>[${project.java.min.version},1.8)</project.java.enforcer.version>
         <project.java.min.version>1.7.0-60</project.java.min.version>
@@ -341,24 +341,6 @@
                             </mapping>
                         </mappings>
                     </configuration>
-                    
-                    <executions>
-						<execution>
-							<id>tag</id>
-							<phase>${fusion.tag.phase}</phase>
-							<goals>
-								<goal>tag</goal>
-							</goals>
-							<configuration>
-								<tagStyle>BUILD_NUMBER</tagStyle>
-								<buildNumberProperty>${fusion.tag.pull-request-number-property}</buildNumberProperty>
-								<buildText>pull-request</buildText>
-								<linkedVersionPropertyNames>
-										<versionPropertyName>ks-impex-db.version</versionPropertyName>
-								</linkedVersionPropertyNames>
-							</configuration>
-						</execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <artifactId>maven-enforcer-plugin</artifactId>
@@ -456,6 +438,27 @@
             </plugins>
         </pluginManagement>
         <plugins>
+        	<plugin>
+                    <groupId>org.kuali.maven.plugins</groupId>
+                    <artifactId>fusion-maven-plugin</artifactId>
+                    <executions>
+						<execution>
+							<id>tag</id>
+							<phase>${fusion.tag.phase}</phase>
+							<goals>
+								<goal>tag</goal>
+							</goals>
+							<configuration>
+								<tagStyle>BUILD_NUMBER</tagStyle>
+								<buildNumberProperty>${fusion.tag.pull-request-number-property}</buildNumberProperty>
+								<buildText>pull-request</buildText>
+								<linkedVersionPropertyNames>
+										<versionPropertyName>ks-impex-db.version</versionPropertyName>
+								</linkedVersionPropertyNames>
+							</configuration>
+						</execution>
+                    </executions>
+                </plugin>
             <plugin>
                 <!-- use this plugin to help ensure build reproducibility -->
                 <artifactId>maven-enforcer-plugin</artifactId>
