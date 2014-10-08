@@ -12,7 +12,7 @@
     <packaging>pom</packaging>
     <name>Kuali Student</name>
     <description>
-    Kuali Student is a modular, open source, standards-based next generation student system that offers a flexible, scalable,
+    Student is a modular, open source, standards-based next generation student system that offers a flexible, scalable,
     cost-effective system that can be configured to meet the business requirements of any higher education institution
   </description>
     <url>http://${kuali.site.hostname}/student/${project.version}/</url>
